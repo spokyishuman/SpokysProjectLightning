@@ -88,6 +88,10 @@ namespace SpokysProjectLightning.Views
             // Build color options
             BuildColorPanel(settings.CustomColors);
 
+            // API Keys
+            TmdbApiKeyBox.Text = settings.TmdbApiKey;
+            OmdbApiKeyBox.Text = settings.OmdbApiKey;
+
             // Update URL
             if (!string.IsNullOrEmpty(settings.UpdateUrl))
             {
@@ -613,6 +617,22 @@ namespace SpokysProjectLightning.Views
                     VideoPaletteService.ApplyFromVideo(dialog.FileName);
                 }
             }
+        }
+
+        private void SaveTmdbKey_Click(object sender, RoutedEventArgs e)
+        {
+            var settings = _data.LoadSettings();
+            settings.TmdbApiKey = TmdbApiKeyBox.Text.Trim();
+            _data.SaveSettings(settings);
+            ApiKeyStatus.Text = "✅ TMDB API key saved";
+        }
+
+        private void SaveOmdbKey_Click(object sender, RoutedEventArgs e)
+        {
+            var settings = _data.LoadSettings();
+            settings.OmdbApiKey = OmdbApiKeyBox.Text.Trim();
+            _data.SaveSettings(settings);
+            ApiKeyStatus.Text = "✅ OMDb API key saved";
         }
 
         private void SaveUpdateUrl_Click(object sender, RoutedEventArgs e)

@@ -10,8 +10,8 @@ namespace SpokysProjectLightning.Services
     public class MovieScraperService
     {
         private readonly HttpClient _httpClient;
+        private readonly string _tmdbApiKey;
         private readonly string _omdbApiKey;
-        private const string TmdbApiKey = "03ea17fd725585fa30751965ed1993eb";
         private const string BaseUrl = "https://api.themoviedb.org/3";
 
         public MovieScraperService()
@@ -31,26 +31,28 @@ namespace SpokysProjectLightning.Services
             _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
             _httpClient.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9");
             _httpClient.Timeout = TimeSpan.FromSeconds(20);
-            _omdbApiKey = new DataService().LoadSettings().OmdbApiKey;
+            var settings = new DataService().LoadSettings();
+            _tmdbApiKey = string.IsNullOrEmpty(settings.TmdbApiKey) ? "03ea17fd725585fa30751965ed1993eb" : settings.TmdbApiKey;
+            _omdbApiKey = settings.OmdbApiKey;
         }
 
         public async Task<List<MovieResult>> GetTrendingAsync()
-            => await FetchMoviesAsync($"{BaseUrl}/trending/all/week?api_key={TmdbApiKey}&language=en-US&page=1");
+            => await FetchMoviesAsync($"{BaseUrl}/trending/all/week?api_key={_tmdbApiKey}&language=en-US&page=1");
 
         public async Task<List<MovieResult>> GetPopularMoviesAsync()
-            => await FetchMoviesAsync($"{BaseUrl}/movie/popular?api_key={TmdbApiKey}&language=en-US&page=1");
+            => await FetchMoviesAsync($"{BaseUrl}/movie/popular?api_key={_tmdbApiKey}&language=en-US&page=1");
 
         public async Task<List<MovieResult>> GetTopRatedAsync()
-            => await FetchMoviesAsync($"{BaseUrl}/movie/top_rated?api_key={TmdbApiKey}&language=en-US&page=1");
+            => await FetchMoviesAsync($"{BaseUrl}/movie/top_rated?api_key={_tmdbApiKey}&language=en-US&page=1");
 
         public async Task<List<MovieResult>> GetNowPlayingAsync()
-            => await FetchMoviesAsync($"{BaseUrl}/movie/now_playing?api_key={TmdbApiKey}&language=en-US&page=1");
+            => await FetchMoviesAsync($"{BaseUrl}/movie/now_playing?api_key={_tmdbApiKey}&language=en-US&page=1");
 
         public async Task<List<MovieResult>> GetUpcomingAsync()
-            => await FetchMoviesAsync($"{BaseUrl}/movie/upcoming?api_key={TmdbApiKey}&language=en-US&page=1");
+            => await FetchMoviesAsync($"{BaseUrl}/movie/upcoming?api_key={_tmdbApiKey}&language=en-US&page=1");
 
         public async Task<List<MovieResult>> GetOnTVAsync()
-            => await FetchMoviesAsync($"{BaseUrl}/tv/on_the_air?api_key={TmdbApiKey}&language=en-US&page=1");
+            => await FetchMoviesAsync($"{BaseUrl}/tv/on_the_air?api_key={_tmdbApiKey}&language=en-US&page=1");
 
         /// <summary>
         /// Get recommended movies - combines popular and trending, deduped
@@ -79,11 +81,19 @@ namespace SpokysProjectLightning.Services
         {
             if (string.IsNullOrWhiteSpace(query)) return new();
 
-            // Primary: TMDB search (returns real TMDB IDs that embed players need)
+            // Primary: VidLink search (no API key needed — works for everyone)
+            try
+            {
+                var vidlink = await SearchVidLinkAsync(query);
+                if (vidlink.Count > 0) return vidlink;
+            }
+            catch { }
+
+            // Fallback: TMDB search
             try
             {
                 var tmdb = await FetchMoviesAsync(
-                    $"{BaseUrl}/search/multi?api_key={TmdbApiKey}&language=en-US&query={Uri.EscapeDataString(query)}&page=1&include_adult=false");
+                    $"{BaseUrl}/search/multi?api_key={_tmdbApiKey}&language=en-US&query={Uri.EscapeDataString(query)}&page=1&include_adult=false");
                 if (tmdb.Count > 0) return tmdb;
             }
             catch { }
@@ -122,7 +132,7 @@ namespace SpokysProjectLightning.Services
             if (string.IsNullOrEmpty(imdbId)) return 0;
             try
             {
-                var url = $"{BaseUrl}/find/{imdbId}?api_key={TmdbApiKey}&external_source=imdb_id";
+                var url = $"{BaseUrl}/find/{imdbId}?api_key={_tmdbApiKey}&external_source=imdb_id";
                 var json = await _httpClient.GetStringAsync(url);
                 var data = JObject.Parse(json);
                 var movieResults = data["movie_results"] as JArray;
@@ -347,7 +357,7 @@ namespace SpokysProjectLightning.Services
             var seasons = new List<int>();
             try
             {
-                var response = await _httpClient.GetStringAsync($"{BaseUrl}/tv/{tmdbId}?api_key={TmdbApiKey}&language=en-US");
+                var response = await _httpClient.GetStringAsync($"{BaseUrl}/tv/{tmdbId}?api_key={_tmdbApiKey}&language=en-US");
                 var json = JObject.Parse(response);
                 var seasonsArray = json["seasons"] as JArray;
                 if (seasonsArray != null)
@@ -368,7 +378,7 @@ namespace SpokysProjectLightning.Services
             var episodes = new List<int>();
             try
             {
-                var response = await _httpClient.GetStringAsync($"{BaseUrl}/tv/{tmdbId}/season/{season}?api_key={TmdbApiKey}&language=en-US");
+                var response = await _httpClient.GetStringAsync($"{BaseUrl}/tv/{tmdbId}/season/{season}?api_key={_tmdbApiKey}&language=en-US");
                 var json = JObject.Parse(response);
                 var episodesArray = json["episodes"] as JArray;
                 if (episodesArray != null)

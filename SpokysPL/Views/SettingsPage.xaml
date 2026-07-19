@@ -150,6 +150,41 @@
 
             <Border Style="{DynamicResource ModernCard}" Margin="0,0,0,16">
                 <StackPanel>
+                    <TextBlock Text="API Keys" FontSize="17" FontWeight="Bold"
+                               Foreground="{DynamicResource CardForegroundBrush}" Margin="0,0,0,6"/>
+                    <TextBlock FontSize="13" Foreground="{DynamicResource MutedForegroundBrush}" TextWrapping="Wrap"
+                               Text="Enter your own API keys for TMDB and OMDb to ensure reliable service."
+                               Margin="0,0,0,14"/>
+                    <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4">TMDB API Key:</TextBlock>
+                    <WrapPanel Margin="0,0,0,12">
+                        <TextBox x:Name="TmdbApiKeyBox" FontSize="12" Width="300"
+                                 VerticalContentAlignment="Center" Padding="6,4"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 Background="{DynamicResource SurfaceBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                 Margin="0,0,6,0"/>
+                        <Button Content="Save" FontSize="11" Padding="8,3"
+                                Style="{DynamicResource SecondaryButton}"
+                                Click="SaveTmdbKey_Click"/>
+                    </WrapPanel>
+                    <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4">OMDb API Key:</TextBlock>
+                    <WrapPanel Margin="0,0,0,8">
+                        <TextBox x:Name="OmdbApiKeyBox" FontSize="12" Width="300"
+                                 VerticalContentAlignment="Center" Padding="6,4"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 Background="{DynamicResource SurfaceBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                 Margin="0,0,6,0"/>
+                        <Button Content="Save" FontSize="11" Padding="8,3"
+                                Style="{DynamicResource SecondaryButton}"
+                                Click="SaveOmdbKey_Click"/>
+                    </WrapPanel>
+                    <TextBlock x:Name="ApiKeyStatus" Text="" FontSize="12" Foreground="{DynamicResource PrimaryBrush}" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{DynamicResource ModernCard}" Margin="0,0,0,16">
+                <StackPanel>
                     <TextBlock Text="Updates" FontSize="17" FontWeight="Bold"
                                Foreground="{DynamicResource CardForegroundBrush}" Margin="0,0,0,6"/>
                     <TextBlock FontSize="13" Foreground="{DynamicResource MutedForegroundBrush}" TextWrapping="Wrap"
