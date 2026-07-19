@@ -1,0 +1,293 @@
+<UserControl x:Class="SpokysProjectLightning.Views.MoviesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+      mc:Ignorable="d"
+      d:DesignHeight="800" d:DesignWidth="1200"
+      Background="Transparent">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <!-- Header -->
+        <StackPanel Grid.Row="0" x:Name="HeaderSection" Margin="25,20,25,10">
+            <TextBlock FontSize="28" FontWeight="Bold" Text="🎬 Movies &amp; TV Shows"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <TextBlock FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}"
+                       Text="Stream movies and TV shows with built-in ad-free player"
+                       Margin="0,4,0,12"/>
+            
+            <!-- Search Bar -->
+            <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="12"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                    Padding="5" Height="46">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="SearchBox"
+                             Background="{DynamicResource SurfaceBrush}" BorderThickness="0"
+                             Foreground="#FFF7F4FF"
+                             CaretBrush="{DynamicResource AccentBrush}"
+                             FontSize="15" VerticalAlignment="Stretch"
+                             VerticalContentAlignment="Center"
+                             Padding="14,0,14,0"
+                             GotFocus="SearchBox_GotFocus"
+                             LostFocus="SearchBox_LostFocus"
+                             KeyDown="SearchBox_KeyDown"
+                             TextChanged="SearchBox_TextChanged"/>
+                    <TextBlock x:Name="SearchPlaceholder"
+                               Grid.Column="0"
+                               Text="Search movies &amp; TV shows..."
+                               Foreground="#FFCDB9E9"
+                               FontSize="15"
+                               Margin="14,0,14,0"
+                               VerticalAlignment="Center"
+                               IsHitTestVisible="False"/>
+                    <Button Grid.Column="1" x:Name="SearchButton"
+                            Content="🔍 Search"
+                            Style="{DynamicResource AccentButton}"
+                            Click="SearchButton_Click" Margin="5,0"/>
+                </Grid>
+            </Border>
+            
+            <!-- Category Filters -->
+            <WrapPanel Margin="0,12,0,0">
+                <Button Content="🔥 Trending" Style="{DynamicResource AccentButton}"
+                        Click="CategoryBtn_Click" Tag="Trending" Margin="0,0,8,8"/>
+                <Button Content="⭐ Popular" Style="{DynamicResource SecondaryButton}"
+                        Click="CategoryBtn_Click" Tag="Popular" Margin="0,0,8,8"/>
+                <Button Content="🏆 Top Rated" Style="{DynamicResource SecondaryButton}"
+                        Click="CategoryBtn_Click" Tag="TopRated" Margin="0,0,8,8"/>
+                <Button Content="📅 Now Playing" Style="{DynamicResource SecondaryButton}"
+                        Click="CategoryBtn_Click" Tag="NowPlaying" Margin="0,0,8,8"/>
+                <Button Content="🎬 Upcoming" Style="{DynamicResource SecondaryButton}"
+                        Click="CategoryBtn_Click" Tag="Upcoming" Margin="0,0,8,8"/>
+                <Button Content="📺 On TV" Style="{DynamicResource SecondaryButton}"
+                        Click="CategoryBtn_Click" Tag="OnTV" Margin="0,0,8,8"/>
+            </WrapPanel>
+        </StackPanel>
+
+        <!-- Player -->
+        <Grid Grid.Row="1" x:Name="PlayerOverlay" Visibility="Collapsed" Margin="25,0,25,15"
+              KeyDown="PlayerOverlay_KeyDown">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Player area. Height is kept at 16:9 of its width by PlayerBorder_SizeChanged,
+                 clamped to the viewport so it always fits inside the app. -->
+            <Border x:Name="PlayerBorder" Grid.Row="0" Background="Black"
+                    BorderThickness="0" Height="480">
+                <Grid x:Name="PlayerHost">
+                    <wv2:WebView2 x:Name="MoviePlayer"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"/>
+                    <TextBlock x:Name="PlayerStatusText" Text="Starting player..."
+                               Foreground="#888888" FontSize="18"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Panel.ZIndex="10" Visibility="Collapsed"/>
+
+                    <!-- Close button overlay at top-right -->
+                    <Border x:Name="CloseButtonHost" HorizontalAlignment="Right" VerticalAlignment="Top"
+                            Margin="0,8,8,0" Panel.ZIndex="20">
+                        <Button Content="✕" FontSize="14" Width="28" Height="28"
+                                Style="{DynamicResource WindowCloseButton}" Click="ClosePlayer_Click"/>
+                    </Border>
+                </Grid>
+            </Border>
+            
+            <!-- Player controls bar -->
+            <Border x:Name="PlayerControlsBorder" Grid.Row="1" Background="{DynamicResource CardBrush}"
+                    Margin="0,8,0,0" Padding="12,8"
+                    BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0" x:Name="PlayerTitle" 
+                               FontSize="14" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               VerticalAlignment="Center" Margin="8,0"
+                               TextTrimming="CharacterEllipsis"/>
+                    
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="🔄 Sources" 
+                                Click="TryNextSource_Click"
+                                Style="{DynamicResource SecondaryButton}"
+                                Padding="10,6" FontSize="11"
+                                Margin="0,0,6,0"/>
+                        <Button Content="📺 S/E"
+                                Click="ShowEpisodeSelector_Click"
+                                Style="{DynamicResource SecondaryButton}"
+                                Padding="10,6" FontSize="11"
+                                Margin="0,0,6,0"
+                                x:Name="EpisodeBtn"
+                                Visibility="Collapsed"/>
+                    </StackPanel>
+                    
+                    <Button Grid.Column="4" x:Name="FullscreenBtn" Content="⛶ Fullscreen" 
+                            Click="ToggleFullscreen_Click"
+                            Style="{DynamicResource AccentButton}"
+                            Padding="12,6" FontSize="11"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Recommended -->
+        <StackPanel Grid.Row="2" x:Name="RecommendedSection" Margin="25,0,25,20">
+            <TextBlock FontSize="18" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       Text="⭐ Recommended For You" Margin="0,0,0,12"/>
+            <ItemsControl x:Name="RecommendedGrid">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="10"
+                                Margin="0,0,12,0" Width="120" Cursor="Hand"
+                                MouseLeftButtonUp="MovieCard_Click"
+                                Tag="{Binding}"
+                                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="180"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" CornerRadius="10,10,0,0" ClipToBounds="True">
+                                    <Grid>
+                                        <Border Background="{DynamicResource SurfaceBrush}">
+                                            <TextBlock Text="🎬" FontSize="35"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextMutedBrush}"/>
+                                        </Border>
+                                        <Image Source="{Binding PosterUrl}" Stretch="UniformToFill"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <Border Background="#CC000000" CornerRadius="0,0,0,8"
+                                                Padding="6,3" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                            <TextBlock Text="{Binding RatingDisplay}" FontSize="11" 
+                                                       FontWeight="Bold" Foreground="#FFD700"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                                <StackPanel Grid.Row="1" Margin="8,8,8,10">
+                                    <TextBlock Text="{Binding Title}" FontSize="12" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextPrimaryBrush}"
+                                               TextTrimming="CharacterEllipsis" MaxHeight="32"/>
+                                    <TextBlock Text="{Binding Year}" FontSize="10"
+                                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,3,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+
+        <!-- Results -->
+        <StackPanel Grid.Row="3" x:Name="ResultsSection" Margin="25,0,25,30">
+            <TextBlock x:Name="ResultsHeader" FontSize="18" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextPrimaryBrush}"
+                       Text="🔥 Trending Now" Margin="0,0,0,15"/>
+            
+            <TextBlock x:Name="LoadingText" Text="Loading movies..."
+                       FontSize="15" Foreground="{DynamicResource TextSecondaryBrush}"
+                       HorizontalAlignment="Center" Margin="0,40,0,40"
+                       Visibility="Visible"/>
+            <Border x:Name="NoResultsHeader" Background="{DynamicResource CardBrush}" CornerRadius="12"
+                    Padding="30" Margin="0,0,0,20"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                    Visibility="Collapsed">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="🎬" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                    <TextBlock x:Name="NoMoviesText" FontSize="15"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Text="Could not load movies."
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+            
+            <ItemsControl x:Name="MoviesGrid">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{DynamicResource CardBrush}" CornerRadius="12"
+                                Margin="0,0,16,16" Width="180" Cursor="Hand"
+                                MouseLeftButtonUp="MovieCard_Click"
+                                Tag="{Binding}"
+                                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="270"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" CornerRadius="12,12,0,0" ClipToBounds="True">
+                                    <Grid>
+                                        <Border Background="{DynamicResource SurfaceBrush}">
+                                            <TextBlock Text="🎬" FontSize="45"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextMutedBrush}"/>
+                                        </Border>
+                                        <Image Source="{Binding PosterUrl}" Stretch="UniformToFill"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <Border Background="#CC000000" CornerRadius="0,0,0,10"
+                                                Padding="8,4" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                            <TextBlock Text="{Binding RatingDisplay}" FontSize="12" 
+                                                       FontWeight="Bold" Foreground="#FFD700"/>
+                                        </Border>
+                                        <!-- Play button overlay -->
+                                        <Border Background="#66000000" HorizontalAlignment="Center" 
+                                                VerticalAlignment="Center" CornerRadius="30"
+                                                Width="60" Height="60">
+                                            <TextBlock Text="▶" FontSize="28" Foreground="White"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                                <StackPanel Grid.Row="1" Margin="12,10,12,12">
+                                    <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextPrimaryBrush}"
+                                               TextTrimming="CharacterEllipsis" MaxHeight="42"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                        <Border Background="{DynamicResource AccentBrush}" CornerRadius="4" 
+                                                Padding="6,2" Margin="0,0,6,0">
+                                            <TextBlock Text="{Binding Year}" FontSize="10" 
+                                                       Foreground="White" FontWeight="SemiBold"/>
+                                        </Border>
+                                        <Border Background="{DynamicResource SurfaceBrush}" CornerRadius="4" 
+                                                Padding="6,2">
+                                            <TextBlock Text="{Binding MediaTypeDisplay}" FontSize="10" 
+                                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Grid>
+</UserControl>
+
+

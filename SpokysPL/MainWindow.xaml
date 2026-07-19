@@ -1,0 +1,261 @@
+<Window x:Class="SpokysProjectLightning.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:SpokysProjectLightning.ViewModels"
+        xmlns:views="clr-namespace:SpokysProjectLightning.Views"
+        xmlns:local="clr-namespace:SpokysProjectLightning"
+        mc:Ignorable="d"
+        Title="⚡ Spokys Project Lightning ⚡"
+        Height="900" Width="1400"
+        MinHeight="680" MinWidth="1000"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        Background="Black">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="6"
+                      UseAeroCaptionButtons="False" CornerRadius="8"/>
+    </WindowChrome.WindowChrome>
+
+    <Grid>
+        <!-- ===== BASE BACKGROUND (behind sidebar, visible if sidebar ever transparent) ===== -->
+        <Rectangle Fill="{DynamicResource BackgroundBrush}"/>
+
+        <!-- ===== APP SHELL ===== -->
+        <Grid x:Name="AppShell">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="64"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ===== SIDEBAR (opaque solid background) ==== -->
+            <Border x:Name="Sidebar" Grid.Column="0" Panel.ZIndex="10"
+                    Background="{DynamicResource SidebarBrush}"
+                    BorderBrush="{DynamicResource SidebarBorder}" BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Width="40" Height="40" CornerRadius="12"
+                            Background="#264ADE80" Margin="0,16,0,8" HorizontalAlignment="Center"
+                            Effect="{DynamicResource NeonRing}" Cursor="Hand"
+                            MouseLeftButtonDown="DragArea_MouseLeftButtonDown">
+                        <TextBlock Text="⚡" FontSize="18" Foreground="{DynamicResource PrimaryBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Effect="{DynamicResource TextGlow}"/>
+                    </Border>
+
+                    <Rectangle Grid.Row="0" Height="1" Fill="{DynamicResource SidebarBorder}" Margin="12,0" VerticalAlignment="Bottom"/>
+
+                    <ItemsControl Grid.Row="1" x:Name="NavItemsControl"
+                                  ItemsSource="{Binding NavItems}" VerticalAlignment="Top"
+                                  Margin="0,4,0,0"
+                                  PreviewMouseLeftButtonDown="Nav_PreviewMouseLeftButtonDown"
+                                  PreviewMouseMove="Nav_PreviewMouseMove"
+                                  Drop="Nav_Drop"
+                                  AllowDrop="True">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding Icon}"
+                                        ToolTip="{Binding ToolTip}"
+                                        Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                        CommandParameter="{Binding PageName}"
+                                        Tag="{Binding}">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource IconNavButton}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                    <Setter Property="Background" Value="{DynamicResource SidebarAccentBrush}"/>
+                                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                    <Setter Property="Foreground" Value="{DynamicResource MutedForegroundBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <StackPanel Grid.Row="2" Margin="0,0,0,12">
+                        <Rectangle Height="1" Fill="{DynamicResource SidebarBorder}" Margin="12,0,12,8"/>
+                        <Button Style="{DynamicResource IconNavButton}" Content="⚙️" ToolTip="Settings"
+                                Command="{Binding NavigateCommand}" CommandParameter="Settings"
+                                x:Name="NavSettings"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ===== CONTENT AREA (video backdrop visible behind pages) ===== -->
+            <Grid Grid.Column="1">
+                <!-- Static wallpaper image -->
+                <Image x:Name="ImageWallpaper" Stretch="UniformToFill" Visibility="Collapsed"/>
+                <!-- Video wallpaper (content area only - behind all content) -->
+                <MediaElement x:Name="BackdropPlayer" Visibility="Collapsed"
+                              LoadedBehavior="Play" UnloadedBehavior="Stop"
+                              Stretch="UniformToFill" IsMuted="True"
+                              MediaEnded="BackdropPlayer_MediaEnded"/>
+                <Rectangle x:Name="BackdropOverlay"
+                           Visibility="{Binding IsBackdropVisible, Converter={StaticResource BoolToVis}}"
+                           Fill="#AA000000" Opacity="{Binding BackdropOverlayOpacity}"/>
+
+                <!-- Radial glow at top -->
+                <Grid VerticalAlignment="Top" Height="300" IsHitTestVisible="False">
+                    <Ellipse Width="600" Height="300"
+                             Fill="{DynamicResource PrimaryBrush}" Opacity="0.08"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Top" Margin="0,-100,0,0"/>
+                </Grid>
+
+                <!-- Window drag area -->
+                <Border x:Name="TitleBar" Height="36" VerticalAlignment="Top" Background="Transparent"
+                        Panel.ZIndex="50" MouseLeftButtonDown="DragArea_MouseLeftButtonDown">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                VerticalAlignment="Center" Margin="0,0,8,0">
+                        <Button Content="🗕" Width="30" Height="30" FontSize="12"
+                                Style="{DynamicResource WindowControlButton}"
+                                Click="MinimizeBtn_Click" ToolTip="Minimize"/>
+                        <Button Content="🗖" Width="30" Height="30" FontSize="12"
+                                Style="{DynamicResource WindowControlButton}"
+                                Click="MaximizeBtn_Click" ToolTip="Maximize" Margin="2,0,0,0"/>
+                        <Button Content="✕" Width="30" Height="30" FontSize="12"
+                                Style="{DynamicResource WindowCloseButton}"
+                                Click="CloseBtn_Click" ToolTip="Close" Margin="2,0,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Page content (scrolls everywhere) -->
+                <ScrollViewer x:Name="PageScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                              Margin="0,36,0,0" Panel.ZIndex="10">
+                    <ContentControl Content="{Binding CurrentPage}"
+                                    Focusable="False"
+                                    ContentTemplate="{x:Null}"/>
+                </ScrollViewer>
+
+                <!-- Toast Container -->
+                <StackPanel x:Name="ToastContainer" Panel.ZIndex="200"
+                            HorizontalAlignment="Right" VerticalAlignment="Top"
+                            Margin="0,48,16,0"/>
+
+                <!-- Install Queue Progress -->
+                <Border x:Name="QueuePanel" Panel.ZIndex="100"
+                        HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                        Margin="16,0,0,16" Visibility="Collapsed"
+                        CornerRadius="12" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1"
+                        Background="{DynamicResource CardBrush}"
+                        MinWidth="280" MaxWidth="400">
+                    <StackPanel Margin="12">
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="📥" FontSize="14" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Grid.Column="1" x:Name="QueueTitle" Text="Install Queue" FontWeight="Bold" FontSize="13"
+                                       Foreground="{DynamicResource CardForegroundBrush}" VerticalAlignment="Center"/>
+                            <Button Grid.Column="2" x:Name="ClearQueueBtn" Content="✕ Clear" FontSize="10"
+                                    Padding="6,2" Style="{DynamicResource SecondaryButton}"
+                                    Click="ClearQueue_Click"/>
+                        </Grid>
+                        <Border x:Name="OverallProgressBar" Background="{DynamicResource SurfaceBrush}" CornerRadius="4"
+                                Height="6" Margin="0,0,0,6">
+                            <Border x:Name="OverallProgressFill" Background="{DynamicResource PrimaryBrush}" CornerRadius="4"
+                                    HorizontalAlignment="Left" Width="0"/>
+                        </Border>
+                        <TextBlock x:Name="QueueStatusText" Text="" FontSize="10"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                        <ItemsControl x:Name="QueueItems" MaxHeight="160">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" x:Name="StatusIcon" Text="⏳" FontSize="10"
+                                                   VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding GameName}" FontSize="11"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Status}" FontSize="10"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- UpdateToast -->
+                <Border x:Name="UpdateToast" Panel.ZIndex="100"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                        Margin="0,0,16,16" Visibility="Collapsed"
+                        CornerRadius="12" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="1"
+                        Background="{DynamicResource CardBrush}" MinWidth="260" MaxWidth="360">
+                    <StackPanel Margin="12">
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="🔄" FontSize="16" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Top" Margin="0,2,8,0"/>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock x:Name="UpdateVersionText" Text="Update available" FontWeight="Bold" FontSize="13"
+                                           Foreground="{DynamicResource CardForegroundBrush}"/>
+                                <TextBlock x:Name="UpdateNotesText" Text="A new version is ready to install." FontSize="11" Margin="0,2,0,6"
+                                           Foreground="{DynamicResource MutedForegroundBrush}" TextTrimming="CharacterEllipsis" MaxHeight="32"/>
+                            </StackPanel>
+                            <Button Grid.Column="2" Content="✕" FontSize="11"
+                                    Width="24" Height="24"
+                                    Background="Transparent" Foreground="{DynamicResource MutedForegroundBrush}"
+                                    BorderThickness="0"
+                                    Click="DismissToast_Click"
+                                    VerticalAlignment="Top" Margin="8,0,0,0"/>
+                        </Grid>
+                        <Border x:Name="UpdateProgressTrack" Background="{DynamicResource SurfaceBrush}" CornerRadius="4"
+                                Height="6" Margin="0,0,0,6" Visibility="Collapsed">
+                            <Border x:Name="UpdateProgressBar" Background="{DynamicResource PrimaryBrush}" CornerRadius="4"
+                                    HorizontalAlignment="Left" Width="0"/>
+                        </Border>
+                        <Button x:Name="InstallUpdateBtn" Content="⬇ Download &amp; Install"
+                                Style="{DynamicResource AccentButton}" FontSize="11" Padding="10,5"
+                                HorizontalAlignment="Stretch" Click="InstallUpdate_Click"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- ===== TRUE FULLSCREEN LAYER for the movie player =====
+             Sits above the entire AppShell. The MoviesPage reparents its player
+             host + controls bar here so the video can fill the whole window. -->
+        <Grid x:Name="MediaFullscreenLayer" Visibility="Collapsed" Panel.ZIndex="9999"
+              Background="Black">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+        </Grid>
+    </Grid>
+</Window>
+
+

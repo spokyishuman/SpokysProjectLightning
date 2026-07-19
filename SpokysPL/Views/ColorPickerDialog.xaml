@@ -1,0 +1,90 @@
+<Window x:Class="SpokysProjectLightning.Views.ColorPickerDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Pick a Color" Height="360" Width="380"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Topmost="True"
+        Background="{DynamicResource CardBrush}"
+        WindowStyle="ToolWindow">
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                <Border x:Name="PreviewSwatch" Width="48" Height="48" CornerRadius="8"
+                        BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}" Margin="0,0,12,0"/>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock x:Name="HexDisplay" FontSize="16" FontWeight="Bold" FontFamily="Consolas"/>
+                    <TextBlock x:Name="RgbDisplay" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Grid Grid.Row="1" Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="R" FontWeight="Bold" Foreground="#F44336" Width="20" VerticalAlignment="Center"/>
+                <Slider Grid.Row="0" Grid.Column="1" x:Name="RSlider" Minimum="0" Maximum="255" ValueChanged="Slider_ValueChanged" Margin="6,0"/>
+                <TextBox Grid.Row="0" Grid.Column="2" x:Name="RBox" Text="0" Width="40" TextAlignment="Center" Margin="6,0,0,0"
+                         FontFamily="Consolas" FontSize="11" TextChanged="RgbBox_TextChanged"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="G" FontWeight="Bold" Foreground="#4CAF50" Width="20" VerticalAlignment="Center" Margin="0,4,0,0"/>
+                <Slider Grid.Row="1" Grid.Column="1" x:Name="GSlider" Minimum="0" Maximum="255" ValueChanged="Slider_ValueChanged" Margin="6,4,6,0"/>
+                <TextBox Grid.Row="1" Grid.Column="2" x:Name="GBox" Text="0" Width="40" TextAlignment="Center" Margin="6,4,0,0"
+                         FontFamily="Consolas" FontSize="11" TextChanged="RgbBox_TextChanged"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="B" FontWeight="Bold" Foreground="#2196F3" Width="20" VerticalAlignment="Center" Margin="0,4,0,0"/>
+                <Slider Grid.Row="2" Grid.Column="1" x:Name="BSlider" Minimum="0" Maximum="255" ValueChanged="Slider_ValueChanged" Margin="6,4,6,0"/>
+                <TextBox Grid.Row="2" Grid.Column="2" x:Name="BBox" Text="0" Width="40" TextAlignment="Center" Margin="6,4,0,0"
+                         FontFamily="Consolas" FontSize="11" TextChanged="RgbBox_TextChanged"/>
+            </Grid>
+
+            <Grid Grid.Row="2" Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Hex" FontWeight="Bold" Width="30" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" x:Name="HexBox" FontFamily="Consolas" FontSize="12"
+                         TextChanged="HexBox_TextChanged" Padding="6,4"/>
+            </Grid>
+
+            <Grid Grid.Row="3" Margin="0,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="🎨 Presets" Style="{DynamicResource SecondaryButton}"
+                        Padding="10,6" FontSize="11" Click="Presets_Click"/>
+                <Button Grid.Column="2" Content="Cancel" Style="{DynamicResource SecondaryButton}"
+                        Padding="14,6" FontSize="12" Margin="0,0,8,0" Click="Cancel_Click"/>
+                <Button Grid.Column="2" Content="✓ OK" Style="{DynamicResource AccentButton}"
+                        Padding="14,6" FontSize="12" Click="OK_Click"/>
+            </Grid>
+
+            <Popup x:Name="PresetsPopup" Placement="Mouse"
+                   StaysOpen="False" AllowsTransparency="True">
+                <Border Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="8" MaxWidth="240">
+                    <WrapPanel x:Name="PresetsPanel" Width="208"/>
+                </Border>
+            </Popup>
+        </Grid>
+</Window>
+
+
