@@ -20,7 +20,7 @@ namespace SpokysProjectLightning.Services
     public class UpdateService
     {
         private readonly HttpClient _http;
-        public static string UpdateCheckUrl { get; set; } = "https://api.github.com/repos/spoky/project-spoky/releases/latest";
+        public static string UpdateCheckUrl { get; set; } = "https://api.github.com/repos/spokyishuman/SpokysProjectLightning/releases/latest";
 
         private static readonly string UpdateDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -38,7 +38,7 @@ namespace SpokysProjectLightning.Services
             _http.Timeout = TimeSpan.FromSeconds(15);
         }
 
-        public static Version CurrentVersion => Assembly.GetEntryAssembly()?.GetName()?.Version ?? new Version(4, 2, 0, 0);
+        public static Version CurrentVersion => Assembly.GetEntryAssembly()?.GetName()?.Version ?? new Version(1, 2, 0, 0);
 
         public async Task<UpdateManifest?> CheckForUpdatesAsync(string? customUrl = null)
         {
@@ -58,7 +58,8 @@ namespace SpokysProjectLightning.Services
                         if (Version.TryParse(verStr, out var ghVer) && ghVer > CurrentVersion)
                         {
                             var asset = gh.Assets?.FirstOrDefault(a =>
-                                a.Name?.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) == true);
+                                a.Name?.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) == true ||
+                                a.Name?.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) == true);
                             return new UpdateManifest
                             {
                                 Version = ghVer.ToString(),

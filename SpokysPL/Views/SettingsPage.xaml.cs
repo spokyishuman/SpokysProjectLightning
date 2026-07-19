@@ -646,7 +646,7 @@ namespace SpokysProjectLightning.Views
 
         private void ResetUpdateUrl_Click(object sender, RoutedEventArgs e)
         {
-            var defaultUrl = "https://api.github.com/repos/spoky/project-spoky/releases/latest";
+            var defaultUrl = "https://api.github.com/repos/spokyishuman/SpokysProjectLightning/releases/latest";
             UpdateUrlBox.Text = defaultUrl;
             var settings = _data.LoadSettings();
             settings.UpdateUrl = defaultUrl;

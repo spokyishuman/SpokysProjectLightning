@@ -316,7 +316,7 @@ namespace SpokysProjectLightning.Services
         public string DownloadPath { get; set; } = string.Empty;
         public double BackdropVolume { get; set; } = 30;
         public string Mode { get; set; } = "cloud";
-        public string OmdbApiKey { get; set; } = string.Empty;
+        public string OmdbApiKey { get; set; } = "c80f73ed";
         public string TmdbApiKey { get; set; } = "03ea17fd725585fa30751965ed1993eb";
         public string UpdateUrl { get; set; } = string.Empty;
         public Dictionary<string, string> CustomColors { get; set; } = new();

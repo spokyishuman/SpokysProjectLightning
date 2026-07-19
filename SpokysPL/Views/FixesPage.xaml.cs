@@ -61,7 +61,7 @@ namespace SpokysProjectLightning.Views
             {
                 DiscordLoginBtn.Visibility = Visibility.Collapsed;
                 SignedInPanel.Visibility = Visibility.Visible;
-                SignedInText.Text = _discordUser!;
+                SignedInText.Text = $"{_discordUser} — click to logout";
                 if (!string.IsNullOrEmpty(_discordAvatarUrl))
                     SignedInIcon.Text = "";
             }
@@ -215,7 +215,7 @@ namespace SpokysProjectLightning.Views
             }
             catch { }
 
-            // Restore cookies from disk
+            // Restore cookies from disk and validate them
             try
             {
                 if (File.Exists(CookieStateFile))
@@ -242,6 +242,24 @@ namespace SpokysProjectLightning.Views
             catch { }
 
             UpdateLoginUI();
+        }
+
+        private void Logout()
+        {
+            _sessionCookies = null;
+            _discordUser = null;
+            _discordAvatarUrl = null;
+            try { if (File.Exists(LoginStateFile)) File.Delete(LoginStateFile); } catch { }
+            try { if (File.Exists(CookieStateFile)) File.Delete(CookieStateFile); } catch { }
+            UpdateLoginUI();
+        }
+
+        private void SignedInPanel_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Log out of Discord?", "Logout",
+                MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+                Logout();
         }
 
         private void SaveLoginState()

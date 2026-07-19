@@ -58,7 +58,8 @@
                         <Border x:Name="SignedInPanel" Visibility="Collapsed"
                                 Background="#B3141F19" CornerRadius="6"
                                 BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1"
-                                Padding="10,6">
+                                Padding="10,6" Cursor="Hand"
+                                MouseLeftButtonUp="SignedInPanel_Click">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock x:Name="SignedInIcon" Text="✅" FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                 <TextBlock x:Name="SignedInText" Text="Signed in with Discord"

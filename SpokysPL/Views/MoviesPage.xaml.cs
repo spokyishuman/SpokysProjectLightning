@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Microsoft.Web.WebView2.Core;
 using SpokysProjectLightning.Models;
 using SpokysProjectLightning.Services;
 
@@ -398,7 +399,11 @@ namespace SpokysProjectLightning.Views
             if (_webViewInitialized) return;
             try
             {
-                await MoviePlayer.EnsureCoreWebView2Async();
+                var userDataFolder = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "SpokysProjectLightning", "WebView2");
+                var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
+                await MoviePlayer.EnsureCoreWebView2Async(env);
                 if (!_webViewInitialized)
                 {
                     _webViewInitialized = true;
