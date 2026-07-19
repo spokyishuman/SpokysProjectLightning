@@ -45,4 +45,11 @@
           SkipUnchangedFiles="True" />
   </Target>
 
+  <Target Name="CopyBackgroundVideos" AfterTargets="Build" Condition="Exists('$(MSBuildProjectDirectory)')">
+    <ItemGroup>
+      <_Videos Include="$(MSBuildProjectDirectory)\*.mp4;$(MSBuildProjectDirectory)\*.webm;$(MSBuildProjectDirectory)\*.mkv" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_Videos)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="True" />
+  </Target>
+
 </Project>

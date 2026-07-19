@@ -48,6 +48,17 @@ bld/
 Release/
 *.zip
 
+## Background video files (included in release zip but not tracked in git due to size)
+*.mp4
+*.webm
+*.mkv
+*.mov
+*.avi
+*.wmv
+*.m4v
+
+## Runtime artifacts
+
 ## Runtime artifacts
 *.err.txt
 *_out.txt
