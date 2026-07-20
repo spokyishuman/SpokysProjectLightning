@@ -219,6 +219,9 @@
                     <WrapPanel>
                         <Button Content="🔍 Check for Updates" Style="{DynamicResource AccentButton}"
                                 Click="CheckForUpdates_Click" Padding="14,8" Margin="0,0,8,8"/>
+                        <Button x:Name="DownloadInstallerBtn" Content="📦 Download Installer"
+                                Style="{DynamicResource SecondaryButton}"
+                                Click="DownloadInstaller_Click" Padding="14,8" Margin="0,0,8,8"/>
                         <Button x:Name="ResetUpdateUrlBtn" Content="Reset to Default"
                                 FontSize="11" Padding="10,5"
                                 Style="{DynamicResource SecondaryButton}"

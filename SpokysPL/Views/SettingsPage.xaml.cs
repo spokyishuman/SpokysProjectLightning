@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -353,6 +354,76 @@ namespace SpokysProjectLightning.Views
             settings.SteamPath = path;
             _data.SaveSettings(settings);
             ToolsStatus.Text = "✅ Steam path saved";
+        }
+
+        private async void DownloadInstaller_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            if (btn != null) btn.IsEnabled = false;
+            UpdateStatus.Text = "⏳ Finding latest installer...";
+
+            try
+            {
+                var svc = new UpdateService();
+                var update = await svc.CheckForUpdatesAsync();
+                if (update == null)
+                {
+                    UpdateStatus.Text = "❌ Could not find installer. Check your connection.";
+                    return;
+                }
+
+                // Find the setup exe from the GitHub release
+                string? setupUrl = null;
+                try
+                {
+                    var json = await new HttpClient().GetStringAsync(UpdateService.UpdateCheckUrl);
+                    var gh = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(json);
+                    if (gh?.assets != null)
+                    {
+                        foreach (var asset in gh.assets)
+                        {
+                            string name = asset.name;
+                            if (name != null && name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) &&
+                                name.IndexOf("Setup", StringComparison.OrdinalIgnoreCase) >= 0)
+                            {
+                                setupUrl = asset.browser_download_url;
+                                break;
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                if (string.IsNullOrEmpty(setupUrl))
+                {
+                    UpdateStatus.Text = "❌ No installer found in the latest release. Upload a Setup.exe to GitHub releases.";
+                    return;
+                }
+
+                UpdateStatus.Text = $"⬇ Downloading installer (v{update.Version})...";
+
+                var destDir = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "SpokysPL", "Downloads");
+                Directory.CreateDirectory(destDir);
+                var destPath = Path.Combine(destDir, $"SpokysPL-Setup-v{update.Version}.exe");
+
+                using var http = new HttpClient();
+                http.Timeout = TimeSpan.FromMinutes(10);
+                var bytes = await http.GetByteArrayAsync(setupUrl);
+                await File.WriteAllBytesAsync(destPath, bytes);
+
+                UpdateStatus.Text = $"✅ Installer saved. Launching...";
+                Process.Start(new ProcessStartInfo { FileName = destPath, UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                UpdateStatus.Text = $"❌ Error: {ex.Message}";
+            }
+            finally
+            {
+                if (btn != null) btn.IsEnabled = true;
+            }
         }
 
         private async void CheckForUpdates_Click(object sender, RoutedEventArgs e)

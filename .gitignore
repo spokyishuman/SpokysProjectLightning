@@ -68,3 +68,6 @@ stdout.txt
 
 ## PublishOutput (contains compiled exes from previous builds)
 PublishOutput/
+
+## Windows reserved names (accidentally created by apps)
+nul
