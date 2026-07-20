@@ -2,7 +2,7 @@
 ; Creates a proper Windows installer
 
 #define MyAppName "Spokys Project Lightning"
-#define MyAppVersion "4.2.0"
+#define MyAppVersion "1.3.0"
 #define MyAppPublisher "Spoky"
 #define MyAppURL "https://github.com/spokyishuman/SpokysProjectLightning"
 #define MyAppExeName "SpokysProjectLightning.exe"
@@ -36,7 +36,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional icons:"; Flags: checkedonce
 
 [Files]
-Source: "SpokysPL\bin\Release\net8.0-windows\win-x64\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "SpokysPL\bin\Release\net8.0-windows\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "SpokysPL\app.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
