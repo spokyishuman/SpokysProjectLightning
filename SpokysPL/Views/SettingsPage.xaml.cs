@@ -406,7 +406,14 @@ namespace SpokysProjectLightning.Views
                 await File.WriteAllBytesAsync(destPath, bytes);
 
                 UpdateStatus.Text = $"✅ Installer saved. Launching...";
-                Process.Start(new ProcessStartInfo { FileName = destPath, UseShellExecute = true });
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = destPath,
+                    UseShellExecute = true,
+                    Verb = "runas"
+                });
+                await Task.Delay(2000);
+                Application.Current.Shutdown();
             }
             catch (Exception ex)
             {
