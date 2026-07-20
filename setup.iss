@@ -2,7 +2,7 @@
 ; Creates a proper Windows installer
 
 #define MyAppName "Spokys Project Lightning"
-#define MyAppVersion "1.3.0"
+#define MyAppVersion "1.3.1"
 #define MyAppPublisher "Spoky"
 #define MyAppURL "https://github.com/spokyishuman/SpokysProjectLightning"
 #define MyAppExeName "SpokysProjectLightning.exe"

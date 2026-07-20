@@ -40,6 +40,15 @@ namespace SpokysProjectLightning.Services
 
         public static Version CurrentVersion => Assembly.GetEntryAssembly()?.GetName()?.Version ?? new Version(1, 2, 0, 0);
 
+        private static Version NormalizeVersion(Version v)
+        {
+            var maj = v.Major;
+            var min = v.Minor < 0 ? 0 : v.Minor;
+            var build = v.Build < 0 ? 0 : v.Build;
+            var rev = v.Revision < 0 ? 0 : v.Revision;
+            return new Version(maj, min, build, rev);
+        }
+
         public async Task<UpdateManifest?> CheckForUpdatesAsync(string? customUrl = null)
         {
             try
@@ -55,18 +64,22 @@ namespace SpokysProjectLightning.Services
                     if (gh != null && !string.IsNullOrEmpty(gh.TagName))
                     {
                         var verStr = gh.TagName.TrimStart('v', 'V');
-                        if (Version.TryParse(verStr, out var ghVer) && ghVer > CurrentVersion)
+                        if (Version.TryParse(verStr, out var rawVer))
                         {
-                            var asset = gh.Assets?.FirstOrDefault(a =>
-                                a.Name?.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) == true ||
-                                a.Name?.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) == true);
-                            return new UpdateManifest
+                            var ghVer = NormalizeVersion(rawVer);
+                            if (ghVer > CurrentVersion)
                             {
-                                Version = ghVer.ToString(),
-                                DownloadUrl = asset?.BrowserDownloadUrl ?? gh.ZipballUrl ?? "",
-                                ReleaseNotes = gh.Body ?? "",
-                                Mandatory = false
-                            };
+                                var asset = gh.Assets?.FirstOrDefault(a =>
+                                    a.Name?.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) == true ||
+                                    a.Name?.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) == true);
+                                return new UpdateManifest
+                                {
+                                    Version = ghVer.ToString(),
+                                    DownloadUrl = asset?.BrowserDownloadUrl ?? gh.ZipballUrl ?? "",
+                                    ReleaseNotes = gh.Body ?? "",
+                                    Mandatory = false
+                                };
+                            }
                         }
                         return null;
                     }
@@ -77,8 +90,12 @@ namespace SpokysProjectLightning.Services
                 var manifest = JsonConvert.DeserializeObject<UpdateManifest>(json);
                 if (manifest != null && !string.IsNullOrEmpty(manifest.Version))
                 {
-                    if (Version.TryParse(manifest.Version.TrimStart('v', 'V'), out var mv) && mv > CurrentVersion)
-                        return manifest;
+                    if (Version.TryParse(manifest.Version.TrimStart('v', 'V'), out var rawMv))
+                    {
+                        var mv = NormalizeVersion(rawMv);
+                        if (mv > CurrentVersion)
+                            return manifest;
+                    }
                 }
 
                 return null;

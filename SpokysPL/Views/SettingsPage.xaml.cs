@@ -33,6 +33,9 @@ namespace SpokysProjectLightning.Views
 
         private void SettingsPage_Loaded(object sender, RoutedEventArgs e)
         {
+            var appVer = UpdateService.CurrentVersion;
+            UpdateStatus.Text = $"Current version: {appVer}";
+            VersionLabel.Text = $"Project Spoky v{appVer}";
             var settings = _data.LoadSettings();
             if (!string.IsNullOrEmpty(settings.SteamPath) && Directory.Exists(settings.SteamPath))
             {
@@ -435,40 +438,73 @@ namespace SpokysProjectLightning.Views
             {
                 var svc = new UpdateService();
                 var update = await svc.CheckForUpdatesAsync();
-                if (update != null)
-                {
-                    UpdateStatus.Text = $"✅ v{update.Version} available! Downloading...";
-
-                    var progress = new Progress<double>(p =>
-                    {
-                        Dispatcher.BeginInvoke(() =>
-                            UpdateStatus.Text = $"⬇ Downloading... {p:F0}%");
-                    });
-
-                    var zipPath = await svc.DownloadUpdateAsync(update.DownloadUrl, progress);
-                    if (zipPath != null)
-                    {
-                        UpdateStatus.Text = "📦 Installing update...";
-                        if (svc.InstallUpdate(zipPath))
-                        {
-                            UpdateStatus.Text = "✅ Update applied. Restarting...";
-                            await Task.Delay(1000);
-                            Application.Current.Shutdown();
-                        }
-                        else
-                        {
-                            UpdateStatus.Text = "❌ Install failed. Try manual download.";
-                        }
-                    }
-                    else
-                    {
-                        UpdateStatus.Text = "❌ Download failed. Try again later.";
-                    }
-                }
-                else
+                if (update == null)
                 {
                     UpdateStatus.Text = "✅ You're up to date!";
+                    return;
                 }
+
+                UpdateStatus.Text = $"✅ v{update.Version} available! Downloading...";
+
+                var progress = new Progress<double>(p =>
+                {
+                    Dispatcher.BeginInvoke(() =>
+                        UpdateStatus.Text = $"⬇ Downloading... {p:F0}%");
+                });
+
+                var zipPath = await svc.DownloadUpdateAsync(update.DownloadUrl, progress);
+                if (zipPath == null)
+                {
+                    UpdateStatus.Text = "❌ Download failed. Try again later.";
+                    return;
+                }
+
+                UpdateStatus.Text = "📦 Installing update...";
+
+                var appDir = AppContext.BaseDirectory;
+                var appExe = Path.Combine(appDir, "SpokysProjectLightning.exe");
+                var pid = Environment.ProcessId;
+
+                // Write a PowerShell script that waits for this app to exit, extracts the zip, then restarts
+                var psScript = $@"
+$pid = {pid}
+$zip = '{zipPath.Replace("'", "''")}'
+$dir = '{appDir.Replace("'", "''")}'
+$exe = '{appExe.Replace("'", "''")}'
+try {{
+    Wait-Process -Id $pid -ErrorAction SilentlyContinue
+    Start-Sleep 2
+    Add-Type -A 'System.IO.Compression.FileSystem'
+    $z = [IO.Compression.ZipFile]::OpenRead($zip)
+    foreach ($e in $z.Entries) {{
+        if (!$e.Name) {{ continue }}
+        $d = Join-Path $dir $e.FullName
+        $p = [IO.Path]::GetDirectoryName($d)
+        if (!(Test-Path $p)) {{ [IO.Directory]::CreateDirectory($p) | Out-Null }}
+        [IO.Compression.ZipFileExtensions]::ExtractToFile($e, $d, $true)
+    }}
+    $z.Dispose()
+    Start-Process $exe
+}} catch {{
+    $err = $_.Exception.Message
+    Start-Process 'powershell' ""-NoProfile -Command `""Write-Host 'Update failed: $err'; Start-Sleep 5`""""
+}}
+Remove-Item $zip -ErrorAction SilentlyContinue
+";
+                var psPath = Path.Combine(Path.GetTempPath(), $"spokys-update-{pid}.ps1");
+                await File.WriteAllTextAsync(psPath, psScript);
+
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "powershell",
+                    Arguments = $"-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \"{psPath}\"",
+                    UseShellExecute = true,
+                    CreateNoWindow = true
+                });
+
+                UpdateStatus.Text = "✅ Update will apply after restart...";
+                await Task.Delay(1500);
+                Application.Current.Shutdown();
             }
             catch (Exception ex)
             {

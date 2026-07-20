@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 using SpokysProjectLightning.Services;
 
@@ -85,7 +86,13 @@ namespace SpokysProjectLightning.Views
 
             if (!_webView2Initialized)
             {
-                await ToolBrowser.EnsureCoreWebView2Async();
+                var userDataFolder = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "SpokysPL", "WebView2");
+                var env = await CoreWebView2Environment.CreateAsync(
+                    browserExecutableFolder: null,
+                    userDataFolder: userDataFolder);
+                await ToolBrowser.EnsureCoreWebView2Async(env);
                 ToolBrowser.CoreWebView2.Settings.UserAgent =
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
                 ToolBrowser.CoreWebView2.NewWindowRequested += (s, args) =>

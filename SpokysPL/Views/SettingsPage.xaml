@@ -249,7 +249,7 @@
                 </StackPanel>
             </Border>
 
-            <TextBlock Text="Project Spoky v1.3.0.0"
+            <TextBlock x:Name="VersionLabel" Text="Project Spoky"
                        FontSize="11" Foreground="{DynamicResource MutedForegroundBrush}"
                        HorizontalAlignment="Center" Margin="0,8,0,0"/>
         </StackPanel>
