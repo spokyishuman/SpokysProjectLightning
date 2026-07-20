@@ -364,35 +364,27 @@ namespace SpokysProjectLightning.Views
 
             try
             {
-                var svc = new UpdateService();
-                var update = await svc.CheckForUpdatesAsync();
-                if (update == null)
-                {
-                    UpdateStatus.Text = "❌ Could not find installer. Check your connection.";
-                    return;
-                }
+                var json = await new HttpClient().GetStringAsync(UpdateService.UpdateCheckUrl);
+                var release = Newtonsoft.Json.Linq.JObject.Parse(json);
+                var assets = release["assets"] as Newtonsoft.Json.Linq.JArray;
 
-                // Find the setup exe from the GitHub release
                 string? setupUrl = null;
-                try
+                string? version = null;
+                if (assets != null)
                 {
-                    var json = await new HttpClient().GetStringAsync(UpdateService.UpdateCheckUrl);
-                    var gh = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(json);
-                    if (gh?.assets != null)
+                    foreach (var asset in assets)
                     {
-                        foreach (var asset in gh.assets)
+                        var name = asset["name"]?.ToString();
+                        if (name != null && name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) &&
+                            name.IndexOf("Setup", StringComparison.OrdinalIgnoreCase) >= 0)
                         {
-                            string name = asset.name;
-                            if (name != null && name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) &&
-                                name.IndexOf("Setup", StringComparison.OrdinalIgnoreCase) >= 0)
-                            {
-                                setupUrl = asset.browser_download_url;
-                                break;
-                            }
+                            setupUrl = asset["browser_download_url"]?.ToString();
+                            var tag = release["tag_name"]?.ToString()?.TrimStart('v', 'V');
+                            version = tag ?? "0.0.0";
+                            break;
                         }
                     }
                 }
-                catch { }
 
                 if (string.IsNullOrEmpty(setupUrl))
                 {
@@ -400,13 +392,13 @@ namespace SpokysProjectLightning.Views
                     return;
                 }
 
-                UpdateStatus.Text = $"⬇ Downloading installer (v{update.Version})...";
+                UpdateStatus.Text = $"⬇ Downloading installer (v{version})...";
 
                 var destDir = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "SpokysPL", "Downloads");
                 Directory.CreateDirectory(destDir);
-                var destPath = Path.Combine(destDir, $"SpokysPL-Setup-v{update.Version}.exe");
+                var destPath = Path.Combine(destDir, $"SpokysPL-Setup-v{version}.exe");
 
                 using var http = new HttpClient();
                 http.Timeout = TimeSpan.FromMinutes(10);
