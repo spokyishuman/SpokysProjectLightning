@@ -37,6 +37,7 @@ namespace SpokysProjectLightning.Views
         private readonly ManifestService _manifestService = new();
         private readonly RyuuFixesService _ryuuFixes = new();
         private readonly SteamToolsGamesService _steamTools = new();
+        private readonly SteamToolsSiteService _steamToolsSite = new();
         private readonly List<FixGame> _allGames = new();
         private string _query = string.Empty;
         private int _currentPage = 1;
@@ -552,64 +553,104 @@ namespace SpokysProjectLightning.Views
                         return;
                     }
 
-                    // Try steamtools.games first (free, no API key)
-                    var manifest = await _steamTools.GenerateManifestAsync(game.AppId);
-                    if (manifest != null && !string.IsNullOrEmpty(manifest.DownloadUrl))
+                    bool installed = false;
+
+                    // Source 1: steamtools.site (free, no API key)
+                    try
                     {
-                        var luaDir = Path.Combine(steamPath, "config", "stplug-in");
-                        Directory.CreateDirectory(luaDir);
-
-                        // Download and write the .lua file
-                        var luaBytes = await _steamTools.DownloadFileAsync(manifest.LuaUrl);
-                        if (luaBytes != null && luaBytes.Length > 0)
-                        {
-                            var luaPath = Path.Combine(luaDir, $"{game.AppId}.lua");
-                            await File.WriteAllBytesAsync(luaPath, luaBytes);
-                        }
-
-                        // Download and write key.vdf
-                        var keyBytes = await _steamTools.DownloadFileAsync(manifest.KeyVdfUrl);
-                        if (keyBytes != null && keyBytes.Length > 0)
-                        {
-                            var keyPath = Path.Combine(steamPath, "config", "depotcache", "key.vdf");
-                            Directory.CreateDirectory(Path.GetDirectoryName(keyPath)!);
-                            await File.WriteAllBytesAsync(keyPath, keyBytes);
-                        }
-
-                        // Download and extract the ZIP
-                        var zipBytes = await _steamTools.DownloadFileAsync(manifest.DownloadUrl);
+                        btn.Content = "⏳ steamtools.site...";
+                        var zipBytes = await _steamToolsSite.DownloadManifestZipAsync(game.AppId);
                         if (zipBytes != null && zipBytes.Length > 0)
                         {
+                            var luaDir = Path.Combine(steamPath, "config", "stplug-in");
+                            var depotsDir = Path.Combine(steamPath, "config", "depotcache");
+                            Directory.CreateDirectory(luaDir);
+                            Directory.CreateDirectory(depotsDir);
+
                             using var ms = new MemoryStream(zipBytes);
                             using var zip = new ZipArchive(ms, ZipArchiveMode.Read);
                             foreach (var entry in zip.Entries)
                             {
-                                if (entry.Name.EndsWith(".manifest", StringComparison.OrdinalIgnoreCase))
+                                if (string.IsNullOrEmpty(entry.Name)) continue;
+                                var dest = entry.Name.EndsWith(".lua", StringComparison.OrdinalIgnoreCase)
+                                    ? Path.Combine(luaDir, entry.Name)
+                                    : Path.Combine(depotsDir, entry.Name);
+                                entry.ExtractToFile(dest, true);
+                            }
+
+                            btn.Content = "✅ Manifest";
+                            MessageBox.Show($"✅ {game.Title} - Manifest installed!\n\nRestart SteamTools to see it in your library.",
+                                "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                            installed = true;
+                        }
+                    }
+                    catch { }
+
+                    // Source 2: steamtools.games
+                    if (!installed)
+                    {
+                        try
+                        {
+                            btn.Content = "⏳ steamtools.games...";
+                            var manifest = await _steamTools.GenerateManifestAsync(game.AppId);
+                            if (manifest != null && !string.IsNullOrEmpty(manifest.DownloadUrl))
+                            {
+                                var luaDir = Path.Combine(steamPath, "config", "stplug-in");
+                                Directory.CreateDirectory(luaDir);
+
+                                var luaBytes = await _steamTools.DownloadFileAsync(manifest.LuaUrl);
+                                if (luaBytes != null && luaBytes.Length > 0)
                                 {
-                                    var depotsDir = Path.Combine(steamPath, "config", "depotcache");
-                                    Directory.CreateDirectory(depotsDir);
-                                    entry.ExtractToFile(Path.Combine(depotsDir, entry.Name), true);
+                                    var luaPath = Path.Combine(luaDir, $"{game.AppId}.lua");
+                                    await File.WriteAllBytesAsync(luaPath, luaBytes);
                                 }
-                                else if (entry.Name.EndsWith(".lua", StringComparison.OrdinalIgnoreCase))
+
+                                var keyBytes = await _steamTools.DownloadFileAsync(manifest.KeyVdfUrl);
+                                if (keyBytes != null && keyBytes.Length > 0)
                                 {
-                                    entry.ExtractToFile(Path.Combine(luaDir, entry.Name), true);
+                                    var keyPath = Path.Combine(steamPath, "config", "depotcache", "key.vdf");
+                                    Directory.CreateDirectory(Path.GetDirectoryName(keyPath)!);
+                                    await File.WriteAllBytesAsync(keyPath, keyBytes);
                                 }
-                                else if (entry.Name.EndsWith(".vdf", StringComparison.OrdinalIgnoreCase))
+
+                                var zipBytes = await _steamTools.DownloadFileAsync(manifest.DownloadUrl);
+                                if (zipBytes != null && zipBytes.Length > 0)
                                 {
-                                    var keyDir = Path.Combine(steamPath, "config", "depotcache");
-                                    Directory.CreateDirectory(keyDir);
-                                    entry.ExtractToFile(Path.Combine(keyDir, entry.Name), true);
+                                    using var ms = new MemoryStream(zipBytes);
+                                    using var zip = new ZipArchive(ms, ZipArchiveMode.Read);
+                                    foreach (var entry in zip.Entries)
+                                    {
+                                        if (entry.Name.EndsWith(".manifest", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            var depotsDir = Path.Combine(steamPath, "config", "depotcache");
+                                            Directory.CreateDirectory(depotsDir);
+                                            entry.ExtractToFile(Path.Combine(depotsDir, entry.Name), true);
+                                        }
+                                        else if (entry.Name.EndsWith(".lua", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            entry.ExtractToFile(Path.Combine(luaDir, entry.Name), true);
+                                        }
+                                        else if (entry.Name.EndsWith(".vdf", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            var keyDir = Path.Combine(steamPath, "config", "depotcache");
+                                            Directory.CreateDirectory(keyDir);
+                                            entry.ExtractToFile(Path.Combine(keyDir, entry.Name), true);
+                                        }
+                                    }
                                 }
+
+                                btn.Content = "✅ Manifest";
+                                MessageBox.Show($"✅ {game.Title} - Manifest installed!\n\nRestart SteamTools to see it in your library.",
+                                    "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                                installed = true;
                             }
                         }
-
-                        btn.Content = "✅ Manifest";
-                        MessageBox.Show($"✅ {game.Title} - Manifest installed!\n\nRestart SteamTools to see it in your library.",
-                            "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        catch { }
                     }
-                    else
+
+                    // Source 3: fares.top
+                    if (!installed)
                     {
-                        // Fallback: fares.top via ManifestService
                         await InstallManifestViaFares(btn, game, steamPath);
                     }
                 }
