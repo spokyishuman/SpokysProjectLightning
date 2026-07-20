@@ -177,22 +177,19 @@ namespace SpokysProjectLightning.Views
                     return;
                 }
 
+                ManifestPaths.EnsureDirs();
                 var ext = Path.GetExtension(path).ToLowerInvariant();
                 var fileName = Path.GetFileName(path);
 
                 if (ext == ".manifest")
                 {
-                    var depotDir = Path.Combine(steamPath, "config", "depotcache");
-                    Directory.CreateDirectory(depotDir);
-                    File.Copy(path, Path.Combine(depotDir, fileName), true);
-                    ToastService.Show($"✅ Manifest installed: {fileName}", "success");
+                    File.Copy(path, Path.Combine(ManifestPaths.ManifestDir, fileName), true);
+                    ToastService.Show($"✅ Manifest saved to SteamDaddy: {fileName}", "success");
                 }
                 else if (ext == ".lua")
                 {
-                    var luaDir = Path.Combine(steamPath, "config", "stplug-in");
-                    Directory.CreateDirectory(luaDir);
-                    File.Copy(path, Path.Combine(luaDir, fileName), true);
-                    ToastService.Show($"✅ Lua script installed: {fileName}", "success");
+                    File.Copy(path, Path.Combine(ManifestPaths.LuaDir, fileName), true);
+                    ToastService.Show($"✅ Lua script saved to SteamDaddy: {fileName}", "success");
                 }
                 else if (ext == ".zip")
                 {
@@ -206,15 +203,15 @@ namespace SpokysProjectLightning.Views
 
                         string targetDir = entryExt switch
                         {
-                            ".lua" => Path.Combine(steamPath, "config", "stplug-in"),
-                            _ => Path.Combine(steamPath, "config", "depotcache")
+                            ".lua" => ManifestPaths.LuaDir,
+                            _ => ManifestPaths.ManifestDir
                         };
                         Directory.CreateDirectory(targetDir);
                         entry.ExtractToFile(Path.Combine(targetDir, entry.Name), true);
                         installed++;
                     }
                     if (installed > 0)
-                        ToastService.Show($"✅ {installed} file(s) extracted from {fileName}", "success");
+                        ToastService.Show($"✅ {installed} file(s) extracted to SteamDaddy data", "success");
                     else
                         ToastService.Show($"⚠️ No manifest files found in {fileName}", "warning");
                 }

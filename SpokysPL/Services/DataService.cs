@@ -319,6 +319,8 @@ namespace SpokysProjectLightning.Services
         public string OmdbApiKey { get; set; } = "c80f73ed";
         public string TmdbApiKey { get; set; } = "03ea17fd725585fa30751965ed1993eb";
         public string UpdateUrl { get; set; } = string.Empty;
+        public string ShopAdminPassword { get; set; } = string.Empty;
+        public string SteamDaddyApiKey { get; set; } = string.Empty;
         public Dictionary<string, string> CustomColors { get; set; } = new();
     }
 }

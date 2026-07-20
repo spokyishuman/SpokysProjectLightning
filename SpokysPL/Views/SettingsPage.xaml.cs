@@ -91,6 +91,7 @@ namespace SpokysProjectLightning.Views
             // API Keys
             TmdbApiKeyBox.Text = settings.TmdbApiKey;
             OmdbApiKeyBox.Text = settings.OmdbApiKey;
+            SteamDaddyApiKeyBox.Text = settings.SteamDaddyApiKey;
 
             // Update URL
             if (!string.IsNullOrEmpty(settings.UpdateUrl))
@@ -633,6 +634,14 @@ namespace SpokysProjectLightning.Views
             settings.OmdbApiKey = OmdbApiKeyBox.Text.Trim();
             _data.SaveSettings(settings);
             ApiKeyStatus.Text = "✅ OMDb API key saved";
+        }
+
+        private void SaveSteamDaddyKey_Click(object sender, RoutedEventArgs e)
+        {
+            var settings = _data.LoadSettings();
+            settings.SteamDaddyApiKey = SteamDaddyApiKeyBox.Text.Trim();
+            _data.SaveSettings(settings);
+            ApiKeyStatus.Text = "✅ SteamDaddy API key saved (20 fetches/day)";
         }
 
         private void SaveUpdateUrl_Click(object sender, RoutedEventArgs e)

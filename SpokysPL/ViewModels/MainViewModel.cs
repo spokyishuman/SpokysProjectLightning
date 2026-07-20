@@ -54,6 +54,8 @@ namespace SpokysProjectLightning.ViewModels
             new() { Icon = "🛡️", ToolTip = "Fixes", PageName = "Fixes", DisplayName = "Fixes", IsPinned = true },
             new() { Icon = "🎬", ToolTip = "Movies", PageName = "Movies", DisplayName = "Movies", IsPinned = true },
             new() { Icon = "🔧", ToolTip = "Tools", PageName = "Tools", DisplayName = "Tools", IsPinned = true },
+            new() { Icon = "🛒", ToolTip = "Shop", PageName = "Shop", DisplayName = "Shop", IsPinned = true },
+            new() { Icon = "⚡", ToolTip = "OpenSteamTool", PageName = "OpenSteamTool", DisplayName = "OST", IsPinned = true },
         };
 
         public MainViewModel()
@@ -108,6 +110,8 @@ namespace SpokysProjectLightning.ViewModels
             if (pageError == null) try { OnlineFixPage = new OnlineFixPage(); } catch (Exception ex) { pageError = $"OnlineFixPage: {ex.Message}"; System.Windows.MessageBox.Show(pageError); }
             if (pageError == null) try { LibraryPage = new LibraryPage(); } catch (Exception ex) { pageError = $"LibraryPage: {ex.Message}"; System.Windows.MessageBox.Show(pageError); }
             if (pageError == null) try { BypassPage = new BypassPage(); } catch (Exception ex) { pageError = $"BypassPage: {ex.Message}"; System.Windows.MessageBox.Show(pageError); }
+            if (pageError == null) try { ShopPage = new ShopPage(); } catch (Exception ex) { pageError = $"ShopPage: {ex.Message}"; System.Windows.MessageBox.Show(pageError); }
+            if (pageError == null) try { OpenSteamToolPage = new Views.OpenSteamToolPage(); } catch (Exception ex) { pageError = $"OpenSteamToolPage: {ex.Message}"; System.Windows.MessageBox.Show(pageError); }
             if (pageError != null) throw new InvalidOperationException($"Failed to create page: {pageError}");
 
             _currentPage = HomePage;
@@ -133,6 +137,8 @@ namespace SpokysProjectLightning.ViewModels
         public OnlineFixPage OnlineFixPage { get; } = null!;
         public LibraryPage LibraryPage { get; } = null!;
         public BypassPage BypassPage { get; } = null!;
+        public ShopPage ShopPage { get; } = null!;
+        public Views.OpenSteamToolPage OpenSteamToolPage { get; } = null!;
 
         public object CurrentPage
         {
@@ -206,6 +212,8 @@ namespace SpokysProjectLightning.ViewModels
                     case "OnlineFix":
                     case "Bypass":     CurrentPage = FixesPage; break;
                     case "Library":    CurrentPage = ManagePage; break;
+                    case "Shop":           CurrentPage = ShopPage; break;
+                    case "OpenSteamTool":  CurrentPage = OpenSteamToolPage; break;
                 }
             }
         }

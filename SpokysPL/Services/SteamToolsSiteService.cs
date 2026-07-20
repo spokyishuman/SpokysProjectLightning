@@ -64,7 +64,26 @@ namespace SpokysProjectLightning.Services
                 var downloadUrl = ExtractDownloadUrl(html);
                 if (string.IsNullOrEmpty(downloadUrl)) return null;
 
-                return await _http.GetByteArrayAsync(downloadUrl);
+                // tpi.li and similar shorteners return HTML with JS ads — HttpClient can't execute JS.
+                // Check content type before returning bytes to skip ad pages gracefully.
+                var content = await _http.GetByteArrayAsync(downloadUrl);
+
+                // If response starts with "<html" or "<!DOCTYPE", it's an ad page, not a zip
+                if (content.Length > 10)
+                {
+                    var header = System.Text.Encoding.UTF8.GetString(content, 0, Math.Min(20, content.Length));
+                    if (header.StartsWith("<!", StringComparison.OrdinalIgnoreCase) ||
+                        header.StartsWith("<ht", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Try following a meta refresh or second href in the ad page
+                        var metaUrl = ExtractMetaRefreshUrl(System.Text.Encoding.UTF8.GetString(content));
+                        if (!string.IsNullOrEmpty(metaUrl))
+                            return await _http.GetByteArrayAsync(metaUrl);
+                        return null; // can't handle JS redirects
+                    }
+                }
+
+                return content;
             }
             catch
             {
@@ -81,6 +100,22 @@ namespace SpokysProjectLightning.Services
             var end = html.IndexOf("\"", idx, StringComparison.OrdinalIgnoreCase);
             if (end < 0) return "";
             return html.Substring(idx, end - idx);
+        }
+
+        private static string ExtractMetaRefreshUrl(string html)
+        {
+            var marker = "meta http-equiv=\"refresh\"";
+            var idx = html.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
+            if (idx < 0) return "";
+            var urlMarker = "url=";
+            var urlIdx = html.IndexOf(urlMarker, idx + marker.Length, StringComparison.OrdinalIgnoreCase);
+            if (urlIdx < 0) return "";
+            urlIdx += urlMarker.Length;
+            var end = html.IndexOf("\"", urlIdx, StringComparison.OrdinalIgnoreCase);
+            if (end < 0) end = html.IndexOf("'", urlIdx, StringComparison.OrdinalIgnoreCase);
+            if (end < 0) end = html.IndexOf(">", urlIdx, StringComparison.OrdinalIgnoreCase);
+            if (end < 0) return html.Substring(urlIdx).Trim();
+            return html.Substring(urlIdx, end - urlIdx).Trim().Trim('\'', '"');
         }
     }
 }

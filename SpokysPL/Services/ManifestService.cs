@@ -99,27 +99,23 @@ namespace SpokysProjectLightning.Services
                 var downloadable = manifestData.Manifests.Where(m => !string.IsNullOrEmpty(m.ManifestId)).ToList();
                 var total = downloadable.Count;
 
-                // 2. Determine target depotcache path.
-                // SteamTools reads from config/depotcache (the real, verified path).
-                var depotCacheDir = Path.Combine(steamPath, "config", "depotcache");
-                Directory.CreateDirectory(depotCacheDir);
+                ManifestPaths.EnsureDirs();
 
                 var installedDepots = new List<(string depotId, string manifestId, long size)>();
                 var installedFiles = new List<string>();
                 long totalBytes = 0;
                 int done = 0;
 
-                // 3. Download each manifest file directly into depotcache
+                // 3. Download each manifest file into SteamDaddy's data directory
                 foreach (var m in downloadable)
                 {
                     done++;
                     var fileName = $"{m.DepotId}_{m.ManifestId}.manifest";
-                    var destPath = Path.Combine(depotCacheDir, fileName);
+                    var destPath = Path.Combine(ManifestPaths.ManifestDir, fileName);
                     progress?.Report((done, total, $"Downloading {fileName}..."));
 
                     try
                     {
-                        // Try server 1, fall back to server 2 on failure (handles 401/404 from fares.top)
                         var bytes = await DownloadManifestBytesAsync(appId, m.DepotId, m.ManifestId, 1);
                         if (bytes == null || bytes.Length == 0)
                             bytes = await DownloadManifestBytesAsync(appId, m.DepotId, m.ManifestId, 2);
@@ -134,7 +130,6 @@ namespace SpokysProjectLightning.Services
                     catch (Exception ex)
                     {
                         System.Diagnostics.Debug.WriteLine($"Primary server failed for {fileName}: {ex.Message}");
-                        // Try the alternate server once more before giving up on this depot
                         try
                         {
                             var bytes = await DownloadManifestBytesAsync(appId, m.DepotId, m.ManifestId, 2);
@@ -148,7 +143,6 @@ namespace SpokysProjectLightning.Services
                         }
                         catch (Exception inner)
                         {
-                            // Skip failed depots but continue
                             System.Diagnostics.Debug.WriteLine($"Failed {fileName}: {inner.Message}");
                         }
                     }
@@ -170,10 +164,8 @@ namespace SpokysProjectLightning.Services
                 installedFiles.Add(acfPath);
                 result.AppManifestPath = acfPath;
 
-                // 5. Write/update the .lua with setManifestid entries
-                var luaDir = Path.Combine(steamPath, "config", "stplug-in");
-                Directory.CreateDirectory(luaDir);
-                var luaPath = Path.Combine(luaDir, $"{appId}.lua");
+                // 5. Write/update the .lua with setManifestid entries in SteamDaddy's data
+                var luaPath = Path.Combine(ManifestPaths.LuaDir, $"{appId}.lua");
                 await File.WriteAllTextAsync(luaPath, GenerateLuaList(appId, gameName, installedDepots));
                 installedFiles.Add(luaPath);
                 result.LuaPath = luaPath;
@@ -181,10 +173,10 @@ namespace SpokysProjectLightning.Services
                 result.Success = true;
                 result.ManifestsInstalled = installedDepots.Count;
                 result.TotalBytes = totalBytes;
-                result.DepotCachePath = depotCacheDir;
+                result.DepotCachePath = ManifestPaths.ManifestDir;
                 result.InstalledFiles = installedFiles;
                 result.Message = $"Installed {installedDepots.Count} manifests ({FormatSize(totalBytes)}) for {gameName}.\n" +
-                                 $"Restart Steam (with SteamTools loaded) to see it in your library.";
+                                 $"Files saved to SteamDaddy data directory. Run SteamDaddy.exe to apply.";
                 return result;
             }
             catch (Exception ex)

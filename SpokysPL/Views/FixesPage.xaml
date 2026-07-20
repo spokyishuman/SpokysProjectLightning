@@ -49,6 +49,16 @@
                                      TextChanged="SearchBox_TextChanged"/>
                         </Grid>
                     </Border>
+                    <Border x:Name="SteamDaddyBadge" Background="#1A2196F3" CornerRadius="6"
+                            BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1"
+                            Padding="10,6" Margin="10,0,0,0" Visibility="Collapsed"
+                            ToolTip="SteamDaddy API key is set (ContraryCDN)">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🍼" FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock x:Name="SteamDaddyStatusText" Text="SD"
+                                       FontSize="11" Foreground="#64B5F6"/>
+                        </StackPanel>
+                    </Border>
                     <StackPanel x:Name="DiscordLoginPanel" Orientation="Horizontal" Margin="10,0,0,0">
                         <Button x:Name="DiscordLoginBtn" Content="🔑 Login with Discord"
                                 Style="{DynamicResource SecondaryButton}"

@@ -300,13 +300,7 @@ namespace SpokysProjectLightning.Views
 
         private void HandleFiles(string[] files)
         {
-            var steamPath = SteamService.FindSteamPath();
-            if (steamPath == null)
-            {
-                ToastService.Show("❌ Steam not found. Set Steam path in Settings first.", "error");
-                return;
-            }
-
+            ManifestPaths.EnsureDirs();
             int count = 0;
             foreach (var file in files)
             {
@@ -316,30 +310,22 @@ namespace SpokysProjectLightning.Views
                 switch (ext)
                 {
                     case ".lua":
-                        var scriptsDir = System.IO.Path.Combine(steamPath, "config", "stplug-in");
-                        System.IO.Directory.CreateDirectory(scriptsDir);
-                        System.IO.File.Copy(file, System.IO.Path.Combine(scriptsDir, fileName), true);
+                        System.IO.File.Copy(file, System.IO.Path.Combine(ManifestPaths.LuaDir, fileName), true);
                         count++;
                         break;
                     case ".manifest":
-                        var depotDir = System.IO.Path.Combine(steamPath, "config", "depotcache");
-                        System.IO.Directory.CreateDirectory(depotDir);
-                        System.IO.File.Copy(file, System.IO.Path.Combine(depotDir, fileName), true);
+                        System.IO.File.Copy(file, System.IO.Path.Combine(ManifestPaths.ManifestDir, fileName), true);
                         count++;
                         break;
                     case ".acf":
-                        var steamApps = System.IO.Path.Combine(steamPath, "steamapps");
-                        if (System.IO.Directory.Exists(steamApps))
-                        {
-                            System.IO.File.Copy(file, System.IO.Path.Combine(steamApps, fileName), true);
-                            count++;
-                        }
+                        System.IO.File.Copy(file, System.IO.Path.Combine(ManifestPaths.ManifestDir, fileName), true);
+                        count++;
                         break;
                 }
             }
 
             if (count > 0)
-                ToastService.Show($"✅ {count} file(s) installed to Steam folders", "success");
+                ToastService.Show($"✅ {count} file(s) saved to SteamDaddy data", "success");
             else
                 ToastService.Show("No supported files found (.lua, .manifest, .acf)", "warning");
         }

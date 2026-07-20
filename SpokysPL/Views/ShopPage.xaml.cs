@@ -1,0 +1,320 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using SpokysProjectLightning.Models;
+using SpokysProjectLightning.Services;
+
+namespace SpokysProjectLightning.Views
+{
+    public partial class ShopPage : UserControl
+    {
+        private readonly ShopService _shop;
+        private List<ShopItem> _items = new();
+
+        public ShopPage()
+        {
+            InitializeComponent();
+            _shop = new ShopService();
+            Loaded += (_, _) => LoadItems();
+        }
+
+        private void LoadItems()
+        {
+            _items = _shop.LoadItems().Where(i => i.Active).ToList();
+            ShopGrid.ItemsSource = _items;
+
+            if (_items.Count == 0)
+            {
+                ShopGrid.ItemsSource = null;
+            }
+        }
+
+        private void ManageBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var settings = new DataService().LoadSettings();
+            var adminPassword = settings.ShopAdminPassword;
+
+            if (string.IsNullOrEmpty(adminPassword))
+            {
+                var setup = new PasswordDialog("Set Admin Password",
+                    "Create a password to manage the shop:", "");
+                setup.Owner = Window.GetWindow(this);
+                if (setup.ShowDialog() != true) return;
+                adminPassword = setup.Password;
+                if (string.IsNullOrEmpty(adminPassword)) return;
+                settings.ShopAdminPassword = adminPassword;
+                new DataService().SaveSettings(settings);
+            }
+
+            var login = new PasswordDialog("Admin Access",
+                "Enter admin password to manage shop:", "");
+            login.Owner = Window.GetWindow(this);
+            if (login.ShowDialog() != true) return;
+            if (login.Password != adminPassword)
+            {
+                MessageBox.Show("Incorrect password.", "Access Denied",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            OpenAdminPanel();
+        }
+
+        private void OpenAdminPanel()
+        {
+            var items = _shop.LoadItems();
+            var dialog = new Window
+            {
+                Title = "Shop Admin",
+                Width = 700,
+                Height = 500,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = Window.GetWindow(this),
+                Background = System.Windows.Media.Brushes.Black
+            };
+
+            var margin16 = new Thickness(16, 16, 16, 16);
+            var margin0_0_0_12 = new Thickness(0, 0, 0, 12);
+            var margin0_0_0_10 = new Thickness(0, 0, 0, 10);
+            var margin0_0_0_4 = new Thickness(0, 0, 0, 4);
+            var margin10_0_0_10 = new Thickness(10, 0, 0, 10);
+            var margin0_8_0_0 = new Thickness(0, 8, 0, 0);
+            var pad14_8 = new Thickness(14, 8, 14, 8);
+            var pad6_4 = new Thickness(6, 4, 6, 4);
+            var pad10_6 = new Thickness(10, 6, 10, 6);
+
+            var white = System.Windows.Media.Brushes.White;
+            var black = System.Windows.Media.Brushes.Black;
+            var gray = System.Windows.Media.Brushes.Gray;
+
+            var panel = new StackPanel { Margin = margin16 };
+
+            var header = new TextBlock
+            {
+                Text = "🛒 Shop Management",
+                FontSize = 22,
+                FontWeight = FontWeights.Bold,
+                Foreground = white,
+                Margin = margin0_0_0_12
+            };
+
+            var addBtn = new Button
+            {
+                Content = "➕ Add Game by App ID",
+                Padding = pad14_8,
+                Margin = margin0_0_0_10,
+                FontSize = 13,
+                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(76, 175, 80)),
+                Foreground = white,
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+
+            var bg30 = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 40));
+            var bg40 = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 50));
+
+            var listBox = new ListBox
+            {
+                Height = 320,
+                DisplayMemberPath = "DisplayText",
+                Background = bg30,
+                Foreground = white,
+                BorderBrush = gray
+            };
+
+            void RefreshList()
+            {
+                items = _shop.LoadItems();
+                listBox.ItemsSource = items.Select(i => new
+                {
+                    i.AppId,
+                    DisplayText = $"[{(i.Active ? "✓" : "✗")}] {i.Name} (App {i.AppId}) — ${(i.NormalPrice / 100.0):F2} / ${(i.DonorPrice / 100.0):F2}"
+                }).ToList();
+            }
+
+            addBtn.Click += (_, _) =>
+            {
+                var input = new Window
+                {
+                    Title = "Add Game",
+                    Width = 400,
+                    Height = 300,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = dialog,
+                    Background = black,
+                    ResizeMode = ResizeMode.NoResize
+                };
+                var inputPanel = new StackPanel { Margin = margin16 };
+
+                var lbl1 = new TextBlock { Text = "Steam App ID:", Foreground = white, Margin = margin0_0_0_4 };
+                var appIdBox = new TextBox
+                {
+                    Text = "292030",
+                    Foreground = white,
+                    Background = bg40,
+                    Padding = pad6_4,
+                    Margin = margin0_0_0_10
+                };
+                var lbl2 = new TextBlock { Text = "Name:", Foreground = white, Margin = margin0_0_0_4 };
+                var nameBox = new TextBox
+                {
+                    Foreground = white,
+                    Background = bg40,
+                    Padding = pad6_4,
+                    Margin = margin0_0_0_10
+                };
+                var fetchBtn = new Button
+                {
+                    Content = "🔍 Fetch from Steam",
+                    Padding = pad10_6,
+                    Margin = margin0_0_0_10,
+                    Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(33, 150, 243)),
+                    Foreground = white,
+                    HorizontalAlignment = HorizontalAlignment.Left
+                };
+                var lbl3 = new TextBlock { Text = "Normal Price (cents):", Foreground = white, Margin = margin0_0_0_4 };
+                var priceBox = new TextBox
+                {
+                    Text = "10000",
+                    Foreground = white,
+                    Background = bg40,
+                    Padding = pad6_4,
+                    Margin = margin0_0_0_10
+                };
+                var lbl4 = new TextBlock { Text = "Donor Price (cents):", Foreground = white, Margin = margin0_0_0_4 };
+                var donorBox = new TextBox
+                {
+                    Text = "7500",
+                    Foreground = white,
+                    Background = bg40,
+                    Padding = pad6_4,
+                    Margin = margin0_0_0_10
+                };
+                var saveBtn = new Button
+                {
+                    Content = "💾 Save",
+                    Padding = pad14_8,
+                    Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(76, 175, 80)),
+                    Foreground = white,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    IsEnabled = false
+                };
+
+                fetchBtn.Click += async (_, _) =>
+                {
+                    var id = appIdBox.Text.Trim();
+                    if (string.IsNullOrEmpty(id)) return;
+                    fetchBtn.IsEnabled = false;
+                    fetchBtn.Content = "⏳ Fetching...";
+                    try
+                    {
+                        var url = $"https://store.steampowered.com/api/appdetails?appids={id}";
+                        using var http = new System.Net.Http.HttpClient();
+                        http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0");
+                        var json = await http.GetStringAsync(url);
+                        var data = Newtonsoft.Json.Linq.JObject.Parse(json);
+                        var appData = data[id]?["data"];
+                        if (appData != null)
+                        {
+                            nameBox.Text = (string)appData["name"] ?? "";
+                            saveBtn.IsEnabled = true;
+                        }
+                        else
+                        {
+                            MessageBox.Show("Game not found on Steam.", "Error");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error: {ex.Message}", "Error");
+                    }
+                    finally
+                    {
+                        fetchBtn.IsEnabled = true;
+                        fetchBtn.Content = "🔍 Fetch from Steam";
+                    }
+                };
+
+                saveBtn.Click += (_, _) =>
+                {
+                    if (!int.TryParse(appIdBox.Text.Trim(), out var appId)) return;
+                    if (!int.TryParse(priceBox.Text.Trim(), out var price)) price = 0;
+                    if (!int.TryParse(donorBox.Text.Trim(), out var donor)) donor = 0;
+
+                    _shop.AddOrUpdateItem(new ShopItem
+                    {
+                        AppId = appId.ToString(),
+                        Name = nameBox.Text.Trim(),
+                        Active = true,
+                        NormalPrice = price,
+                        DonorPrice = donor,
+                        HeaderImage = $"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appId}/library_hero.jpg",
+                        LogoImage = $"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appId}/logo.png",
+                        VerticalImage = $"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appId}/library_600x900.jpg",
+                    });
+
+                    RefreshList();
+                    LoadItems();
+                    input.Close();
+                };
+
+                inputPanel.Children.Add(lbl1);
+                inputPanel.Children.Add(appIdBox);
+                inputPanel.Children.Add(fetchBtn);
+                inputPanel.Children.Add(lbl2);
+                inputPanel.Children.Add(nameBox);
+                inputPanel.Children.Add(lbl3);
+                inputPanel.Children.Add(priceBox);
+                inputPanel.Children.Add(lbl4);
+                inputPanel.Children.Add(donorBox);
+                inputPanel.Children.Add(saveBtn);
+                input.Content = inputPanel;
+                input.ShowDialog();
+            };
+
+            var deleteBtn = new Button
+            {
+                Content = "🗑 Delete Selected",
+                Padding = pad14_8,
+                Margin = margin10_0_0_10,
+                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(244, 67, 54)),
+                Foreground = white,
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            deleteBtn.Click += (_, _) =>
+            {
+                if (listBox.SelectedItem == null) return;
+                var selected = listBox.SelectedItem;
+                var appId = selected.GetType().GetProperty("AppId")?.GetValue(selected)?.ToString();
+                if (appId != null)
+                {
+                    _shop.RemoveItem(appId);
+                    RefreshList();
+                    LoadItems();
+                }
+            };
+
+            var btnPanel = new StackPanel { Orientation = Orientation.Horizontal };
+            btnPanel.Children.Add(addBtn);
+            btnPanel.Children.Add(deleteBtn);
+
+            var statusText = new TextBlock
+            {
+                Text = $"Total items: {items.Count}",
+                Foreground = gray,
+                FontSize = 12,
+                Margin = margin0_8_0_0
+            };
+
+            RefreshList();
+
+            panel.Children.Add(header);
+            panel.Children.Add(btnPanel);
+            panel.Children.Add(listBox);
+            panel.Children.Add(statusText);
+            dialog.Content = panel;
+            dialog.ShowDialog();
+        }
+    }
+}
