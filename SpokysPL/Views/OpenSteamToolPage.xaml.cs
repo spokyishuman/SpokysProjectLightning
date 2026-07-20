@@ -38,15 +38,16 @@ namespace SpokysProjectLightning.Views
 
                 if (installed && currentVer != null)
                 {
+                    var hasUpdate = _ost.HasUpdateAvailable();
                     StatusIcon.Text = "✅";
                     StatusTitle.Text = $"OpenSteamTool v{currentVer} installed";
                     StatusSubtitle.Text = $"Latest: v{latestVer} | Steam: {_ost.GetSteamPath()}";
-                    InstallBtn.Content = latestVer != currentVer ? "⬇ Update Available" : "✅ Reinstall";
+                    InstallBtn.Content = hasUpdate ? "⬇ Update Available" : "✅ Reinstall";
                     InstalledText.Text = $"✅ v{currentVer} installed";
                     InstalledBadge.Visibility = Visibility.Visible;
                     UninstallBtn.IsEnabled = true;
 
-                    if (latestVer != currentVer && latestVer != "0.0.0")
+                    if (hasUpdate)
                     {
                         PatternText.Text = $"⬆ Update to v{latestVer} available";
                         PatternBadge.Visibility = Visibility.Visible;

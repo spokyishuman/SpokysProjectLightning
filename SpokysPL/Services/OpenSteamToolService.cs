@@ -413,13 +413,24 @@ enabled = false
         public bool HasUpdateAvailable()
         {
             if (LatestVersion == null || CurrentVersion == null) return false;
-            return ParseVersion(LatestVersion) > ParseVersion(CurrentVersion);
+            var latest = ParseVersion(LatestVersion);
+            var current = ParseVersion(CurrentVersion);
+            if (latest == null || current == null) return false;
+            return latest > current;
         }
 
         private static Version? ParseVersion(string v)
         {
             var clean = v.TrimStart('v', 'V');
-            return Version.TryParse(clean, out var ver) ? ver : null;
+            if (Version.TryParse(clean, out var ver))
+            {
+                var maj = ver.Major;
+                var min = ver.Minor < 0 ? 0 : ver.Minor;
+                var build = ver.Build < 0 ? 0 : ver.Build;
+                var rev = ver.Revision < 0 ? 0 : ver.Revision;
+                return new Version(maj, min, build, rev);
+            }
+            return null;
         }
     }
 
