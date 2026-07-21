@@ -241,7 +241,7 @@
                                 Style="{DynamicResource SecondaryButton}"
                                 Click="SaveUpdateUrl_Click"/>
                     </WrapPanel>
-                    <TextBlock x:Name="UpdateStatus" Text="Current version: 1.3.0.0" FontSize="12"
+                    <TextBlock x:Name="UpdateStatus" Text="Current version:" FontSize="12"
                                Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
                     <WrapPanel>
                         <Button Content="🔍 Check for Updates" Style="{DynamicResource AccentButton}"

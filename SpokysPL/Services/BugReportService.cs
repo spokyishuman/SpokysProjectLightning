@@ -32,7 +32,7 @@ namespace SpokysProjectLightning.Services
 
             try
             {
-                var appVersion = "1.3.3.0";
+                var appVersion = "1.0.0.0";
                 try
                 {
                     var ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
