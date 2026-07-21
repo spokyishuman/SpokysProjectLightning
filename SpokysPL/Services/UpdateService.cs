@@ -51,94 +51,84 @@ namespace SpokysProjectLightning.Services
 
         public async Task<UpdateManifest?> CheckForUpdatesAsync(string? customUrl = null)
         {
+            var url = customUrl ?? UpdateCheckUrl;
+            var json = await _http.GetStringAsync(url);
+
+            // GitHub API returns an array in "assets" - try to parse as our manifest format first
+            // If it's a GitHub release, extract from the standard format
             try
             {
-                var url = customUrl ?? UpdateCheckUrl;
-                var json = await _http.GetStringAsync(url);
-
-                // GitHub API returns an array in "assets" - try to parse as our manifest format first
-                // If it's a GitHub release, extract from the standard format
-                try
+                var gh = JsonConvert.DeserializeObject<GitHubRelease>(json);
+                if (gh != null && !string.IsNullOrEmpty(gh.TagName))
                 {
-                    var gh = JsonConvert.DeserializeObject<GitHubRelease>(json);
-                    if (gh != null && !string.IsNullOrEmpty(gh.TagName))
+                    var verStr = gh.TagName.TrimStart('v', 'V');
+                    if (Version.TryParse(verStr, out var rawVer))
                     {
-                        var verStr = gh.TagName.TrimStart('v', 'V');
-                        if (Version.TryParse(verStr, out var rawVer))
+                        var ghVer = NormalizeVersion(rawVer);
+                        if (ghVer > CurrentVersion)
                         {
-                            var ghVer = NormalizeVersion(rawVer);
-                            if (ghVer > CurrentVersion)
-                            {
-                                var asset = gh.Assets?.FirstOrDefault(a =>
+                            var asset = gh.Assets?
+                                .OrderByDescending(a =>
+                                    a.Name?.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) == true ? 1 :
+                                    a.Name?.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) == true ? 0 : -1)
+                                .FirstOrDefault(a =>
                                     a.Name?.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) == true ||
                                     a.Name?.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) == true);
-                                return new UpdateManifest
-                                {
-                                    Version = ghVer.ToString(),
-                                    DownloadUrl = asset?.BrowserDownloadUrl ?? gh.ZipballUrl ?? "",
-                                    ReleaseNotes = gh.Body ?? "",
-                                    Mandatory = false
-                                };
-                            }
+                            return new UpdateManifest
+                            {
+                                Version = ghVer.ToString(),
+                                DownloadUrl = asset?.BrowserDownloadUrl ?? gh.ZipballUrl ?? "",
+                                ReleaseNotes = gh.Body ?? "",
+                                Mandatory = false
+                            };
                         }
-                        return null;
                     }
+                    return null;
                 }
-                catch { }
-
-                // Fallback: try direct manifest format
-                var manifest = JsonConvert.DeserializeObject<UpdateManifest>(json);
-                if (manifest != null && !string.IsNullOrEmpty(manifest.Version))
-                {
-                    if (Version.TryParse(manifest.Version.TrimStart('v', 'V'), out var rawMv))
-                    {
-                        var mv = NormalizeVersion(rawMv);
-                        if (mv > CurrentVersion)
-                            return manifest;
-                    }
-                }
-
-                return null;
             }
-            catch
+            catch { }
+
+            // Fallback: try direct manifest format
+            var manifest = JsonConvert.DeserializeObject<UpdateManifest>(json);
+            if (manifest != null && !string.IsNullOrEmpty(manifest.Version))
             {
-                return null;
+                if (Version.TryParse(manifest.Version.TrimStart('v', 'V'), out var rawMv))
+                {
+                    var mv = NormalizeVersion(rawMv);
+                    if (mv > CurrentVersion)
+                        return manifest;
+                }
             }
+
+            return null;
         }
 
         public async Task<string?> DownloadUpdateAsync(string downloadUrl, IProgress<double>? progress = null)
         {
-            try
+            Directory.CreateDirectory(UpdateDir);
+            var zipPath = Path.Combine(UpdateDir, $"update-{DateTime.Now:yyyyMMdd-HHmmss}.zip");
+
+            using var response = await _http.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
+            response.EnsureSuccessStatusCode();
+
+            var totalBytes = response.Content.Headers.ContentLength ?? -1;
+            var totalRead = 0L;
+            var buffer = new byte[81920];
+
+            using var contentStream = await response.Content.ReadAsStreamAsync();
+            using var fileStream = new FileStream(zipPath, FileMode.Create, FileAccess.Write, FileShare.None);
+
+            while (true)
             {
-                Directory.CreateDirectory(UpdateDir);
-                var zipPath = Path.Combine(UpdateDir, $"update-{DateTime.Now:yyyyMMdd-HHmmss}.zip");
-
-                using var response = await _http.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
-                response.EnsureSuccessStatusCode();
-
-                var totalBytes = response.Content.Headers.ContentLength ?? -1;
-                var totalRead = 0L;
-                var buffer = new byte[81920];
-
-                using var contentStream = await response.Content.ReadAsStreamAsync();
-                using var fileStream = new FileStream(zipPath, FileMode.Create, FileAccess.Write, FileShare.None);
-
-                while (true)
-                {
-                    var bytesRead = await contentStream.ReadAsync(buffer);
-                    if (bytesRead == 0) break;
-                    await fileStream.WriteAsync(buffer, 0, bytesRead);
-                    totalRead += bytesRead;
-                    if (totalBytes > 0)
-                        progress?.Report((double)totalRead / totalBytes * 100);
-                }
-
-                return zipPath;
+                var bytesRead = await contentStream.ReadAsync(buffer);
+                if (bytesRead == 0) break;
+                await fileStream.WriteAsync(buffer, 0, bytesRead);
+                totalRead += bytesRead;
+                if (totalBytes > 0)
+                    progress?.Report((double)totalRead / totalBytes * 100);
             }
-            catch
-            {
-                return null;
-            }
+
+            return zipPath;
         }
 
         public bool InstallUpdate(string zipPath)

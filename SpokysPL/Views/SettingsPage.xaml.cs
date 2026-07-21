@@ -830,10 +830,12 @@ Remove-Item $zip -ErrorAction SilentlyContinue
                     ToolsStatus.Text = "🗑️ Tools removed";
                     InstallToolsBtn.Content = "📥 Install";
                 }
-                catch (Exception ex)
-                {
-                    ToolsStatus.Text = $"❌ Error: {ex.Message}";
-                }
+            catch (Exception ex)
+            {
+                UpdateStatus.Text = $"❌ {ex.Message}";
+                // Log full details
+                System.Diagnostics.Debug.WriteLine($"[Update] Error: {ex}");
+            }
             }
         }
     }
