@@ -484,7 +484,8 @@ try {{
         [IO.Compression.ZipFileExtensions]::ExtractToFile($e, $d, $true)
     }}
     $z.Dispose()
-    Start-Process $exe
+    # Restart the app without elevation (even if this script is elevated)
+    cmd /c start """" ""$exe""
 }} catch {{
     $err = $_.Exception.Message
     Start-Process 'powershell' ""-NoProfile -Command `""Write-Host 'Update failed: $err'; Start-Sleep 5`""""
@@ -494,13 +495,27 @@ Remove-Item $zip -ErrorAction SilentlyContinue
                 var psPath = Path.Combine(Path.GetTempPath(), $"spokys-update-{pid}.ps1");
                 await File.WriteAllTextAsync(psPath, psScript);
 
-                Process.Start(new ProcessStartInfo
+                try
                 {
-                    FileName = "powershell",
-                    Arguments = $"-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \"{psPath}\"",
-                    UseShellExecute = true,
-                    CreateNoWindow = true
-                });
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "powershell",
+                        Arguments = $"-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \"{psPath}\"",
+                        Verb = "runas",
+                        UseShellExecute = true
+                    });
+                }
+                catch
+                {
+                    // UAC denied or elevation failed — fall back to non-elevated (will fail if in Program Files)
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "powershell",
+                        Arguments = $"-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \"{psPath}\"",
+                        UseShellExecute = true,
+                        CreateNoWindow = true
+                    });
+                }
 
                 UpdateStatus.Text = "✅ Update will apply after restart...";
                 await Task.Delay(1500);
