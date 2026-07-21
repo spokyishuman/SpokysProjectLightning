@@ -104,9 +104,9 @@ namespace SpokysProjectLightning.Views
                         var url = wv.CoreWebView2.Source?.ToLowerInvariant() ?? "";
                         if (url.StartsWith("https://generator.ryuu.lol") &&
                             !string.IsNullOrEmpty(_lastWvUrl) &&
-                            _lastWvUrl.Contains("discord.com"))
+                            !_lastWvUrl.StartsWith("https://generator.ryuu.lol"))
                         {
-                            await Task.Delay(1500); // let cookies settle
+                            await Task.Delay(1500);
                             await ExtractLoginState(wv);
                             Dispatcher.Invoke(() => win.Close());
                         }
@@ -259,7 +259,47 @@ namespace SpokysProjectLightning.Views
             }
             catch { }
 
+            // Validate restored cookies with a test request
+            if (_sessionCookies != null)
+                _ = ValidateCookiesAsync();
+
             UpdateLoginUI();
+        }
+
+        private async Task ValidateCookiesAsync()
+        {
+            try
+            {
+                var cookieValues = new List<string>();
+                foreach (System.Net.Cookie c in _sessionCookies.GetCookies(new Uri("https://generator.ryuu.lol")))
+                    cookieValues.Add($"{c.Name}={c.Value}");
+                if (cookieValues.Count == 0) { await Dispatcher.InvokeAsync(Logout); return; }
+
+                var handler = new System.Net.Http.SocketsHttpHandler
+                {
+                    AllowAutoRedirect = false,
+                    SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+                    {
+                        EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls13
+                    }
+                };
+                using var http = new System.Net.Http.HttpClient(handler);
+                http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+                http.DefaultRequestHeaders.TryAddWithoutValidation("Cookie", string.Join("; ", cookieValues));
+                http.Timeout = TimeSpan.FromSeconds(10);
+
+                var resp = await http.GetAsync("https://generator.ryuu.lol/fixes/");
+                var body = await resp.Content.ReadAsStringAsync();
+                if (body.Contains("discord", StringComparison.OrdinalIgnoreCase) ||
+                    body.Contains("login", StringComparison.OrdinalIgnoreCase))
+                {
+                    await Dispatcher.InvokeAsync(Logout);
+                }
+            }
+            catch
+            {
+                await Dispatcher.InvokeAsync(Logout);
+            }
         }
 
         private void Logout()
@@ -324,10 +364,7 @@ namespace SpokysProjectLightning.Views
                 {
                     var cookies = await Dispatcher.InvokeAsync(() =>
                         wv.CoreWebView2.CookieManager.GetCookiesAsync("https://generator.ryuu.lol")).Task.Unwrap();
-                    var session = cookies?.FirstOrDefault(c =>
-                        c.Name.IndexOf("session", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                        c.Name.IndexOf("auth", StringComparison.OrdinalIgnoreCase) >= 0);
-                    if (session != null)
+                    if (cookies != null && cookies.Count > 0)
                     {
                         await ExtractLoginState(wv);
                         Dispatcher.Invoke(() => win.Close());
