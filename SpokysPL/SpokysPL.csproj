@@ -8,10 +8,10 @@
     <UseWPF>true</UseWPF>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
     <ApplicationIcon>app.ico</ApplicationIcon>
-<ApplicationVersion>1.3.3.0</ApplicationVersion>
-<AssemblyVersion>1.3.3.0</AssemblyVersion>
-<FileVersion>1.3.3.0</FileVersion>
-<InformationalVersion>1.3.3.0</InformationalVersion>
+<ApplicationVersion>1.3.4.0</ApplicationVersion>
+<AssemblyVersion>1.3.4.0</AssemblyVersion>
+<FileVersion>1.3.4.0</FileVersion>
+<InformationalVersion>1.3.4.0</InformationalVersion>
     <AssemblyName>SpokysProjectLightning</AssemblyName>
     <RootNamespace>SpokysProjectLightning</RootNamespace>
     <Company>Spoky</Company>
@@ -57,11 +57,12 @@
           SkipUnchangedFiles="True" />
   </Target>
 
-  <Target Name="CopyBackgroundVideos" AfterTargets="Build" Condition="Exists('$(MSBuildProjectDirectory)')">
+  <Target Name="CopyBackgroundVideos" AfterTargets="Build;Publish" Condition="Exists('$(MSBuildProjectDirectory)')">
     <ItemGroup>
       <_Videos Include="$(MSBuildProjectDirectory)\*.mp4;$(MSBuildProjectDirectory)\*.webm;$(MSBuildProjectDirectory)\*.mkv" />
     </ItemGroup>
     <Copy SourceFiles="@(_Videos)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="True" />
+    <Copy SourceFiles="@(_Videos)" DestinationFolder="$(OutputPath)publish\" SkipUnchangedFiles="True" Condition="Exists('$(OutputPath)publish\')" />
   </Target>
 
 </Project>
