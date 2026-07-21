@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -33,8 +32,6 @@ namespace SpokysProjectLightning.Services
 
             try
             {
-                using var form = new MultipartFormDataContent();
-
                 var appVersion = "1.3.3.0";
                 try
                 {
@@ -45,22 +42,32 @@ namespace SpokysProjectLightning.Services
 
                 var detail = $"**Bug Report**\n{description}\n\n---\nApp: Spoky's Project Lightning v{appVersion}\nOS: {Environment.OSVersion}";
 
-                form.Add(new StringContent(detail, Encoding.UTF8), "content");
-
-                if (!string.IsNullOrEmpty(videoPath) && File.Exists(videoPath))
+                // Direct Discord webhook → multipart with optional video
+                if (webhookUrl.Contains("discord.com/api/webhooks"))
                 {
-                    var fileStream = new FileStream(videoPath, FileMode.Open, FileAccess.Read);
-                    var fileName = Path.GetFileName(videoPath);
-                    form.Add(new StreamContent(fileStream), "file", fileName);
+                    using var form = new MultipartFormDataContent();
+                    form.Add(new StringContent(detail, Encoding.UTF8), "content");
+
+                    if (!string.IsNullOrEmpty(videoPath) && File.Exists(videoPath))
+                    {
+                        var fileStream = new FileStream(videoPath, FileMode.Open, FileAccess.Read);
+                        form.Add(new StreamContent(fileStream), "file", Path.GetFileName(videoPath));
+                    }
+
+                    var resp = await _http.PostAsync(webhookUrl, form);
+                    var body = await resp.Content.ReadAsStringAsync();
+                    return resp.IsSuccessStatusCode
+                        ? (true, "Report sent! Thank you.")
+                        : (false, $"Server returned {(int)resp.StatusCode}: {body}");
                 }
 
-                var response = await _http.PostAsync(webhookUrl, form);
-                var body = await response.Content.ReadAsStringAsync();
-
-                if (response.IsSuccessStatusCode)
-                    return (true, "Report sent! Thank you.");
-
-                return (false, $"Server returned {(int)response.StatusCode}: {body}");
+                // Generic endpoint (Vercel proxy) → JSON, text-only
+                var json = System.Text.Json.JsonSerializer.Serialize(new { content = detail });
+                var resp2 = await _http.PostAsync(webhookUrl, new StringContent(json, Encoding.UTF8, "application/json"));
+                var body2 = await resp2.Content.ReadAsStringAsync();
+                return resp2.IsSuccessStatusCode
+                    ? (true, "Report sent! Thank you.")
+                    : (false, $"Server returned {(int)resp2.StatusCode}: {body2}");
             }
             catch (HttpRequestException ex)
             {

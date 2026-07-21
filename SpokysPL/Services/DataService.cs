@@ -322,7 +322,7 @@ namespace SpokysProjectLightning.Services
         public string UpdateUrl { get; set; } = string.Empty;
         public string ShopAdminPassword { get; set; } = string.Empty;
         public string SteamDaddyApiKey { get; set; } = string.Empty;
-        public string BugReportWebhookUrl { get; set; } = string.Empty;
+        public string BugReportWebhookUrl { get; set; } = "https://spokys-tmdb-proxy.vercel.app/api/report-bug";
         public Dictionary<string, string> CustomColors { get; set; } = new();
     }
 }
