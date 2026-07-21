@@ -785,6 +785,13 @@ Remove-Item $zip -ErrorAction SilentlyContinue
             UpdateStatus.Text = "Update URL reset to default";
         }
 
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            if (e.Uri != null)
+                Process.Start(new ProcessStartInfo { FileName = e.Uri.ToString(), UseShellExecute = true });
+            e.Handled = true;
+        }
+
         private void UninstallTools_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show("Remove all LUA scripts and manifests?\nThis won't affect installed games.",

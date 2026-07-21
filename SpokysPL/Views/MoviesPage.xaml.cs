@@ -131,7 +131,7 @@ namespace SpokysProjectLightning.Views
             LoadingText.Visibility = Visibility.Collapsed;
 
             NoResultsHeader.Visibility = Visibility.Collapsed;
-            NoMoviesText.Text = "Could not reach TMDB — showing fallback. Search should still work.";
+            NoMoviesText.Text = "TMDB API unreachable. Set your own free API key in Settings → API Keys (https://www.themoviedb.org/settings/api)";
         }
 
         private async Task LoadCategory(string category)

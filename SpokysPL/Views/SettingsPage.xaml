@@ -153,8 +153,11 @@
                     <TextBlock Text="API Keys" FontSize="17" FontWeight="Bold"
                                Foreground="{DynamicResource CardForegroundBrush}" Margin="0,0,0,6"/>
                     <TextBlock FontSize="13" Foreground="{DynamicResource MutedForegroundBrush}" TextWrapping="Wrap"
-                               Text="Enter your own API keys for TMDB and OMDb to ensure reliable service."
-                               Margin="0,0,0,14"/>
+                               Margin="0,0,0,14">
+                        Enter your own API keys to ensure reliable service.
+                        <Hyperlink NavigateUri="https://www.themoviedb.org/settings/api"
+                                   RequestNavigate="Hyperlink_RequestNavigate">Get a free TMDB key</Hyperlink>
+                    </TextBlock>
                     <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4">TMDB API Key:</TextBlock>
                     <WrapPanel Margin="0,0,0,12">
                         <TextBox x:Name="TmdbApiKeyBox" FontSize="12" Width="300"
