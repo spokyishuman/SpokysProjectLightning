@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SpokysProjectLightning.Models;
 
@@ -34,6 +36,22 @@ namespace SpokysProjectLightning.Services
             var settings = new DataService().LoadSettings();
             _tmdbApiKey = string.IsNullOrEmpty(settings.TmdbApiKey) ? "03ea17fd725585fa30751965ed1993eb" : settings.TmdbApiKey;
             _omdbApiKey = settings.OmdbApiKey;
+        }
+
+        /// <summary>Load movies from the bundled movies.json (no API key needed).</summary>
+        public List<MovieResult> LoadBundled()
+        {
+            try
+            {
+                var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "movies.json");
+                if (File.Exists(path))
+                {
+                    var json = File.ReadAllText(path);
+                    return JsonConvert.DeserializeObject<List<MovieResult>>(json) ?? new();
+                }
+            }
+            catch { }
+            return new();
         }
 
         public async Task<List<MovieResult>> GetTrendingAsync()

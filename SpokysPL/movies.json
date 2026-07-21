@@ -1,0 +1,1442 @@
+﻿[
+    {
+        "Id":  155,
+        "VoteAverage":  8.5,
+        "PosterPath":  "/qJ2tW6WMUDux911BytTEwHUG0P.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2008-07-18",
+        "Title":  "The Dark Knight"
+    },
+    {
+        "Id":  49026,
+        "VoteAverage":  7.8,
+        "PosterPath":  "/hr0L2aueqlP2BYUblTTjmtn0hw.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2012-07-20",
+        "Title":  "The Dark Knight Rises"
+    },
+    {
+        "Id":  27205,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2010-07-16",
+        "Title":  "Inception"
+    },
+    {
+        "Id":  19995,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/jRXYjXNq0Cs2TcJjLkki24MLp7u.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2009-12-18",
+        "Title":  "Avatar"
+    },
+    {
+        "Id":  76600,
+        "VoteAverage":  7.7,
+        "PosterPath":  "/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2022-12-16",
+        "Title":  "Avatar: The Way of Water"
+    },
+    {
+        "Id":  453,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1999-03-31",
+        "Title":  "The Matrix"
+    },
+    {
+        "Id":  604,
+        "VoteAverage":  7.2,
+        "PosterPath":  "/9TGHD2WQqlc5LDhTlcVJN4KbE8.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2003-05-15",
+        "Title":  "The Matrix Reloaded"
+    },
+    {
+        "Id":  605,
+        "VoteAverage":  6.7,
+        "PosterPath":  "/fgm8OZ7o4s1e5TZ6c6GfT7kJw5.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2003-11-05",
+        "Title":  "The Matrix Revolutions"
+    },
+    {
+        "Id":  1726,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/78lPobvA3s5s0o6FgGzKc3o1l.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2008-05-02",
+        "Title":  "Iron Man"
+    },
+    {
+        "Id":  10138,
+        "VoteAverage":  6.8,
+        "PosterPath":  "/6WBeq4fCfn7ANJ8o6FTHg3s3f5.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2010-05-07",
+        "Title":  "Iron Man 2"
+    },
+    {
+        "Id":  24428,
+        "VoteAverage":  7.7,
+        "PosterPath":  "/RYMX2wc1h7UOMoSN4xUvP5k1.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2012-05-04",
+        "Title":  "The Avengers"
+    },
+    {
+        "Id":  99861,
+        "VoteAverage":  7.3,
+        "PosterPath":  "/4ssDuvEDkSPhCbGfJX6R1f7v5I.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2015-05-01",
+        "Title":  "Avengers: Age of Ultron"
+    },
+    {
+        "Id":  299536,
+        "VoteAverage":  8.3,
+        "PosterPath":  "/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2018-04-27",
+        "Title":  "Avengers: Infinity War"
+    },
+    {
+        "Id":  299534,
+        "VoteAverage":  8.3,
+        "PosterPath":  "/or06FNJ9NAdK7s7o2WcLvMm3NE.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2019-04-26",
+        "Title":  "Avengers: Endgame"
+    },
+    {
+        "Id":  361466,
+        "VoteAverage":  7.7,
+        "PosterPath":  "/74xTEgt7R36Fpooo50r9T25onhq.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2022-03-04",
+        "Title":  "The Batman"
+    },
+    {
+        "Id":  453395,
+        "VoteAverage":  7.2,
+        "PosterPath":  "/9Gtg2DzB5Y4J2Tk0g9w3Wx1v.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2022-05-06",
+        "Title":  "Doctor Strange in the Multiverse of Madness"
+    },
+    {
+        "Id":  616037,
+        "VoteAverage":  6.3,
+        "PosterPath":  "/pIkRyD18kl4FhoCNvW3tK8TqE7.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2022-07-08",
+        "Title":  "Thor: Love and Thunder"
+    },
+    {
+        "Id":  438148,
+        "VoteAverage":  7.4,
+        "PosterPath":  "/4q2hz2m8hC7zW1Y3l4h7z2rb8f.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2021-05-28",
+        "Title":  "A Quiet Place Part II"
+    },
+    {
+        "Id":  568124,
+        "VoteAverage":  7.3,
+        "PosterPath":  "/kb4s0n7D7Tg5W6jZ3w6F9v0G1h.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2021-08-05",
+        "Title":  "The Suicide Squad"
+    },
+    {
+        "Id":  460465,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/6Wl9C1v3s5D8a7X4zY2bN9mR0f.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2021-04-23",
+        "Title":  "Mortal Kombat"
+    },
+    {
+        "Id":  791373,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/tnAuB8q5t7d9c3jF1pW4yR6v0s.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2021-03-18",
+        "Title":  "Zack Snyder\u0027s Justice League"
+    },
+    {
+        "Id":  315162,
+        "VoteAverage":  7.8,
+        "PosterPath":  "/kuf6dutpsT0vSVehic3EZIqkOBt.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2022-12-21",
+        "Title":  "Puss in Boots: The Last Wish"
+    },
+    {
+        "Id":  245891,
+        "VoteAverage":  7.4,
+        "PosterPath":  "/5vHssUeVe25bM4ZxDS9eW2zD0A.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2014-10-24",
+        "Title":  "John Wick"
+    },
+    {
+        "Id":  286217,
+        "VoteAverage":  7.9,
+        "PosterPath":  "/5BHuvQ6p9kUjVf1LJw8H8y3p6c.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2015-10-02",
+        "Title":  "The Martian"
+    },
+    {
+        "Id":  157336,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/gEU2QniE6EoNIiXb2Jm5mU6J8t.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2014-11-07",
+        "Title":  "Interstellar"
+    },
+    {
+        "Id":  37724,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/u6VQ8e5X5jKQ5dG6b3c9pW1y7f.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2012-10-26",
+        "Title":  "Skyfall"
+    },
+    {
+        "Id":  577922,
+        "VoteAverage":  7.3,
+        "PosterPath":  "/aCIFMriQh8GvZ7W6l9jX2e4v0b.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2020-09-03",
+        "Title":  "Tenet"
+    },
+    {
+        "Id":  76341,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/8tZYtuWezp8JkJj8kYkG8n6f5d.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2015-05-15",
+        "Title":  "Mad Max: Fury Road"
+    },
+    {
+        "Id":  475557,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/udD2lP6lO4g3f7a5X9zR1v0s2b.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2019-10-04",
+        "Title":  "Joker"
+    },
+    {
+        "Id":  120,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/6oom5QYQ2yQTMJJBnQ4HCHN7n4m.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2001-12-19",
+        "Title":  "The Lord of the Rings: The Fellowship of the Ring"
+    },
+    {
+        "Id":  121,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/5VTN0pR8gcqV3EPUHHfMGnJYN9L.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2002-12-18",
+        "Title":  "The Lord of the Rings: The Two Towers"
+    },
+    {
+        "Id":  122,
+        "VoteAverage":  8.5,
+        "PosterPath":  "/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2003-12-17",
+        "Title":  "The Lord of the Rings: The Return of the King"
+    },
+    {
+        "Id":  11,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1977-05-25",
+        "Title":  "Star Wars"
+    },
+    {
+        "Id":  1891,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/7BuH8itoSrLExs2YZSsM01Qk2no.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1980-05-21",
+        "Title":  "The Empire Strikes Back"
+    },
+    {
+        "Id":  1892,
+        "VoteAverage":  8,
+        "PosterPath":  "/lrJWyjQVjjkQ7O3J4Jr6I5SnO0o.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1983-05-25",
+        "Title":  "Return of the Jedi"
+    },
+    {
+        "Id":  1893,
+        "VoteAverage":  6.5,
+        "PosterPath":  "/6wkfovpn7Eq816xNXJBmGQb0VvN.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1999-05-19",
+        "Title":  "Star Wars: Episode I - The Phantom Menace"
+    },
+    {
+        "Id":  1894,
+        "VoteAverage":  6.5,
+        "PosterPath":  "/oZNPUN9jW7aBw7qP1vG6hG5z5L.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2002-05-16",
+        "Title":  "Star Wars: Episode II - Attack of the Clones"
+    },
+    {
+        "Id":  1895,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/xlFbZwQw8J4g7j3fV2z5c8p9h0.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2005-05-19",
+        "Title":  "Star Wars: Episode III - Revenge of the Sith"
+    },
+    {
+        "Id":  140607,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/wqnLdwVXpBjWf0e4kYb1xV1l6P.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2015-12-18",
+        "Title":  "Star Wars: The Force Awakens"
+    },
+    {
+        "Id":  330459,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/qjiskwlVtZ7eXgGgU5VjXk6f8s.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2016-12-16",
+        "Title":  "Rogue One: A Star Wars Story"
+    },
+    {
+        "Id":  181808,
+        "VoteAverage":  6.9,
+        "PosterPath":  "/kOVEVc0T8aX2s6E5j9zR3v4w1b.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2017-12-15",
+        "Title":  "Star Wars: The Last Jedi"
+    },
+    {
+        "Id":  348350,
+        "VoteAverage":  7,
+        "PosterPath":  "/3QfJ6n3c1o5K7d8s0a2X9v4w6m.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2018-05-25",
+        "Title":  "Solo: A Star Wars Story"
+    },
+    {
+        "Id":  419430,
+        "VoteAverage":  6.5,
+        "PosterPath":  "/m8JTwHFwX7K7l5G6pV3j2y0z1n.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2019-12-20",
+        "Title":  "Star Wars: The Rise of Skywalker"
+    },
+    {
+        "Id":  557,
+        "VoteAverage":  7.3,
+        "PosterPath":  "/gh4cZbhZxyTbgxQPxD0dOudN9nT.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2002-05-03",
+        "Title":  "Spider-Man"
+    },
+    {
+        "Id":  558,
+        "VoteAverage":  7.4,
+        "PosterPath":  "/olxwhq0Jx3rL8Q3w5d7n9v2c4f.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2004-06-30",
+        "Title":  "Spider-Man 2"
+    },
+    {
+        "Id":  559,
+        "VoteAverage":  6.3,
+        "PosterPath":  "/qFmwhVUoUSXC0t2Yg9n6p8k1r3.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2007-05-04",
+        "Title":  "Spider-Man 3"
+    },
+    {
+        "Id":  1930,
+        "VoteAverage":  6.7,
+        "PosterPath":  "/eA2tKcrx8Lb5g6F9v0s3d7n1m4.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2012-07-03",
+        "Title":  "The Amazing Spider-Man"
+    },
+    {
+        "Id":  1931,
+        "VoteAverage":  6.5,
+        "PosterPath":  "/c3e9e18c1d5f4a2b7g0h8i6j3k.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2014-05-02",
+        "Title":  "The Amazing Spider-Man 2"
+    },
+    {
+        "Id":  315635,
+        "VoteAverage":  7.4,
+        "PosterPath":  "/c24sv2weSTQrs8Y5G0nRcC5sD7.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2017-07-07",
+        "Title":  "Spider-Man: Homecoming"
+    },
+    {
+        "Id":  429617,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/4q2hz2m8hC7zW1Y3l4h7z2rb8f.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2019-07-02",
+        "Title":  "Spider-Man: Far From Home"
+    },
+    {
+        "Id":  634649,
+        "VoteAverage":  8,
+        "PosterPath":  "/1g0dhYtq4irTY1GPXvft6k4YLn.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2021-12-17",
+        "Title":  "Spider-Man: No Way Home"
+    },
+    {
+        "Id":  10195,
+        "VoteAverage":  6.8,
+        "PosterPath":  "/prSfAi1xGrhLQNxVSU8C3oCgK4s.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2011-05-06",
+        "Title":  "Thor"
+    },
+    {
+        "Id":  76338,
+        "VoteAverage":  6.5,
+        "PosterPath":  "/bnX5PqAdw1f3R3jG4k7L9v0s2d.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2013-11-08",
+        "Title":  "Thor: The Dark World"
+    },
+    {
+        "Id":  284053,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/rzRwTcFvttcN1EbzWj5Jm9b8xL.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2017-11-03",
+        "Title":  "Thor: Ragnarok"
+    },
+    {
+        "Id":  1771,
+        "VoteAverage":  6.9,
+        "PosterPath":  "/vSNxAJTlD0LkR8d6z5w9f2c3g.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2011-07-22",
+        "Title":  "Captain America: The First Avenger"
+    },
+    {
+        "Id":  100402,
+        "VoteAverage":  7.7,
+        "PosterPath":  "/5TQ6gMwLj2L2p8ZpYFQ7v5z5Qp.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2014-04-04",
+        "Title":  "Captain America: The Winter Soldier"
+    },
+    {
+        "Id":  271110,
+        "VoteAverage":  7.4,
+        "PosterPath":  "/rAGiXaUfPzY7CDEyOBUfUnWb6.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2016-05-06",
+        "Title":  "Captain America: Civil War"
+    },
+    {
+        "Id":  550,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1999-10-15",
+        "Title":  "Fight Club"
+    },
+    {
+        "Id":  680,
+        "VoteAverage":  8.5,
+        "PosterPath":  "/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1994-10-14",
+        "Title":  "Pulp Fiction"
+    },
+    {
+        "Id":  278,
+        "VoteAverage":  8.7,
+        "PosterPath":  "/9cjIGRQLm3a6U2R1Cj1fFOO0l.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1994-09-23",
+        "Title":  "The Shawshank Redemption"
+    },
+    {
+        "Id":  238,
+        "VoteAverage":  8.7,
+        "PosterPath":  "/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1972-03-14",
+        "Title":  "The Godfather"
+    },
+    {
+        "Id":  240,
+        "VoteAverage":  8.6,
+        "PosterPath":  "/hek3koDUyRQk7FIhPXsa6hT46Z.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1974-12-20",
+        "Title":  "The Godfather Part II"
+    },
+    {
+        "Id":  241,
+        "VoteAverage":  7.4,
+        "PosterPath":  "/lm3dXyJ0w5z2k7v8c9p4n1m6f.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1990-12-25",
+        "Title":  "The Godfather Part III"
+    },
+    {
+        "Id":  424,
+        "VoteAverage":  8.6,
+        "PosterPath":  "/sF1U4EUQS8YHUYjNl3pM3o0z8c.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1993-12-15",
+        "Title":  "Schindler\u0027s List"
+    },
+    {
+        "Id":  497,
+        "VoteAverage":  8.5,
+        "PosterPath":  "/velWPhVMQeQKcxggNEU8YmIo52R.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1999-12-10",
+        "Title":  "The Green Mile"
+    },
+    {
+        "Id":  807,
+        "VoteAverage":  8.3,
+        "PosterPath":  "/6yOgJ43j2V7j7T6gN5M9v2c4f.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1995-09-22",
+        "Title":  "Se7en"
+    },
+    {
+        "Id":  769,
+        "VoteAverage":  8.5,
+        "PosterPath":  "/aKuFiU82s5SKDDkj4w7jGQ7G0c.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1990-09-21",
+        "Title":  "Goodfellas"
+    },
+    {
+        "Id":  274,
+        "VoteAverage":  8.3,
+        "PosterPath":  "/uS9m8OBk1RVF9UJj6L4WzG8f5d.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1991-02-14",
+        "Title":  "The Silence of the Lambs"
+    },
+    {
+        "Id":  629,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/bUPmtQzQzC3n7r7o7g7J7k3l2.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1995-08-16",
+        "Title":  "The Usual Suspects"
+    },
+    {
+        "Id":  1124,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/dEfNhjqy5zC2gM1fR3w8p6v0s.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2006-10-20",
+        "Title":  "The Prestige"
+    },
+    {
+        "Id":  77,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/fQMSaP2q0Z6w0jJ6k3l9n1v4x.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2000-10-11",
+        "Title":  "Memento"
+    },
+    {
+        "Id":  500,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/g7j7m6z5L8p3q2r1s0t9u8v7w6.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1992-10-23",
+        "Title":  "Reservoir Dogs"
+    },
+    {
+        "Id":  24,
+        "VoteAverage":  7.9,
+        "PosterPath":  "/v7TaX8kX5s4r3d2f1g0h9j8k7l.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2003-10-10",
+        "Title":  "Kill Bill: Vol. 1"
+    },
+    {
+        "Id":  393,
+        "VoteAverage":  7.8,
+        "PosterPath":  "/2r5P1s6t8u9v0w1x2y3z4a5b6c7.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2004-04-16",
+        "Title":  "Kill Bill: Vol. 2"
+    },
+    {
+        "Id":  244786,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/7fn624j5lj6x6jE0WcN3rF6w0s.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2014-10-10",
+        "Title":  "Whiplash"
+    },
+    {
+        "Id":  194662,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/rLbSU6IVKVg3N8d4e5f6g7h8j9.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2014-11-14",
+        "Title":  "Birdman"
+    },
+    {
+        "Id":  37799,
+        "VoteAverage":  7.7,
+        "PosterPath":  "/n0yibJ7i3z3k5l7m9n1p2r4t6v.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2010-10-01",
+        "Title":  "The Social Network"
+    },
+    {
+        "Id":  49047,
+        "VoteAverage":  7.9,
+        "PosterPath":  "/g6T8j5l3p1q7r9s2t0u4v6w8x.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2014-10-03",
+        "Title":  "Gone Girl"
+    },
+    {
+        "Id":  103,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/2Sg0mfOo3A5v7e8x9z0c1v2b3n.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1975-11-19",
+        "Title":  "One Flew Over the Cuckoo\u0027s Nest"
+    },
+    {
+        "Id":  637,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/9mZ6j5k4l3p2o1i0u9y8t7r6e5.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1998-03-06",
+        "Title":  "The Big Lebowski"
+    },
+    {
+        "Id":  281957,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/tUcYxK7p3j5l1n9v2w4x6z8a0b.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2015-12-25",
+        "Title":  "The Revenant"
+    },
+    {
+        "Id":  11005,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/EELKc6G7h8j9k0l1m2n3o4p5q6.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1998-06-05",
+        "Title":  "The Truman Show"
+    },
+    {
+        "Id":  98,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/ty8TGRuvJLPUmAR1H1nRIsgCLQ.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2000-05-05",
+        "Title":  "Gladiator"
+    },
+    {
+        "Id":  13,
+        "VoteAverage":  8.5,
+        "PosterPath":  "/arw2vcBveWOVZr6pxd9wzG7p0s.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1994-07-06",
+        "Title":  "Forrest Gump"
+    },
+    {
+        "Id":  105,
+        "VoteAverage":  8.3,
+        "PosterPath":  "/fVtGgY0Uyr5z8c3a1b9n7m4k2j.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1985-07-03",
+        "Title":  "Back to the Future"
+    },
+    {
+        "Id":  106,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/d5xO3k8r1t6v9z2c4f7h0j3m5p.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1989-11-22",
+        "Title":  "Back to the Future Part II"
+    },
+    {
+        "Id":  107,
+        "VoteAverage":  7.3,
+        "PosterPath":  "/l6p9s2v5x8z1c4f7h0j3m6q9t.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1990-05-25",
+        "Title":  "Back to the Future Part III"
+    },
+    {
+        "Id":  620,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/3ibXH4w8t7r6e5d4f3g2h1j0k9.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1984-06-08",
+        "Title":  "Ghostbusters"
+    },
+    {
+        "Id":  694,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/9f3g5h7j8k0l2m4n6p8q9r1t3v.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1980-05-23",
+        "Title":  "The Shining"
+    },
+    {
+        "Id":  578,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/l1m3n5p7q9r2t4v6w8x0z2b4c6.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1975-06-20",
+        "Title":  "Jaws"
+    },
+    {
+        "Id":  348,
+        "VoteAverage":  7.8,
+        "PosterPath":  "/4u7e8w9q0t1y2u3i4o5p6a7s8d.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1973-12-26",
+        "Title":  "The Exorcist"
+    },
+    {
+        "Id":  583,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/g7h8j9k0l1m2n3p4q5r6s7t8u9.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2002-08-30",
+        "Title":  "City of God"
+    },
+    {
+        "Id":  496243,
+        "VoteAverage":  8.5,
+        "PosterPath":  "/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2019-05-30",
+        "Title":  "Parasite"
+    },
+    {
+        "Id":  372058,
+        "VoteAverage":  8.5,
+        "PosterPath":  "/xq1Ugd62d23K2kU6Yj5v2w4z8b.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2016-08-26",
+        "Title":  "Your Name."
+    },
+    {
+        "Id":  872585,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2023-07-21",
+        "Title":  "Oppenheimer"
+    },
+    {
+        "Id":  346364,
+        "VoteAverage":  7.2,
+        "PosterPath":  "/9E2y5Q7W8p3r1t6v9z2c4f7h0j.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2017-09-08",
+        "Title":  "It"
+    },
+    {
+        "Id":  508947,
+        "VoteAverage":  6.8,
+        "PosterPath":  "/3n7k9l1m4p6r8t0v2x5z7b9c2.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2019-09-06",
+        "Title":  "It Chapter Two"
+    },
+    {
+        "Id":  138843,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/x2d8f5h7j9k1l3m5p7r9t1v3x5.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2013-07-19",
+        "Title":  "The Conjuring"
+    },
+    {
+        "Id":  259693,
+        "VoteAverage":  7.3,
+        "PosterPath":  "/w4y6u8i0o2p4r6t8v0x2z4b6c8.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2016-06-10",
+        "Title":  "The Conjuring 2"
+    },
+    {
+        "Id":  447332,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/n79D1r9K3l5m7p9r1t3v5x7z9b.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2018-04-06",
+        "Title":  "A Quiet Place"
+    },
+    {
+        "Id":  566525,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/1BIoJGKbXjdVoIiL6f5dP5v0fV.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2021-09-03",
+        "Title":  "Shang-Chi and the Legend of the Ten Rings"
+    },
+    {
+        "Id":  524434,
+        "VoteAverage":  6.8,
+        "PosterPath":  "/b6qUuL8j2m4o6q8s0u2w4y6z8a.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2021-11-05",
+        "Title":  "Eternals"
+    },
+    {
+        "Id":  572802,
+        "VoteAverage":  7.1,
+        "PosterPath":  "/qAZ0pNk3k5l7n9p1r3t5v7x9z1.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2021-07-09",
+        "Title":  "Black Widow"
+    },
+    {
+        "Id":  862,
+        "VoteAverage":  8,
+        "PosterPath":  "/uMZqKhT4K6Z7b9c1d3f5g7h9j1.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1995-11-22",
+        "Title":  "Toy Story"
+    },
+    {
+        "Id":  863,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/3g6k8m0o2q4s6u8w0y2a4c6e8.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1999-11-24",
+        "Title":  "Toy Story 2"
+    },
+    {
+        "Id":  10193,
+        "VoteAverage":  7.9,
+        "PosterPath":  "/m9t7r5p3n1l9j7h5f3d1b9v7.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2010-06-18",
+        "Title":  "Toy Story 3"
+    },
+    {
+        "Id":  301528,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/w9k8j7h6g5f4d3s2a1p0o9i8u7.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2019-06-21",
+        "Title":  "Toy Story 4"
+    },
+    {
+        "Id":  14160,
+        "VoteAverage":  7.9,
+        "PosterPath":  "/nk11p2d3q4r5s6t7u8v9w0x1y2.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2009-05-29",
+        "Title":  "Up"
+    },
+    {
+        "Id":  354912,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/gGEsB1ijMc0R9zF3P3WJ7y8x9s.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2017-11-22",
+        "Title":  "Coco"
+    },
+    {
+        "Id":  9487,
+        "VoteAverage":  7,
+        "PosterPath":  "/4q1w3e5r7t9y1u3i5o7p9a1s3.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1998-11-25",
+        "Title":  "A Bug\u0027s Life"
+    },
+    {
+        "Id":  9806,
+        "VoteAverage":  7.9,
+        "PosterPath":  "/2e1d3f5g7h9j1k3l5m7n9p1r3.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2004-11-05",
+        "Title":  "The Incredibles"
+    },
+    {
+        "Id":  260513,
+        "VoteAverage":  7.4,
+        "PosterPath":  "/9p7n5l3j1h9f7d5b3z1x9v7t5.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2018-06-15",
+        "Title":  "Incredibles 2"
+    },
+    {
+        "Id":  2062,
+        "VoteAverage":  7.8,
+        "PosterPath":  "/t8y7u6i5o4p3a2s1d0f9g8h7j6.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2007-06-29",
+        "Title":  "Ratatouille"
+    },
+    {
+        "Id":  10681,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/h8c1d2e3f4g5h6i7j8k9l0m1n2.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2008-06-27",
+        "Title":  "WALL-E"
+    },
+    {
+        "Id":  12,
+        "VoteAverage":  7.9,
+        "PosterPath":  "/zjqR5qO1r2s3t4u5v6w7x8y9z0.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2003-05-30",
+        "Title":  "Finding Nemo"
+    },
+    {
+        "Id":  58595,
+        "VoteAverage":  7.8,
+        "PosterPath":  "/m5n7p9r1t3v5x7z9b1d3f5g7h.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2001-11-02",
+        "Title":  "Monsters, Inc."
+    },
+    {
+        "Id":  62211,
+        "VoteAverage":  7,
+        "PosterPath":  "/y8w0q2s4u6w8y0a2c4e6g8i0k.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2013-06-21",
+        "Title":  "Monsters University"
+    },
+    {
+        "Id":  12782,
+        "VoteAverage":  7.1,
+        "PosterPath":  "/9k7j5h3f1d9b7v5t3r1p9n7l5.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2012-06-22",
+        "Title":  "Brave"
+    },
+    {
+        "Id":  269149,
+        "VoteAverage":  7.8,
+        "PosterPath":  "/hlK0D3c4l5m6n7o8p9q0r1s2t3.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2016-03-04",
+        "Title":  "Zootopia"
+    },
+    {
+        "Id":  177572,
+        "VoteAverage":  7.7,
+        "PosterPath":  "/2x8z4b6d8f0h2j4l6n8p0r2t4.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2014-11-07",
+        "Title":  "Big Hero 6"
+    },
+    {
+        "Id":  812,
+        "VoteAverage":  8,
+        "PosterPath":  "/lRHE0vx3d6f8g0h2j4k6m8o0q2.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2015-06-19",
+        "Title":  "Inside Out"
+    },
+    {
+        "Id":  508943,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/8tABp3d5f7h9j1l3n5p7r9t1v3.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2021-06-18",
+        "Title":  "Luca"
+    },
+    {
+        "Id":  560050,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/4j0k2m4o6q8s0u2w4y6z8b0d2.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2021-11-24",
+        "Title":  "Encanto"
+    },
+    {
+        "Id":  508442,
+        "VoteAverage":  8,
+        "PosterPath":  "/7f9h1j3l5n7p9r1t3v5x7z9b1.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2020-12-25",
+        "Title":  "Soul"
+    },
+    {
+        "Id":  447277,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/2w4y6u8i0o2p4r6t8v0x2z4b6.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2021-04-23",
+        "Title":  "The Mitchells vs. the Machines"
+    },
+    {
+        "Id":  502033,
+        "VoteAverage":  7.4,
+        "PosterPath":  "/q6s8u0w2y4a6c8e0g2i4k6m8o.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2022-03-11",
+        "Title":  "Turning Red"
+    },
+    {
+        "Id":  629542,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/7p9r1t3v5x7z9b1d3f5g7h9j1.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2022-04-22",
+        "Title":  "The Bad Guys"
+    },
+    {
+        "Id":  676710,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/8z0b2d4f6h8j0l2n4p6r8t0v2.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2023-06-16",
+        "Title":  "Elemental"
+    },
+    {
+        "Id":  20352,
+        "VoteAverage":  7.2,
+        "PosterPath":  "/4q1w3e5r7t9y1u3i5o7p9a1s3.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2010-07-09",
+        "Title":  "Despicable Me"
+    },
+    {
+        "Id":  93456,
+        "VoteAverage":  6.9,
+        "PosterPath":  "/k2m4o6q8s0u2w4y6z8b0d2f4h.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2013-07-03",
+        "Title":  "Despicable Me 2"
+    },
+    {
+        "Id":  283566,
+        "VoteAverage":  6.6,
+        "PosterPath":  "/5n7p9r1t3v5x7z9b1d3f5g7h9.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2017-06-30",
+        "Title":  "Despicable Me 3"
+    },
+    {
+        "Id":  335988,
+        "VoteAverage":  7.1,
+        "PosterPath":  "/9k1l3m5n7p9r1t3v5x7z9b1d3.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2016-12-21",
+        "Title":  "Sing"
+    },
+    {
+        "Id":  128,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2001-07-20",
+        "Title":  "Spirited Away"
+    },
+    {
+        "Id":  4935,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/6pZgH10jH0oW5x6W3y8z1b4d7f.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2004-11-20",
+        "Title":  "Howl\u0027s Moving Castle"
+    },
+    {
+        "Id":  12477,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/lQlwI2j3k5m7n9p1r3t5v7x9z1.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1997-07-12",
+        "Title":  "Princess Mononoke"
+    },
+    {
+        "Id":  8392,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/rtGDOeG9L1k4hS6J8m0q2s4u6w.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1988-04-16",
+        "Title":  "My Neighbor Totoro"
+    },
+    {
+        "Id":  18491,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/5rH6x3l7n9p1r3t5v7x9z1b3d5.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1988-07-16",
+        "Title":  "Akira"
+    },
+    {
+        "Id":  1396,
+        "VoteAverage":  8.9,
+        "PosterPath":  "/ggFHVNuKYYjM7x3w0Q1gP6y8z.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2008-01-20",
+        "Title":  "Breaking Bad"
+    },
+    {
+        "Id":  1399,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/u3b0EIMj3n0y7n8Q9p0w1r2t4.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2011-04-17",
+        "Title":  "Game of Thrones"
+    },
+    {
+        "Id":  66732,
+        "VoteAverage":  8.6,
+        "PosterPath":  "/49WJZfFAyH3L2a5v6s8d1f3g5h.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2016-07-15",
+        "Title":  "Stranger Things"
+    },
+    {
+        "Id":  60625,
+        "VoteAverage":  8.7,
+        "PosterPath":  "/8kOWDBK6Xk2z4j6l8n0p2r4t6.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2013-12-02",
+        "Title":  "Rick and Morty"
+    },
+    {
+        "Id":  456,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/vHToM6Fh7j9k1l3n5p7r9t1v3x.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "1989-12-17",
+        "Title":  "The Simpsons"
+    },
+    {
+        "Id":  1395,
+        "VoteAverage":  8.6,
+        "PosterPath":  "/57okJJSUAD8mF5z6x7y8z9b0d2.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "1999-01-10",
+        "Title":  "The Sopranos"
+    },
+    {
+        "Id":  60059,
+        "VoteAverage":  8.7,
+        "PosterPath":  "/fC2H3j5l7n9p1r3t5v7x9z1b3.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2015-02-08",
+        "Title":  "Better Call Saul"
+    },
+    {
+        "Id":  82856,
+        "VoteAverage":  8.5,
+        "PosterPath":  "/e9n5d7f9h1j3l5n7p9r1t3v5x7.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2019-11-12",
+        "Title":  "The Mandalorian"
+    },
+    {
+        "Id":  76479,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/m2k4o6q8s0u2w4y6z8b0d2f4h6.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2019-07-26",
+        "Title":  "The Boys"
+    },
+    {
+        "Id":  71912,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/cZ0d3f5g7h9j1k3l5m7n9p1r3t5.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2019-12-20",
+        "Title":  "The Witcher"
+    },
+    {
+        "Id":  93405,
+        "VoteAverage":  7.9,
+        "PosterPath":  "/dDlEmu3S0WDJ7n8p9q0r1s2t4v.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2021-09-17",
+        "Title":  "Squid Game"
+    },
+    {
+        "Id":  42009,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/5x6y8z0b2d4f6h8j0l2n4p6r8t.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2011-12-04",
+        "Title":  "Black Mirror"
+    },
+    {
+        "Id":  75710,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/1m3o5q7s9u1w3y5a7c9e1g3i5.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2016-11-04",
+        "Title":  "The Crown"
+    },
+    {
+        "Id":  1668,
+        "VoteAverage":  8.3,
+        "PosterPath":  "/h9j1l3n5p7r9t1v3x5z7b9d1f3.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "1994-09-22",
+        "Title":  "Friends"
+    },
+    {
+        "Id":  2316,
+        "VoteAverage":  8.5,
+        "PosterPath":  "/q7s9u1w3y5a7c9e1g3i5k7m9o1.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2005-03-24",
+        "Title":  "The Office"
+    },
+    {
+        "Id":  1421,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/n5p7r9t1v3x5z7b9d1f3h5j7l9.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2014-01-12",
+        "Title":  "True Detective"
+    },
+    {
+        "Id":  1402,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/r1t3v5x7z9b1d3f5g7h9j1l3n5.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2010-10-31",
+        "Title":  "The Walking Dead"
+    },
+    {
+        "Id":  1418,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/f5g7h9j1k3l5m7n9p1r3t5v7x9.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2007-09-24",
+        "Title":  "The Big Bang Theory"
+    },
+    {
+        "Id":  671,
+        "VoteAverage":  7.9,
+        "PosterPath":  "/dMhmkU0i7kF3a5s8z1b4d7f9h2.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2001-11-16",
+        "Title":  "Harry Potter and the Philosopher\u0027s Stone"
+    },
+    {
+        "Id":  672,
+        "VoteAverage":  7.7,
+        "PosterPath":  "/sd6e0p3r6t9v0w3x6y9z2c5f8h.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2002-11-15",
+        "Title":  "Harry Potter and the Chamber of Secrets"
+    },
+    {
+        "Id":  673,
+        "VoteAverage":  7.8,
+        "PosterPath":  "/a2x8z4b6d8f0h2j4l6n8p0r2t4.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2004-06-04",
+        "Title":  "Harry Potter and the Prisoner of Azkaban"
+    },
+    {
+        "Id":  674,
+        "VoteAverage":  7.7,
+        "PosterPath":  "/m5p7r9t1v3x5z7b9d1f3h5j7l9.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2005-11-18",
+        "Title":  "Harry Potter and the Goblet of Fire"
+    },
+    {
+        "Id":  675,
+        "VoteAverage":  7.4,
+        "PosterPath":  "/k4m6o8q0s2u4w6y8z0b2d4f6h.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2007-07-11",
+        "Title":  "Harry Potter and the Order of the Phoenix"
+    },
+    {
+        "Id":  676,
+        "VoteAverage":  7.5,
+        "PosterPath":  "/f8h0j2l4n6p8r0t2v4x6z8b0d.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2009-07-15",
+        "Title":  "Harry Potter and the Half-Blood Prince"
+    },
+    {
+        "Id":  677,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/9k1m3o5q7s9u1w3y5a7c9e1g3.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2010-11-19",
+        "Title":  "Harry Potter and the Deathly Hallows: Part 1"
+    },
+    {
+        "Id":  678,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/n2p4r6t8v0x2z4b6d8f0h2j4l.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2011-07-15",
+        "Title":  "Harry Potter and the Deathly Hallows: Part 2"
+    },
+    {
+        "Id":  68718,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/7o2j5k7l9n1p3r5t7v9z1b3d5.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2012-12-25",
+        "Title":  "Django Unchained"
+    },
+    {
+        "Id":  168259,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/k8m0o2q4s6u8w0y2a4c6e8g0i.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2015-12-25",
+        "Title":  "The Hateful Eight"
+    },
+    {
+        "Id":  273248,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/8j5i3k7m9o1q3s5u7w9y1b3d5.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2019-07-26",
+        "Title":  "Once Upon a Time in Hollywood"
+    },
+    {
+        "Id":  11324,
+        "VoteAverage":  7.6,
+        "PosterPath":  "/eUdK7lQ7l7n9p1r3t5v7x9z1b3.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2017-07-21",
+        "Title":  "Dunkirk"
+    },
+    {
+        "Id":  597,
+        "VoteAverage":  7.8,
+        "PosterPath":  "/9xjZS2rlVd8u2F1U2c4e6g8i0k.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1997-11-18",
+        "Title":  "Titanic"
+    },
+    {
+        "Id":  316,
+        "VoteAverage":  7.8,
+        "PosterPath":  "/n9p1r3t5v7x9z1b3d5f7h9j1l3.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1986-07-18",
+        "Title":  "Aliens"
+    },
+    {
+        "Id":  22,
+        "VoteAverage":  7.8,
+        "PosterPath":  "/z8b0d2f4h6j8k0m2o4q6s8u0w2.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2003-07-09",
+        "Title":  "Pirates of the Caribbean: The Curse of the Black Pearl"
+    },
+    {
+        "Id":  58,
+        "VoteAverage":  7.3,
+        "PosterPath":  "/l1n3p5r7t9v1x3z5b7d9f1h3.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2006-07-07",
+        "Title":  "Pirates of the Caribbean: Dead Man\u0027s Chest"
+    },
+    {
+        "Id":  285,
+        "VoteAverage":  7.1,
+        "PosterPath":  "/f5g7h9j1k3l5m7n9p1r3t5v7x9.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "2007-05-25",
+        "Title":  "Pirates of the Caribbean: At World\u0027s End"
+    },
+    {
+        "Id":  87,
+        "VoteAverage":  8.1,
+        "PosterPath":  "/ceG9VzoAbxKQN3Y1Gp8q9r0s2t.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1981-06-12",
+        "Title":  "Indiana Jones and the Raiders of the Lost Ark"
+    },
+    {
+        "Id":  85,
+        "VoteAverage":  7.3,
+        "PosterPath":  "/k8m0o2q4s6u8w0y2a4c6e8g0i.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1984-05-23",
+        "Title":  "Indiana Jones and the Temple of Doom"
+    },
+    {
+        "Id":  89,
+        "VoteAverage":  7.8,
+        "PosterPath":  "/p3r5t7v9x1z3b5d7f9h1j3l5n.jpg",
+        "MediaType":  "movie",
+        "ReleaseDate":  "1989-05-24",
+        "Title":  "Indiana Jones and the Last Crusade"
+    },
+    {
+        "Id":  1420,
+        "VoteAverage":  8.4,
+        "PosterPath":  "/p9r1t3v5x7z9b1d3f5h7j9l1n3.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2002-06-02",
+        "Title":  "The Wire"
+    },
+    {
+        "Id":  1416,
+        "VoteAverage":  8.5,
+        "PosterPath":  "/q1s3u5w7y9a1c3e5g7i9k1m3o.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2005-03-24",
+        "Title":  "The Office (US)"
+    },
+    {
+        "Id":  1425,
+        "VoteAverage":  8,
+        "PosterPath":  "/r3t5v7x9z1b3d5f7h9j1l3n5p7.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2016-10-02",
+        "Title":  "Westworld"
+    },
+    {
+        "Id":  1411,
+        "VoteAverage":  8,
+        "PosterPath":  "/s6u8w0y2a4c6e8g0i2k4m6o8q0.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2013-02-01",
+        "Title":  "House of Cards"
+    },
+    {
+        "Id":  1422,
+        "VoteAverage":  8.2,
+        "PosterPath":  "/t8v0x2z4b6d8f0h2j4l6n8p0r2.jpg",
+        "MediaType":  "tv",
+        "ReleaseDate":  "2006-10-01",
+        "Title":  "Dexter"
+    }
+]

@@ -91,25 +91,19 @@ namespace SpokysProjectLightning.Views
 
         private async Task LoadRecommended()
         {
-            try
+            var bundled = _scraper.LoadBundled();
+            if (bundled.Count > 0)
             {
-                var fromApi = await _scraper.GetRecommendedAsync();
-                if (fromApi.Count > 0)
-                {
-                    RecommendedGrid.ItemsSource = fromApi.Take(10).ToList();
-                    ResultsHeader.Text = "🔥 Trending Now";
-                    _currentMovies = fromApi;
-                    MoviesGrid.ItemsSource = _currentMovies;
-                    LoadingText.Visibility = Visibility.Collapsed;
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error loading movies: {ex.Message}");
+                var shuffled = bundled.OrderBy(_ => Random.Shared.Next()).ToList();
+                RecommendedGrid.ItemsSource = shuffled.Take(10).ToList();
+                ResultsHeader.Text = $"📚 Local Database ({bundled.Count} titles)";
+                _currentMovies = shuffled;
+                MoviesGrid.ItemsSource = _currentMovies;
+                LoadingText.Visibility = Visibility.Collapsed;
+                return;
             }
 
-            // Fallback: hardcoded popular movies so the page always shows content
+            // Fallback: hardcoded list as last resort
             var fallback = new List<MovieResult>
             {
                 new() { Id = 550, Title = "Fight Club", PosterPath = "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg", VoteAverage = 8.4, ReleaseDate = "1999-10-15", MediaType = "movie" },
@@ -125,13 +119,12 @@ namespace SpokysProjectLightning.Views
             };
 
             RecommendedGrid.ItemsSource = fallback.Take(5).ToList();
-            ResultsHeader.Text = "🔥 Popular Movies (offline)";
+            ResultsHeader.Text = "🔥 Popular Movies (fallback)";
             _currentMovies = fallback;
             MoviesGrid.ItemsSource = _currentMovies;
             LoadingText.Visibility = Visibility.Collapsed;
-
             NoResultsHeader.Visibility = Visibility.Collapsed;
-            NoMoviesText.Text = "TMDB API unreachable. Set your own free API key in Settings → API Keys (https://www.themoviedb.org/settings/api)";
+            NoMoviesText.Text = "movies.json not found — bundled database missing.";
         }
 
         private async Task LoadCategory(string category)
@@ -140,6 +133,7 @@ namespace SpokysProjectLightning.Views
             LoadingText.Text = "Loading movies...";
             MoviesGrid.ItemsSource = null;
             NoResultsHeader.Visibility = Visibility.Collapsed;
+            var bundled = _scraper.LoadBundled();
 
             try
             {
@@ -170,6 +164,15 @@ namespace SpokysProjectLightning.Views
                         _currentMovies = await _scraper.GetOnTVAsync();
                         break;
                 }
+                if (_currentMovies.Count == 0 && bundled.Count > 0)
+                {
+                    _currentMovies = category switch
+                    {
+                        "OnTV" => bundled.Where(m => m.IsTv).ToList(),
+                        _ => bundled.Where(m => !m.IsTv).ToList()
+                    };
+                    ResultsHeader.Text = $"📚 Local Database ({_currentMovies.Count} titles)";
+                }
                 MoviesGrid.ItemsSource = _currentMovies;
                 if (_currentMovies.Count == 0)
                 {
@@ -179,9 +182,22 @@ namespace SpokysProjectLightning.Views
             }
             catch (Exception ex)
             {
-                ResultsHeader.Text = $"❌ Error: {ex.Message}";
-                NoResultsHeader.Visibility = Visibility.Visible;
-                NoMoviesText.Text = $"Failed to load: {ex.Message}";
+                if (bundled.Count > 0)
+                {
+                    _currentMovies = category switch
+                    {
+                        "OnTV" => bundled.Where(m => m.IsTv).ToList(),
+                        _ => bundled.Where(m => !m.IsTv).ToList()
+                    };
+                    ResultsHeader.Text = $"📚 Local Database ({_currentMovies.Count} titles)";
+                    MoviesGrid.ItemsSource = _currentMovies;
+                }
+                else
+                {
+                    ResultsHeader.Text = $"❌ Error: {ex.Message}";
+                    NoResultsHeader.Visibility = Visibility.Visible;
+                    NoMoviesText.Text = $"Failed to load: {ex.Message}";
+                }
             }
             finally
             {
