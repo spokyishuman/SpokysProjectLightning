@@ -194,6 +194,18 @@
                                 Style="{DynamicResource SecondaryButton}"
                                 Click="SaveSteamDaddyKey_Click"/>
                     </WrapPanel>
+                    <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,10,0,4">Movie Database Proxy URL (optional — share one TMDB key across all users):</TextBlock>
+                    <WrapPanel Margin="0,0,0,8">
+                        <TextBox x:Name="MovieProxyUrlBox" FontSize="12" Width="300"
+                                 VerticalContentAlignment="Center" Padding="6,4"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 Background="{DynamicResource SurfaceBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                 Margin="0,0,6,0"/>
+                        <Button Content="Save" FontSize="11" Padding="8,3"
+                                Style="{DynamicResource SecondaryButton}"
+                                Click="SaveMovieProxyUrl_Click"/>
+                    </WrapPanel>
                     <TextBlock x:Name="ApiKeyStatus" Text="" FontSize="12" Foreground="{DynamicResource PrimaryBrush}" Margin="0,6,0,0"/>
                 </StackPanel>
             </Border>

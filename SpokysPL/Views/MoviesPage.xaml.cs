@@ -91,6 +91,22 @@ namespace SpokysProjectLightning.Views
 
         private async Task LoadRecommended()
         {
+            // Priority: proxy/TMDB API → bundled database → hardcoded fallback
+            try
+            {
+                var fromApi = await _scraper.GetRecommendedAsync();
+                if (fromApi.Count > 0)
+                {
+                    RecommendedGrid.ItemsSource = fromApi.Take(10).ToList();
+                    ResultsHeader.Text = _scraper.SourceLabel;
+                    _currentMovies = fromApi;
+                    MoviesGrid.ItemsSource = _currentMovies;
+                    LoadingText.Visibility = Visibility.Collapsed;
+                    return;
+                }
+            }
+            catch { }
+
             var bundled = _scraper.LoadBundled();
             if (bundled.Count > 0)
             {
@@ -100,6 +116,7 @@ namespace SpokysProjectLightning.Views
                 _currentMovies = shuffled;
                 MoviesGrid.ItemsSource = _currentMovies;
                 LoadingText.Visibility = Visibility.Collapsed;
+                NoResultsHeader.Visibility = Visibility.Collapsed;
                 return;
             }
 
@@ -164,21 +181,28 @@ namespace SpokysProjectLightning.Views
                         _currentMovies = await _scraper.GetOnTVAsync();
                         break;
                 }
-                if (_currentMovies.Count == 0 && bundled.Count > 0)
-                {
-                    _currentMovies = category switch
-                    {
-                        "OnTV" => bundled.Where(m => m.IsTv).ToList(),
-                        _ => bundled.Where(m => !m.IsTv).ToList()
-                    };
-                    ResultsHeader.Text = $"📚 Local Database ({_currentMovies.Count} titles)";
-                }
-                MoviesGrid.ItemsSource = _currentMovies;
                 if (_currentMovies.Count == 0)
                 {
-                    NoResultsHeader.Visibility = Visibility.Visible;
-                    NoMoviesText.Text = $"No movies found in this category.";
+                    if (bundled.Count > 0)
+                    {
+                        _currentMovies = category switch
+                        {
+                            "OnTV" => bundled.Where(m => m.IsTv).ToList(),
+                            _ => bundled.Where(m => !m.IsTv).ToList()
+                        };
+                        ResultsHeader.Text = $"📚 Local Database ({_currentMovies.Count} titles)";
+                    }
+                    else
+                    {
+                        NoResultsHeader.Visibility = Visibility.Visible;
+                        NoMoviesText.Text = $"No movies found in this category.";
+                    }
                 }
+                else
+                {
+                    ResultsHeader.Text = _scraper.SourceLabel;
+                }
+                MoviesGrid.ItemsSource = _currentMovies;
             }
             catch (Exception ex)
             {

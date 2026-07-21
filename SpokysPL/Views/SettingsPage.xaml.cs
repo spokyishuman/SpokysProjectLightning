@@ -96,6 +96,7 @@ namespace SpokysProjectLightning.Views
             TmdbApiKeyBox.Text = settings.TmdbApiKey;
             OmdbApiKeyBox.Text = settings.OmdbApiKey;
             SteamDaddyApiKeyBox.Text = settings.SteamDaddyApiKey;
+            MovieProxyUrlBox.Text = settings.MovieProxyUrl;
 
             // Update URL
             if (!string.IsNullOrEmpty(settings.UpdateUrl))
@@ -763,6 +764,14 @@ Remove-Item $zip -ErrorAction SilentlyContinue
             settings.SteamDaddyApiKey = SteamDaddyApiKeyBox.Text.Trim();
             _data.SaveSettings(settings);
             ApiKeyStatus.Text = "✅ SteamDaddy API key saved (20 fetches/day)";
+        }
+
+        private void SaveMovieProxyUrl_Click(object sender, RoutedEventArgs e)
+        {
+            var settings = _data.LoadSettings();
+            settings.MovieProxyUrl = MovieProxyUrlBox.Text.Trim();
+            _data.SaveSettings(settings);
+            ApiKeyStatus.Text = "✅ Movie proxy URL saved";
         }
 
         private void SaveUpdateUrl_Click(object sender, RoutedEventArgs e)
