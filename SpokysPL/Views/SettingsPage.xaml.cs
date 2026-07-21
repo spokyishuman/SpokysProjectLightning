@@ -97,6 +97,7 @@ namespace SpokysProjectLightning.Views
             OmdbApiKeyBox.Text = settings.OmdbApiKey;
             SteamDaddyApiKeyBox.Text = settings.SteamDaddyApiKey;
             MovieProxyUrlBox.Text = settings.MovieProxyUrl;
+            BugReportWebhookUrlBox.Text = settings.BugReportWebhookUrl;
 
             // Update URL
             if (!string.IsNullOrEmpty(settings.UpdateUrl))
@@ -772,6 +773,14 @@ Remove-Item $zip -ErrorAction SilentlyContinue
             settings.MovieProxyUrl = MovieProxyUrlBox.Text.Trim();
             _data.SaveSettings(settings);
             ApiKeyStatus.Text = "✅ Movie proxy URL saved";
+        }
+
+        private void SaveBugReportWebhook_Click(object sender, RoutedEventArgs e)
+        {
+            var settings = _data.LoadSettings();
+            settings.BugReportWebhookUrl = BugReportWebhookUrlBox.Text.Trim();
+            _data.SaveSettings(settings);
+            ApiKeyStatus.Text = "✅ Webhook URL saved";
         }
 
         private void SaveUpdateUrl_Click(object sender, RoutedEventArgs e)

@@ -56,6 +56,7 @@ namespace SpokysProjectLightning.ViewModels
             new() { Icon = "🔧", ToolTip = "Tools", PageName = "Tools", DisplayName = "Tools", IsPinned = true },
             new() { Icon = "🛒", ToolTip = "Shop", PageName = "Shop", DisplayName = "Shop", IsPinned = true },
             new() { Icon = "⚡", ToolTip = "OpenSteamTool", PageName = "OpenSteamTool", DisplayName = "OST", IsPinned = true },
+            new() { Icon = "🐛", ToolTip = "Report Bug", PageName = "ReportBug", DisplayName = "Bug", IsPinned = true },
         };
 
         public MainViewModel()
@@ -112,6 +113,7 @@ namespace SpokysProjectLightning.ViewModels
             if (pageError == null) try { BypassPage = new BypassPage(); } catch (Exception ex) { pageError = $"BypassPage: {ex.Message}"; System.Windows.MessageBox.Show(pageError); }
             if (pageError == null) try { ShopPage = new ShopPage(); } catch (Exception ex) { pageError = $"ShopPage: {ex.Message}"; System.Windows.MessageBox.Show(pageError); }
             if (pageError == null) try { OpenSteamToolPage = new Views.OpenSteamToolPage(); } catch (Exception ex) { pageError = $"OpenSteamToolPage: {ex.Message}"; System.Windows.MessageBox.Show(pageError); }
+            if (pageError == null) try { ReportBugPage = new Views.ReportBugPage(); } catch (Exception ex) { pageError = $"ReportBugPage: {ex.Message}"; System.Windows.MessageBox.Show(pageError); }
             if (pageError != null) throw new InvalidOperationException($"Failed to create page: {pageError}");
 
             _currentPage = HomePage;
@@ -139,6 +141,7 @@ namespace SpokysProjectLightning.ViewModels
         public BypassPage BypassPage { get; } = null!;
         public ShopPage ShopPage { get; } = null!;
         public Views.OpenSteamToolPage OpenSteamToolPage { get; } = null!;
+        public Views.ReportBugPage ReportBugPage { get; } = null!;
 
         public object CurrentPage
         {
@@ -214,6 +217,7 @@ namespace SpokysProjectLightning.ViewModels
                     case "Library":    CurrentPage = ManagePage; break;
                     case "Shop":           CurrentPage = ShopPage; break;
                     case "OpenSteamTool":  CurrentPage = OpenSteamToolPage; break;
+                    case "ReportBug":      CurrentPage = ReportBugPage; break;
                 }
             }
         }
