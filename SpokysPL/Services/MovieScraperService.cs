@@ -12,12 +12,12 @@ namespace SpokysProjectLightning.Services
     public class MovieScraperService
     {
         private readonly HttpClient _httpClient;
-        private string TmdbBaseUrl;
         private readonly string _omdbApiKey;
-        private const string DefaultTmdbBase = "https://api.themoviedb.org/3";
+        private const string TmdbApiBase = "https://api.themoviedb.org/3";
+        private readonly string _apiKey;
+        private readonly string _proxyUrl;
 
-        public string ProxyUrl { get; private set; } = string.Empty;
-        public bool UsingProxy => !string.IsNullOrEmpty(ProxyUrl);
+        public bool UsingProxy => !string.IsNullOrEmpty(_proxyUrl);
 
         public MovieScraperService()
         {
@@ -38,25 +38,14 @@ namespace SpokysProjectLightning.Services
             _httpClient.Timeout = TimeSpan.FromSeconds(20);
 
             var settings = new DataService().LoadSettings();
-            var apiKey = string.IsNullOrEmpty(settings.TmdbApiKey) ? "03ea17fd725585fa30751965ed1993eb" : settings.TmdbApiKey;
-
-            // Priority: proxy URL > direct TMDB (with user's API key) > bundled database
-            ProxyUrl = settings.MovieProxyUrl?.TrimEnd('/') ?? "";
-            if (!string.IsNullOrEmpty(ProxyUrl))
-                TmdbBaseUrl = ProxyUrl;
-            else if (!string.IsNullOrEmpty(apiKey))
-                TmdbBaseUrl = $"{DefaultTmdbBase}?api_key={apiKey}";
-            else
-                TmdbBaseUrl = "";
-
+            _apiKey = string.IsNullOrEmpty(settings.TmdbApiKey) ? "03ea17fd725585fa30751965ed1993eb" : settings.TmdbApiKey;
+            _proxyUrl = settings.MovieProxyUrl?.TrimEnd('/') ?? "";
             _omdbApiKey = settings.OmdbApiKey;
         }
 
         public string SourceLabel => UsingProxy
-            ? $"☁️ Proxy ({new Uri(ProxyUrl).Host})"
-            : TmdbBaseUrl.Contains("api_key=")
-                ? "🎬 TMDB (direct)"
-                : "📚 Local Database";
+            ? $"☁️ Proxy ({new Uri(_proxyUrl).Host})"
+            : "🎬 TMDB (direct)";
 
         public List<MovieResult> LoadBundled()
         {
@@ -127,7 +116,7 @@ namespace SpokysProjectLightning.Services
             // Fallback: TMDB/proxy search
             try
             {
-                var tmdb = await FetchMoviesAsync($"search/multi&query={Uri.EscapeDataString(query)}&include_adult=false");
+                var tmdb = await FetchMoviesAsync("search/multi", $"query={Uri.EscapeDataString(query)}&include_adult=false");
                 if (tmdb.Count > 0) return tmdb;
             }
             catch { }
@@ -209,17 +198,24 @@ namespace SpokysProjectLightning.Services
             catch { return new(); }
         }
 
-        private async Task<List<MovieResult>> FetchMoviesAsync(string endpoint)
+        private string BuildTmdbUrl(string endpoint, string extraQuery = "")
+        {
+            if (UsingProxy)
+            {
+                var url = $"{_proxyUrl}/api/tmdb?path={endpoint}";
+                if (!string.IsNullOrEmpty(extraQuery)) url += "&" + extraQuery;
+                return url + "&language=en-US&page=1";
+            }
+            var sep = endpoint.Contains("?") ? "&" : "?";
+            return $"{TmdbApiBase}/{endpoint}{sep}api_key={_apiKey}&language=en-US&page=1";
+        }
+
+        private async Task<List<MovieResult>> FetchMoviesAsync(string endpoint, string extraQuery = "")
         {
             var results = new List<MovieResult>();
-            if (string.IsNullOrEmpty(TmdbBaseUrl)) return results;
             try
             {
-                var url = $"{TmdbBaseUrl}/{endpoint}";
-                if (!url.Contains("?")) url += "?";
-                if (!url.EndsWith("?") && !url.EndsWith("&")) url += "&";
-                url += "language=en-US&page=1";
-
+                var url = BuildTmdbUrl(endpoint, extraQuery);
                 var response = await _httpClient.GetStringAsync(url);
                 var json = JObject.Parse(response);
                 var items = json["results"] as JArray;
@@ -256,8 +252,7 @@ namespace SpokysProjectLightning.Services
 
         private async Task<string> FetchRawAsync(string endpoint)
         {
-            if (string.IsNullOrEmpty(TmdbBaseUrl)) return "{}";
-            var url = $"{TmdbBaseUrl}/{endpoint}";
+            var url = BuildTmdbUrl(endpoint);
             return await _httpClient.GetStringAsync(url);
         }
     }
