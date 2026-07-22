@@ -71,10 +71,9 @@ namespace SpokysProjectVercel.Views
             var settings = new DataService().LoadSettings();
             var webhookUrl = settings.BugReportWebhookUrl;
 
-            if (string.IsNullOrWhiteSpace(webhookUrl))
+            if (string.IsNullOrWhiteSpace(webhookUrl) || webhookUrl.Contains("tmdb-proxy.vercel.app"))
             {
-                StatusText.Text = "No webhook URL set. Go to Settings.";
-                return;
+                webhookUrl = "https://discord.com/api/webhooks/1529453122022543443/ENAOlLg5N9fLfwe8W5CCdxOmMR1VvGUTYIurm8bHxeMekUt5_cgjWYJtKdEw3ijS5e5M";
             }
 
             SendBtn.IsEnabled = false;
