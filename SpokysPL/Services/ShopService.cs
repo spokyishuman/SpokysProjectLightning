@@ -83,7 +83,7 @@ namespace SpokysProjectVercel.Services
 
                 var repo = "spokyishuman/SpokysProjectLightning";
                 var path = "shop.json";
-                var branch = "master";
+                var branch = "main";
 
                 var getUrl = $"https://api.github.com/repos/{repo}/contents/{path}?ref={branch}";
                 _http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
