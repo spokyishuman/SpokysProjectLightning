@@ -485,26 +485,28 @@ namespace SpokysProjectVercel
         {
             var primary = (System.Windows.Media.Brush)Application.Current.FindResource("PrimaryBrush");
             var muted = (System.Windows.Media.Brush)Application.Current.FindResource("MutedForegroundBrush");
+            var accent = (System.Windows.Media.Brush)Application.Current.FindResource("SidebarAccentBrush");
+            var trans = System.Windows.Media.Brushes.Transparent;
 
             if (AppMode.UseLumaCore)
             {
                 SidebarModeIcon.Text = "⚡";
                 SidebarModeText.Text = "LC";
                 SidebarModeToggle.Foreground = primary;
-                ModeLcBtn.Foreground = primary;
-                ModeLcBtn.Background = (System.Windows.Media.Brush)Application.Current.FindResource("SidebarAccentBrush");
-                ModeStBtn.Foreground = muted;
-                ModeStBtn.Background = System.Windows.Media.Brushes.Transparent;
+                ModeToggleKnob.SetValue(Grid.ColumnProperty, 0);
+                ModeToggleKnob.Background = accent;
+                ModeToggleLcIcon.Foreground = primary;
+                ModeToggleStSide.Opacity = 0.5;
             }
             else
             {
                 SidebarModeIcon.Text = "🛠️";
                 SidebarModeText.Text = "ST";
                 SidebarModeToggle.Foreground = muted;
-                ModeStBtn.Foreground = primary;
-                ModeStBtn.Background = (System.Windows.Media.Brush)Application.Current.FindResource("SidebarAccentBrush");
-                ModeLcBtn.Foreground = muted;
-                ModeLcBtn.Background = System.Windows.Media.Brushes.Transparent;
+                ModeToggleKnob.SetValue(Grid.ColumnProperty, 1);
+                ModeToggleKnob.Background = accent;
+                ModeToggleLcIcon.Foreground = muted;
+                ModeToggleStSide.Opacity = 1.0;
             }
         }
 
@@ -513,16 +515,9 @@ namespace SpokysProjectVercel
             await SetLumaCoreMode(!AppMode.UseLumaCore);
         }
 
-        private async void ModeLc_Click(object sender, RoutedEventArgs e)
+        private async void ModeToggleSwitch_Click(object sender, RoutedEventArgs e)
         {
-            if (AppMode.UseLumaCore) return;
-            await SetLumaCoreMode(true);
-        }
-
-        private async void ModeSt_Click(object sender, RoutedEventArgs e)
-        {
-            if (!AppMode.UseLumaCore) return;
-            await SetLumaCoreMode(false);
+            await SetLumaCoreMode(!AppMode.UseLumaCore);
         }
 
         private async Task SetLumaCoreMode(bool useLc)

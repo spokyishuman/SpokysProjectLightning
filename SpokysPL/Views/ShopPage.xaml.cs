@@ -65,17 +65,29 @@ namespace SpokysProjectVercel.Views
         private void OpenAdminPanel()
         {
             var items = _shop.LoadItems();
+            var w = Window.GetWindow(this);
             var dialog = new Window
             {
                 Title = "Shop Admin",
                 Width = 700,
                 Height = 600,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Owner = Window.GetWindow(this),
-                Background = System.Windows.Media.Brushes.Black
+                Owner = w,
+                Background = TryFindResource("BackgroundBrush") as System.Windows.Media.Brush ?? System.Windows.Media.Brushes.Black,
+                Style = null
             };
+            dialog.Resources.MergedDictionaries.Add(w.Resources.MergedDictionaries[0]);
 
-            var margin16 = new Thickness(16, 16, 16, 16);
+            T Res<T>(string key) where T : class => TryFindResource(key) as T;
+            var bgCard = Res<System.Windows.Media.Brush>("CardBrush") ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 45));
+            var bgSurface = Res<System.Windows.Media.Brush>("SurfaceBrush") ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(25, 25, 35));
+            var textPrimary = Res<System.Windows.Media.Brush>("TextPrimaryBrush") ?? System.Windows.Media.Brushes.White;
+            var textSecondary = Res<System.Windows.Media.Brush>("TextSecondaryBrush") ?? System.Windows.Media.Brushes.Gray;
+            var borderBrush = Res<System.Windows.Media.Brush>("BorderBrush") ?? textSecondary;
+            var primaryBrush = Res<System.Windows.Media.Brush>("PrimaryBrush") ?? System.Windows.Media.Brushes.DeepSkyBlue;
+            var mutedBrush = Res<System.Windows.Media.Brush>("MutedForegroundBrush") ?? System.Windows.Media.Brushes.Gray;
+
+            var margin16 = new Thickness(16);
             var margin0_0_0_12 = new Thickness(0, 0, 0, 12);
             var margin0_0_0_10 = new Thickness(0, 0, 0, 10);
             var margin0_0_0_4 = new Thickness(0, 0, 0, 4);
@@ -85,10 +97,6 @@ namespace SpokysProjectVercel.Views
             var pad6_4 = new Thickness(6, 4, 6, 4);
             var pad10_6 = new Thickness(10, 6, 10, 6);
 
-            var white = System.Windows.Media.Brushes.White;
-            var black = System.Windows.Media.Brushes.Black;
-            var gray = System.Windows.Media.Brushes.Gray;
-
             var panel = new StackPanel { Margin = margin16 };
 
             var header = new TextBlock
@@ -96,12 +104,9 @@ namespace SpokysProjectVercel.Views
                 Text = "🛒 Shop Management",
                 FontSize = 22,
                 FontWeight = FontWeights.Bold,
-                Foreground = white,
+                Foreground = textPrimary,
                 Margin = margin0_0_0_12
             };
-
-            var bg30 = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 40));
-            var bg40 = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 50));
 
             // Sync status
             var syncRow = new StackPanel { Orientation = Orientation.Horizontal, Margin = margin0_0_0_10 };
@@ -110,7 +115,7 @@ namespace SpokysProjectVercel.Views
             {
                 Text = _shop.SyncStatus,
                 FontSize = 12,
-                Foreground = gray,
+                Foreground = textSecondary,
                 VerticalAlignment = VerticalAlignment.Center
             };
             syncRow.Children.Add(syncIcon);
@@ -123,7 +128,7 @@ namespace SpokysProjectVercel.Views
                 Margin = margin0_0_0_10,
                 FontSize = 13,
                 Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(76, 175, 80)),
-                Foreground = white,
+                Foreground = System.Windows.Media.Brushes.White,
                 HorizontalAlignment = HorizontalAlignment.Left
             };
 
@@ -131,9 +136,9 @@ namespace SpokysProjectVercel.Views
             {
                 Height = 300,
                 DisplayMemberPath = "DisplayText",
-                Background = bg30,
-                Foreground = white,
-                BorderBrush = gray
+                Background = bgSurface,
+                Foreground = textPrimary,
+                BorderBrush = borderBrush
             };
 
             void RefreshList()
@@ -156,27 +161,29 @@ namespace SpokysProjectVercel.Views
                     Height = 300,
                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
                     Owner = dialog,
-                    Background = black,
+                    Background = bgSurface,
                     ResizeMode = ResizeMode.NoResize
                 };
                 var inputPanel = new StackPanel { Margin = margin16 };
 
-                var lbl1 = new TextBlock { Text = "Steam App ID:", Foreground = white, Margin = margin0_0_0_4 };
+                var lbl1 = new TextBlock { Text = "Steam App ID:", Foreground = textPrimary, Margin = margin0_0_0_4 };
                 var appIdBox = new TextBox
                 {
                     Text = "292030",
-                    Foreground = white,
-                    Background = bg40,
+                    Foreground = textPrimary,
+                    Background = bgCard,
                     Padding = pad6_4,
-                    Margin = margin0_0_0_10
+                    Margin = margin0_0_0_10,
+                    BorderBrush = borderBrush
                 };
-                var lbl2 = new TextBlock { Text = "Name:", Foreground = white, Margin = margin0_0_0_4 };
+                var lbl2 = new TextBlock { Text = "Name:", Foreground = textPrimary, Margin = margin0_0_0_4 };
                 var nameBox = new TextBox
                 {
-                    Foreground = white,
-                    Background = bg40,
+                    Foreground = textPrimary,
+                    Background = bgCard,
                     Padding = pad6_4,
-                    Margin = margin0_0_0_10
+                    Margin = margin0_0_0_10,
+                    BorderBrush = borderBrush
                 };
                 var fetchBtn = new Button
                 {
@@ -184,33 +191,35 @@ namespace SpokysProjectVercel.Views
                     Padding = pad10_6,
                     Margin = margin0_0_0_10,
                     Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(33, 150, 243)),
-                    Foreground = white,
+                    Foreground = System.Windows.Media.Brushes.White,
                     HorizontalAlignment = HorizontalAlignment.Left
                 };
-                var lbl3 = new TextBlock { Text = "Normal Price (cents):", Foreground = white, Margin = margin0_0_0_4 };
+                var lbl3 = new TextBlock { Text = "Normal Price (cents):", Foreground = textPrimary, Margin = margin0_0_0_4 };
                 var priceBox = new TextBox
                 {
                     Text = "10000",
-                    Foreground = white,
-                    Background = bg40,
+                    Foreground = textPrimary,
+                    Background = bgCard,
                     Padding = pad6_4,
-                    Margin = margin0_0_0_10
+                    Margin = margin0_0_0_10,
+                    BorderBrush = borderBrush
                 };
-                var lbl4 = new TextBlock { Text = "Donor Price (cents):", Foreground = white, Margin = margin0_0_0_4 };
+                var lbl4 = new TextBlock { Text = "Donor Price (cents):", Foreground = textPrimary, Margin = margin0_0_0_4 };
                 var donorBox = new TextBox
                 {
                     Text = "7500",
-                    Foreground = white,
-                    Background = bg40,
+                    Foreground = textPrimary,
+                    Background = bgCard,
                     Padding = pad6_4,
-                    Margin = margin0_0_0_10
+                    Margin = margin0_0_0_10,
+                    BorderBrush = borderBrush
                 };
                 var saveBtn = new Button
                 {
                     Content = "💾 Save",
                     Padding = pad14_8,
                     Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(76, 175, 80)),
-                    Foreground = white,
+                    Foreground = System.Windows.Media.Brushes.White,
                     HorizontalAlignment = HorizontalAlignment.Left,
                     IsEnabled = false
                 };
@@ -293,7 +302,7 @@ namespace SpokysProjectVercel.Views
                 Padding = pad14_8,
                 Margin = margin10_0_0_10,
                 Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(244, 67, 54)),
-                Foreground = white,
+                Foreground = System.Windows.Media.Brushes.White,
                 HorizontalAlignment = HorizontalAlignment.Left
             };
             deleteBtn.Click += (_, _) =>
@@ -316,7 +325,7 @@ namespace SpokysProjectVercel.Views
                 Padding = pad14_8,
                 FontSize = 13,
                 Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(156, 39, 176)),
-                Foreground = white,
+                Foreground = System.Windows.Media.Brushes.White,
                 HorizontalAlignment = HorizontalAlignment.Left
             };
             publishBtn.Click += async (_, _) =>
@@ -360,7 +369,7 @@ namespace SpokysProjectVercel.Views
             var statusText = new TextBlock
             {
                 Text = $"Total items: {items.Count}",
-                Foreground = gray,
+                Foreground = textSecondary,
                 FontSize = 12,
                 Margin = margin0_8_0_0
             };
