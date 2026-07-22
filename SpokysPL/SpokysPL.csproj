@@ -11,12 +11,12 @@
 <ApplicationVersion>1.0.0.0</ApplicationVersion>
 <AssemblyVersion>1.0.0.0</AssemblyVersion>
 <FileVersion>1.0.0.0</FileVersion>
-<InformationalVersion>1.0.0.0</InformationalVersion>
-    <AssemblyName>SpokysProjectLightning</AssemblyName>
-    <RootNamespace>SpokysProjectLightning</RootNamespace>
+<InformationalVersion>1.0.0</InformationalVersion>
+    <AssemblyName>SpokysProjectVercel</AssemblyName>
+    <RootNamespace>SpokysProjectVercel</RootNamespace>
     <Company>Spoky</Company>
-    <Product>Spokys Project Lightning</Product>
-    <Description>Game manifest manager and movie streaming app</Description>
+    <Product>Spoky's Project Vercel</Product>
+    <Description>Steam tools and manifest manager</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -46,15 +46,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SpokysPL.Updater\SpokysPL.Updater.csproj" ReferenceOutputAssembly="false">
+    <ProjectReference Include="..\SpokysProjectVercel.Updater\SpokysProjectVercel.Updater.csproj" ReferenceOutputAssembly="false">
       <Private>false</Private>
     </ProjectReference>
   </ItemGroup>
 
-  <Target Name="CopyUpdater" AfterTargets="Build">
-    <Copy SourceFiles="..\SpokysPL.Updater\bin\$(Configuration)\net8.0\win-x64\publish\SpokysPL.Updater.exe"
+  <Target Name="CopyUpdater" AfterTargets="Build;Publish">
+    <Copy SourceFiles="..\SpokysProjectVercel.Updater\bin\$(Configuration)\net8.0\win-x64\publish\SpokysProjectVercel.Updater.exe"
           DestinationFolder="$(OutputPath)"
           SkipUnchangedFiles="True" />
+    <Copy SourceFiles="..\SpokysProjectVercel.Updater\bin\$(Configuration)\net8.0\win-x64\publish\SpokysProjectVercel.Updater.exe"
+          DestinationFolder="$(OutputPath)publish\"
+          SkipUnchangedFiles="True" Condition="Exists('$(OutputPath)publish\')" />
   </Target>
 
   <Target Name="CopyBackgroundVideos" AfterTargets="Build;Publish" Condition="Exists('$(MSBuildProjectDirectory)')">

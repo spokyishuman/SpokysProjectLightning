@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     public static class ManifestPaths
     {

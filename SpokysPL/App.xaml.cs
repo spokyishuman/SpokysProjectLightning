@@ -1,9 +1,9 @@
 using System;
 using System.Net;
 using System.Windows;
-using SpokysProjectLightning.Services;
+using SpokysProjectVercel.Services;
 
-namespace SpokysProjectLightning
+namespace SpokysProjectVercel
 {
     public partial class App : Application
     {

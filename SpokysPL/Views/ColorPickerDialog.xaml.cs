@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     public partial class ColorPickerDialog : Window
     {

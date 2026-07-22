@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using SpokysProjectLightning.Services;
+using SpokysProjectVercel.Services;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     public partial class OpenSteamToolPage : UserControl
     {
@@ -22,6 +22,25 @@ namespace SpokysProjectLightning.Views
             {
                 if (!_loaded) { _loaded = true; await RefreshStatusAsync(); }
             };
+            AppMode.ModeChanged += () => Dispatcher.BeginInvoke(() => UpdateModeUI());
+        }
+
+        private void UpdateModeUI()
+        {
+            var isLc = AppMode.UseLumaCore;
+            if (isLc)
+            {
+                StatusIcon.Text = "⚠️";
+                StatusTitle.Text = "LumaCore mode active";
+                StatusSubtitle.Text = "LumaCore and OpenSteamTool both use dwmapi.dll/xinput1_4.dll — switch to ST mode to use OST";
+                InstallBtn.IsEnabled = false;
+                UninstallBtn.IsEnabled = false;
+            }
+            else
+            {
+                InstallBtn.IsEnabled = true;
+                UninstallBtn.IsEnabled = true;
+            }
         }
 
         private async Task RefreshStatusAsync()
@@ -29,6 +48,20 @@ namespace SpokysProjectLightning.Views
             RefreshBtn.IsEnabled = false;
             try
             {
+                if (AppMode.UseLumaCore)
+                {
+                    UpdateModeUI();
+                    VersionText.Text = "—";
+                    InstalledBadge.Visibility = Visibility.Collapsed;
+                    PatternBadge.Visibility = Visibility.Collapsed;
+                    LuaCountBadge.Visibility = Visibility.Collapsed;
+                    RefreshBtn.IsEnabled = true;
+                    return;
+                }
+
+                InstallBtn.IsEnabled = true;
+                UninstallBtn.IsEnabled = true;
+
                 var (latestVer, releaseUrl, _, _) = await _ost.CheckLatestReleaseAsync();
                 var installed = _ost.IsInstalled();
                 var currentVer = _ost.GetInstalledVersion();

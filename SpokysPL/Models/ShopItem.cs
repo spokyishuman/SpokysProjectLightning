@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace SpokysProjectLightning.Models
+namespace SpokysProjectVercel.Models
 {
     public class ShopItem
     {

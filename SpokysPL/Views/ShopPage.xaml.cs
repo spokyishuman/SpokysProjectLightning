@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using SpokysProjectLightning.Models;
-using SpokysProjectLightning.Services;
+using SpokysProjectVercel.Models;
+using SpokysProjectVercel.Services;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     public partial class ShopPage : UserControl
     {
@@ -17,12 +17,12 @@ namespace SpokysProjectLightning.Views
         {
             InitializeComponent();
             _shop = new ShopService();
-            Loaded += (_, _) => LoadItems();
+            Loaded += async (_, _) => await LoadItemsAsync();
         }
 
-        private void LoadItems()
+        private async System.Threading.Tasks.Task LoadItemsAsync()
         {
-            _items = _shop.LoadItems().Where(i => i.Active).ToList();
+            _items = (await _shop.LoadItemsAsync()).Where(i => i.Active).ToList();
             ShopGrid.ItemsSource = _items;
 
             if (_items.Count == 0)
@@ -69,7 +69,7 @@ namespace SpokysProjectLightning.Views
             {
                 Title = "Shop Admin",
                 Width = 700,
-                Height = 500,
+                Height = 600,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Owner = Window.GetWindow(this),
                 Background = System.Windows.Media.Brushes.Black
@@ -100,6 +100,22 @@ namespace SpokysProjectLightning.Views
                 Margin = margin0_0_0_12
             };
 
+            var bg30 = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 40));
+            var bg40 = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 50));
+
+            // Sync status
+            var syncRow = new StackPanel { Orientation = Orientation.Horizontal, Margin = margin0_0_0_10 };
+            var syncIcon = new TextBlock { Text = "🌐", FontSize = 14, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0) };
+            var syncText = new TextBlock
+            {
+                Text = _shop.SyncStatus,
+                FontSize = 12,
+                Foreground = gray,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            syncRow.Children.Add(syncIcon);
+            syncRow.Children.Add(syncText);
+
             var addBtn = new Button
             {
                 Content = "➕ Add Game by App ID",
@@ -111,12 +127,9 @@ namespace SpokysProjectLightning.Views
                 HorizontalAlignment = HorizontalAlignment.Left
             };
 
-            var bg30 = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 40));
-            var bg40 = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 50));
-
             var listBox = new ListBox
             {
-                Height = 320,
+                Height = 300,
                 DisplayMemberPath = "DisplayText",
                 Background = bg30,
                 Foreground = white,
@@ -131,6 +144,7 @@ namespace SpokysProjectLightning.Views
                     i.AppId,
                     DisplayText = $"[{(i.Active ? "✓" : "✗")}] {i.Name} (App {i.AppId}) — ${(i.NormalPrice / 100.0):F2} / ${(i.DonorPrice / 100.0):F2}"
                 }).ToList();
+                syncText.Text = _shop.SyncStatus;
             }
 
             addBtn.Click += (_, _) =>
@@ -255,7 +269,7 @@ namespace SpokysProjectLightning.Views
                     });
 
                     RefreshList();
-                    LoadItems();
+                    _ = LoadItemsAsync();
                     input.Close();
                 };
 
@@ -291,13 +305,57 @@ namespace SpokysProjectLightning.Views
                 {
                     _shop.RemoveItem(appId);
                     RefreshList();
-                    LoadItems();
+                    _ = LoadItemsAsync();
                 }
+            };
+
+            // Publish button
+            var publishBtn = new Button
+            {
+                Content = "📤 Publish to GitHub",
+                Padding = pad14_8,
+                FontSize = 13,
+                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(156, 39, 176)),
+                Foreground = white,
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            publishBtn.Click += async (_, _) =>
+            {
+                var settings = new DataService().LoadSettings();
+                var token = settings.ShopGithubToken;
+                if (string.IsNullOrEmpty(token))
+                {
+                    var setupToken = MessageBox.Show(
+                        "No GitHub token configured. Set one now in Settings?",
+                        "GitHub Token", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (setupToken != MessageBoxResult.Yes) return;
+
+                    var tokenDialog = new PasswordDialog("GitHub Token",
+                        "Enter a GitHub Personal Access Token (repo scope):", "");
+                    tokenDialog.Owner = dialog;
+                    if (tokenDialog.ShowDialog() != true) return;
+                    token = tokenDialog.Password;
+                    if (string.IsNullOrEmpty(token)) return;
+                    settings.ShopGithubToken = token;
+                    new DataService().SaveSettings(settings);
+                }
+
+                publishBtn.IsEnabled = false;
+                publishBtn.Content = "⏳ Publishing...";
+                var ok = await _shop.PublishToGithubAsync();
+                publishBtn.IsEnabled = true;
+                publishBtn.Content = "📤 Publish to GitHub";
+                syncText.Text = _shop.SyncStatus;
+                if (ok)
+                    MessageBox.Show("Shop data published to GitHub!\nUsers will see updates on next refresh.", "Published", MessageBoxButton.OK, MessageBoxImage.Information);
+                else
+                    MessageBox.Show($"Failed to publish.\n{_shop.SyncStatus}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             };
 
             var btnPanel = new StackPanel { Orientation = Orientation.Horizontal };
             btnPanel.Children.Add(addBtn);
             btnPanel.Children.Add(deleteBtn);
+            btnPanel.Children.Add(publishBtn);
 
             var statusText = new TextBlock
             {
@@ -310,6 +368,7 @@ namespace SpokysProjectLightning.Views
             RefreshList();
 
             panel.Children.Add(header);
+            panel.Children.Add(syncRow);
             panel.Children.Add(btnPanel);
             panel.Children.Add(listBox);
             panel.Children.Add(statusText);

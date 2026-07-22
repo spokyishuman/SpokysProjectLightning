@@ -1,12 +1,14 @@
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using SpokysProjectLightning.Services;
-using SpokysProjectLightning.ViewModels;
+using SpokysProjectVercel.Services;
+using SpokysProjectVercel.ViewModels;
 
-namespace SpokysProjectLightning
+namespace SpokysProjectVercel
 {
     public partial class MainWindow : Window
     {
@@ -21,6 +23,49 @@ namespace SpokysProjectLightning
 
         public bool IsMediaFullscreen { get; private set; }
         public event EventHandler? MediaFullscreenEscapePressed;
+
+        public static readonly DependencyProperty IsSidebarExpandedProperty =
+            DependencyProperty.Register("IsSidebarExpanded", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
+
+        public bool IsSidebarExpanded
+        {
+            get => (bool)GetValue(IsSidebarExpandedProperty);
+            set => SetValue(IsSidebarExpandedProperty, value);
+        }
+
+        private bool _sidebarAnimating;
+        private const double SidebarCollapsedWidth = 64;
+        private const double SidebarExpandedWidth = 200;
+
+        private void Sidebar_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (_sidebarAnimating) return;
+            _sidebarAnimating = true;
+            IsSidebarExpanded = true;
+            var anim = new System.Windows.Media.Animation.DoubleAnimation
+            {
+                To = SidebarExpandedWidth,
+                Duration = TimeSpan.FromSeconds(0.2),
+                EasingFunction = new System.Windows.Media.Animation.QuadraticEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }
+            };
+            anim.Completed += (s, a) => _sidebarAnimating = false;
+            Sidebar.BeginAnimation(FrameworkElement.WidthProperty, anim);
+        }
+
+        private void Sidebar_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (_sidebarAnimating) return;
+            _sidebarAnimating = true;
+            IsSidebarExpanded = false;
+            var anim = new System.Windows.Media.Animation.DoubleAnimation
+            {
+                To = SidebarCollapsedWidth,
+                Duration = TimeSpan.FromSeconds(0.15),
+                EasingFunction = new System.Windows.Media.Animation.QuadraticEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseIn }
+            };
+            anim.Completed += (s, a) => _sidebarAnimating = false;
+            Sidebar.BeginAnimation(FrameworkElement.WidthProperty, anim);
+        }
 
         private void MainWindow_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -58,9 +103,29 @@ namespace SpokysProjectLightning
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            AppMode.Load();
+            UpdateSidebarModeUI();
+            AppMode.ModeChanged += () => Dispatcher.BeginInvoke(() => UpdateSidebarModeUI());
             TryInitBackdrop();
             ContentRendered += (s, args) => TryInitBackdrop();
             _ = CheckForUpdatesAsync();
+            _ = AutoInstallLumaCoreAsync();
+        }
+
+        private async Task AutoInstallLumaCoreAsync()
+        {
+            try
+            {
+                var lc = new LumaCoreService();
+                if (await lc.InstallIfMissingAsync())
+                {
+                    await Dispatcher.BeginInvoke(() =>
+                    {
+                        LumaCoreToast.Visibility = Visibility.Visible;
+                    });
+                }
+            }
+            catch { }
         }
 
         private async Task CheckForUpdatesAsync()
@@ -414,6 +479,124 @@ namespace SpokysProjectLightning
         private void DismissToast_Click(object sender, RoutedEventArgs e)
         {
             UpdateToast.Visibility = Visibility.Collapsed;
+        }
+
+        private void UpdateSidebarModeUI()
+        {
+            var primary = (System.Windows.Media.Brush)Application.Current.FindResource("PrimaryBrush");
+            var muted = (System.Windows.Media.Brush)Application.Current.FindResource("MutedForegroundBrush");
+
+            if (AppMode.UseLumaCore)
+            {
+                SidebarModeIcon.Text = "⚡";
+                SidebarModeText.Text = "LC";
+                SidebarModeToggle.Foreground = primary;
+                ModeLcBtn.Foreground = primary;
+                ModeLcBtn.Background = (System.Windows.Media.Brush)Application.Current.FindResource("SidebarAccentBrush");
+                ModeStBtn.Foreground = muted;
+                ModeStBtn.Background = System.Windows.Media.Brushes.Transparent;
+            }
+            else
+            {
+                SidebarModeIcon.Text = "🛠️";
+                SidebarModeText.Text = "ST";
+                SidebarModeToggle.Foreground = muted;
+                ModeStBtn.Foreground = primary;
+                ModeStBtn.Background = (System.Windows.Media.Brush)Application.Current.FindResource("SidebarAccentBrush");
+                ModeLcBtn.Foreground = muted;
+                ModeLcBtn.Background = System.Windows.Media.Brushes.Transparent;
+            }
+        }
+
+        private async void SidebarModeToggle_Click(object sender, RoutedEventArgs e)
+        {
+            await SetLumaCoreMode(!AppMode.UseLumaCore);
+        }
+
+        private async void ModeLc_Click(object sender, RoutedEventArgs e)
+        {
+            if (AppMode.UseLumaCore) return;
+            await SetLumaCoreMode(true);
+        }
+
+        private async void ModeSt_Click(object sender, RoutedEventArgs e)
+        {
+            if (!AppMode.UseLumaCore) return;
+            await SetLumaCoreMode(false);
+        }
+
+        private async Task SetLumaCoreMode(bool useLc)
+        {
+            AppMode.SetLumaCore(useLc);
+            UpdateSidebarModeUI();
+
+            if (AppMode.UseLumaCore)
+            {
+                if (!LumaCoreService.IsLumaCoreInstalled())
+                {
+                    var lc = new LumaCoreService();
+                    try { await lc.InstallIfMissingAsync(); }
+                    catch { }
+                    if (LumaCoreService.IsLumaCoreInstalled())
+                        ToastService.Show("⚡ LumaCore installed automatically!", "success");
+                }
+            }
+        }
+
+        private async void SidebarRestartSteam_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                foreach (var p in Process.GetProcessesByName("steam"))
+                    p.Kill();
+                await Task.Delay(2000);
+                var steamPath = SteamService.FindSteamPath();
+                if (!string.IsNullOrEmpty(steamPath))
+                {
+                    var exe = Path.Combine(steamPath, "steam.exe");
+                    if (File.Exists(exe))
+                        Process.Start(exe);
+                }
+            }
+            catch { }
+        }
+
+        private void DismissLumaCoreToast_Click(object sender, RoutedEventArgs e)
+        {
+            LumaCoreToast.Visibility = Visibility.Collapsed;
+        }
+
+        private async void RestartSteam_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            if (btn != null) btn.IsEnabled = false;
+
+            try
+            {
+                foreach (var p in Process.GetProcessesByName("steam"))
+                    p.Kill();
+
+                await Task.Delay(2000);
+
+                var steamPath = SteamService.FindSteamPath();
+                if (!string.IsNullOrEmpty(steamPath))
+                {
+                    var exe = Path.Combine(steamPath, "steam.exe");
+                    if (File.Exists(exe))
+                        Process.Start(exe);
+                }
+
+                LumaCoreToast.Visibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to restart Steam:\n{ex.Message}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                if (btn != null) btn.IsEnabled = true;
+            }
         }
 
         private void ClearQueue_Click(object sender, RoutedEventArgs e)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     public class ThemeService
     {

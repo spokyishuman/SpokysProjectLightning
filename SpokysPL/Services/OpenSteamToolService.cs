@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     public class OpenSteamToolService
     {
@@ -151,21 +151,7 @@ namespace SpokysProjectLightning.Services
             return null;
         }
 
-        public string? GetSteamPath()
-        {
-            try
-            {
-                using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
-                    @"SOFTWARE\WOW6432Node\Valve\Steam") ??
-                    Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Valve\Steam");
-                if (key?.GetValue("InstallPath") is string path && Directory.Exists(path))
-                    return path;
-            }
-            catch { }
-
-            var defaultPath = @"C:\Program Files (x86)\Steam";
-            return Directory.Exists(defaultPath) ? defaultPath : null;
-        }
+        public string? GetSteamPath() => SteamService.FindSteamPath();
 
         public string GetLuaDir()
         {
@@ -216,16 +202,16 @@ namespace SpokysProjectLightning.Services
             string? steamId = null)
         {
             var lines = new List<string>();
-            if (!string.IsNullOrEmpty(depotKey))
-                lines.Add($"addappid({appId}, 0, \"{depotKey}\")");
-            else
-                lines.Add($"addappid({appId})");
+            lines.Add($"addappid({appId})");
 
-            if (!string.IsNullOrEmpty(accessToken))
-                lines.Add($"addtoken({appId},\"{accessToken}\")");
+            if (!string.IsNullOrEmpty(depotKey))
+                lines.Add($"addappid({appId}, 1, \"{depotKey}\")");
 
             if (!string.IsNullOrEmpty(manifestId))
                 lines.Add($"setManifestid({appId},\"{manifestId}\")");
+
+            if (!string.IsNullOrEmpty(accessToken))
+                lines.Add($"addtoken({appId},\"{accessToken}\")");
 
             if (!string.IsNullOrEmpty(appTicket))
                 lines.Add($"setAppTicket({appId},\"{appTicket}\")");

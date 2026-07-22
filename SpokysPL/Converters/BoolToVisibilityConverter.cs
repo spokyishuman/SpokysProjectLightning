@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace SpokysProjectLightning.Converters
+namespace SpokysProjectVercel.Converters
 {
     public class BoolToVisibilityConverter : IValueConverter
     {

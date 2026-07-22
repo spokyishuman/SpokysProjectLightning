@@ -8,9 +8,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using SpokysProjectLightning.Services;
+using SpokysProjectVercel.Services;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     public class ManageGame
     {

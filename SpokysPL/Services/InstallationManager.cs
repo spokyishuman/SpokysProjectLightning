@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     public class InstallTask : INotifyPropertyChanged
     {

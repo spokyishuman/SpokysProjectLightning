@@ -10,9 +10,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
-using SpokysProjectLightning.Services;
+using SpokysProjectVercel.Services;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     public class ToolInfo
     {
@@ -37,6 +37,9 @@ namespace SpokysProjectLightning.Views
 
         private void ToolsPage_Loaded(object sender, RoutedEventArgs e)
         {
+            UpdateModeBadge();
+            AppMode.ModeChanged += () => Dispatcher.BeginInvoke(() => UpdateModeBadge());
+
             ToolsList.ItemsSource = new List<ToolInfo>
             {
                 new ToolInfo
@@ -68,6 +71,20 @@ namespace SpokysProjectLightning.Views
                     Url = "https://steamdb.info"
                 }
             };
+        }
+
+        private void UpdateModeBadge()
+        {
+            if (AppMode.UseLumaCore)
+            {
+                ModeBadgeText.Text = "⚡ LC";
+                ModeBadge.Background = (System.Windows.Media.Brush)Application.Current.FindResource("PrimaryBrush");
+            }
+            else
+            {
+                ModeBadgeText.Text = "🛠️ ST";
+                ModeBadge.Background = (System.Windows.Media.Brush)Application.Current.FindResource("AccentBrush");
+            }
         }
 
         private async void ToolCard_Click(object sender, MouseButtonEventArgs e)
@@ -191,12 +208,12 @@ namespace SpokysProjectLightning.Views
                 if (ext == ".manifest")
                 {
                     File.Copy(path, Path.Combine(ManifestPaths.ManifestDir, fileName), true);
-                    ToastService.Show($"✅ Manifest saved to SteamDaddy: {fileName}", "success");
+                    ToastService.Show($"✅ Manifest saved: {fileName}", "success");
                 }
                 else if (ext == ".lua")
                 {
                     File.Copy(path, Path.Combine(ManifestPaths.LuaDir, fileName), true);
-                    ToastService.Show($"✅ Lua script saved to SteamDaddy: {fileName}", "success");
+                    ToastService.Show($"✅ Lua script saved: {fileName}", "success");
                 }
                 else if (ext == ".zip")
                 {
@@ -218,7 +235,7 @@ namespace SpokysProjectLightning.Views
                         installed++;
                     }
                     if (installed > 0)
-                        ToastService.Show($"✅ {installed} file(s) extracted to SteamDaddy data", "success");
+                        ToastService.Show($"✅ {installed} file(s) extracted to depotcache", "success");
                     else
                         ToastService.Show($"⚠️ No manifest files found in {fileName}", "warning");
                 }

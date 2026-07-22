@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     public class BugReportService
     {

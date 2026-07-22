@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     /// <summary>
     /// fares.top manifest API client — ported from the proven Discord bot (fares.ts).

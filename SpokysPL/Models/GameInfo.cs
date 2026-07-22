@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SpokysProjectLightning.Models
+namespace SpokysProjectVercel.Models
 {
     public class GameInfo
     {

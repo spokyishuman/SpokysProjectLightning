@@ -1,15 +1,15 @@
-; Inno Setup script for Spokys Project Lightning
+; Inno Setup script for Spoky's Project Vercel
 ; Creates a proper Windows installer
 
-#define MyAppName "Spokys Project Lightning"
+#define MyAppName "Spoky's Project Vercel"
 #define MyAppVersion "1.0.0"
 #define MyAppPublisher "Spoky"
-#define MyAppURL "https://github.com/spokyishuman/SpokysProjectLightning"
-#define MyAppExeName "SpokysProjectLightning.exe"
-#define MyAppAssocName "Spokys Project Lightning File"
+#define MyAppURL ""
+#define MyAppExeName "SpokysProjectVercel.exe"
+#define MyAppAssocName "Spoky's Project Vercel File"
 
 [Setup]
-AppId={{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
+AppId={{VERCEL-A5F6-7890-ABCD-EF1234567890}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
@@ -17,10 +17,11 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
+DisableDirPage=yes
 DisableProgramGroupPage=yes
 PrivilegesRequired=admin
 OutputDir=.\Release\Installer
-OutputBaseFilename=SpokysProjectLightning-Setup-v{#MyAppVersion}
+OutputBaseFilename=Spokys-Project-Vercel-Setup-v{#MyAppVersion}
 SetupIconFile=SpokysPL\app.ico
 Compression=lzma2/max
 SolidCompression=yes
@@ -28,6 +29,7 @@ WizardStyle=modern
 UninstallDisplayIcon={app}\{#MyAppExeName}
 CreateAppDir=yes
 AllowNoIcons=yes
+CloseApplications=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -36,7 +38,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional icons:"; Flags: checkedonce
 
 [Files]
-Source: "SpokysPL\bin\Release\net8.0-windows\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "SpokysPL\bin\Release\net8.0-windows\win-x64\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.xml"
 Source: "SpokysPL\app.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
@@ -47,11 +49,12 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDi
 Filename: "{app}\{#MyAppExeName}"; Description: "Launch {#MyAppName}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-Filename: "{app}\SpokysPL.Updater.exe"; Parameters: "/uninstall"; Flags: runhidden
+Filename: "{app}\SpokysProjectVercel.Updater.exe"; Parameters: "/uninstall"; Flags: runhidden
 
 [Registry]
 Root: HKCU; Subkey: "Software\Spoky\{#MyAppName}"; Flags: uninsdeletekeyifempty
 Root: HKCU; Subkey: "Software\Spoky\{#MyAppName}"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\Spoky\SpokysProjectVercel"; ValueType: string; ValueName: "LegacyInstallPath"; ValueData: "{app}"; Flags: uninsdeletevalue
 
 [Code]
 procedure CurStepChanged(CurStep: TSetupStep);

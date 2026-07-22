@@ -7,10 +7,10 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.Web.WebView2.Core;
-using SpokysProjectLightning.Models;
-using SpokysProjectLightning.Services;
+using SpokysProjectVercel.Models;
+using SpokysProjectVercel.Services;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     public partial class MoviesPage : UserControl
     {
@@ -441,7 +441,7 @@ namespace SpokysProjectLightning.Views
             {
                 var userDataFolder = System.IO.Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "SpokysProjectLightning", "WebView2");
+                    "SpokysProjectVercel", "WebView2");
                 var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
                 await MoviePlayer.EnsureCoreWebView2Async(env);
                 if (!_webViewInitialized)

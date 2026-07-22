@@ -1,9 +1,9 @@
-<UserControl x:Class="SpokysProjectLightning.Views.FixesPage"
+<UserControl x:Class="SpokysProjectVercel.Views.FixesPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:SpokysProjectLightning.Views"
+      xmlns:local="clr-namespace:SpokysProjectVercel.Views"
       mc:Ignorable="d"
       d:DesignHeight="800" d:DesignWidth="1200"
       Background="Transparent">
@@ -59,6 +59,11 @@
                                        FontSize="11" Foreground="#64B5F6"/>
                         </StackPanel>
                     </Border>
+                    <Button x:Name="RestartSteamBtn" Content="🔄 Steam"
+                            Style="{DynamicResource SecondaryButton}"
+                            Padding="10,6" FontSize="11" Margin="10,0,0,0"
+                            Click="RestartSteam_Click"
+                            ToolTip="Restart Steam to apply changes"/>
                     <StackPanel x:Name="DiscordLoginPanel" Orientation="Horizontal" Margin="10,0,0,0">
                         <Button x:Name="DiscordLoginBtn" Content="🔑 Login with Discord"
                                 Style="{DynamicResource SecondaryButton}"

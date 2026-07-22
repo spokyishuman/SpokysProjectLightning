@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     /// <summary>Lightweight, dependency-free folder picker built on a WPF TreeView.</summary>
     public partial class FolderBrowserDialog : Window

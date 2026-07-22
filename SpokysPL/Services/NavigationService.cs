@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     public class NavigationService
     {

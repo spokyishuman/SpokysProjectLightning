@@ -12,9 +12,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SpokysProjectLightning.Models;
+using SpokysProjectVercel.Models;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     /// <summary>
     /// Online-Fix.me scraper — ported from the proven Discord bot (onlinefix.ts).

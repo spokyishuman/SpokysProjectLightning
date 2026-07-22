@@ -7,10 +7,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using SpokysProjectLightning.Models;
-using SpokysProjectLightning.Services;
+using SpokysProjectVercel.Models;
+using SpokysProjectVercel.Services;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     public partial class BypassPage : UserControl
     {

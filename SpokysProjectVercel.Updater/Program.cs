@@ -1,7 +1,7 @@
 using System.IO.Compression;
 using System.Diagnostics;
 
-namespace SpokysPL.Updater;
+namespace SpokysProjectVercel.Updater;
 
 class Program
 {
@@ -9,7 +9,7 @@ class Program
     {
         if (args.Length < 3)
         {
-            Console.Error.WriteLine("Usage: SpokysPL.Updater <zipPath> <targetDir> <restartExe> [parentPid]");
+            Console.Error.WriteLine("Usage: SpokysProjectVercel.Updater <zipPath> <targetDir> <restartExe> [parentPid]");
             return 1;
         }
 

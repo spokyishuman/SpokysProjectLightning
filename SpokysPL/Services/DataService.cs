@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SpokysProjectLightning.Models;
+using SpokysProjectVercel.Models;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     public class DataService
     {
@@ -321,8 +321,11 @@ namespace SpokysProjectLightning.Services
         public string MovieProxyUrl { get; set; } = "https://spokys-tmdb-proxy.vercel.app";
         public string UpdateUrl { get; set; } = string.Empty;
         public string ShopAdminPassword { get; set; } = string.Empty;
+        public string ShopRemoteUrl { get; set; } = "https://raw.githubusercontent.com/spokyishuman/SpokysProjectVercel/master/shop.json";
+        public string ShopGithubToken { get; set; } = string.Empty;
         public string SteamDaddyApiKey { get; set; } = string.Empty;
-        public string BugReportWebhookUrl { get; set; } = "https://spokys-tmdb-proxy.vercel.app/api/report-bug";
+        public string BugReportWebhookUrl { get; set; } = "https://discord.com/api/webhooks/1529453122022543443/ENAOlLg5N9fLfwe8W5CCdxOmMR1VvGUTYIurm8bHxeMekUt5_cgjWYJtKdEw3ijS5e5M";
+        public bool UseLumaCore { get; set; } = true;
         public Dictionary<string, string> CustomColors { get; set; } = new();
     }
 }

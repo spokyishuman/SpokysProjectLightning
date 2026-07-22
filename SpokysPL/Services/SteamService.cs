@@ -7,9 +7,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
-using SpokysProjectLightning.Models;
+using SpokysProjectVercel.Models;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     public class SteamService
     {

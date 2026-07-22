@@ -5,10 +5,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using SpokysProjectLightning.Services;
-using SpokysProjectLightning.Views;
+using SpokysProjectVercel.Services;
+using SpokysProjectVercel.Views;
 
-namespace SpokysProjectLightning.ViewModels
+namespace SpokysProjectVercel.ViewModels
 {
     public class NavItem : INotifyPropertyChanged
     {

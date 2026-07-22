@@ -1,8 +1,8 @@
-<Application x:Class="SpokysProjectLightning.App"
+<Application x:Class="SpokysProjectVercel.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:SpokysProjectLightning"
-             xmlns:converters="clr-namespace:SpokysProjectLightning.Converters"
+             xmlns:local="clr-namespace:SpokysProjectVercel"
+             xmlns:converters="clr-namespace:SpokysProjectVercel.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>

@@ -8,9 +8,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using SpokysProjectLightning.Services;
+using SpokysProjectVercel.Services;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     public partial class AddPage : UserControl
     {
@@ -325,7 +325,7 @@ namespace SpokysProjectLightning.Views
             }
 
             if (count > 0)
-                ToastService.Show($"✅ {count} file(s) saved to SteamDaddy data", "success");
+                ToastService.Show($"✅ {count} file(s) saved to depotcache", "success");
             else
                 ToastService.Show("No supported files found (.lua, .manifest, .acf)", "warning");
         }

@@ -11,9 +11,9 @@ using Microsoft.Win32;
 using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Readers;
-using SpokysProjectLightning.Models;
+using SpokysProjectVercel.Models;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     /// <summary>
     /// Downloads an online-fix file, extracts it (RAR/ZIP/7z/split .001), and copies the

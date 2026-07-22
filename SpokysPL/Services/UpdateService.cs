@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     public class UpdateManifest
     {
@@ -20,11 +20,11 @@ namespace SpokysProjectLightning.Services
     public class UpdateService
     {
         private readonly HttpClient _http;
-        public static string UpdateCheckUrl { get; set; } = "https://api.github.com/repos/spokyishuman/SpokysProjectLightning/releases/latest";
+        public static string UpdateCheckUrl { get; set; } = "https://api.github.com/repos/spokyishuman/SpokysProjectVercel/releases/latest";
 
         private static readonly string UpdateDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "SpokysProjectLightning", "Updates");
+            "SpokysProjectVercel", "Updates");
 
         public UpdateService()
         {
@@ -69,11 +69,11 @@ namespace SpokysProjectLightning.Services
                         {
                             var asset = gh.Assets?
                                 .OrderByDescending(a =>
-                                    a.Name?.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) == true ? 1 :
-                                    a.Name?.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) == true ? 0 : -1)
+                                    a.Name?.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) == true ? 1 :
+                                    a.Name?.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) == true ? 0 : -1)
                                 .FirstOrDefault(a =>
-                                    a.Name?.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) == true ||
-                                    a.Name?.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) == true);
+                                    a.Name?.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) == true ||
+                                    a.Name?.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) == true);
                             return new UpdateManifest
                             {
                                 Version = ghVer.ToString(),
@@ -106,7 +106,8 @@ namespace SpokysProjectLightning.Services
         public async Task<string?> DownloadUpdateAsync(string downloadUrl, IProgress<double>? progress = null)
         {
             Directory.CreateDirectory(UpdateDir);
-            var zipPath = Path.Combine(UpdateDir, $"update-{DateTime.Now:yyyyMMdd-HHmmss}.zip");
+            var ext = Path.GetExtension(new Uri(downloadUrl).AbsolutePath) ?? ".zip";
+            var filePath = Path.Combine(UpdateDir, $"update-{DateTime.Now:yyyyMMdd-HHmmss}{ext}");
 
             using var response = await _http.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
@@ -116,7 +117,7 @@ namespace SpokysProjectLightning.Services
             var buffer = new byte[81920];
 
             using var contentStream = await response.Content.ReadAsStreamAsync();
-            using var fileStream = new FileStream(zipPath, FileMode.Create, FileAccess.Write, FileShare.None);
+            using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
 
             while (true)
             {
@@ -128,39 +129,56 @@ namespace SpokysProjectLightning.Services
                     progress?.Report((double)totalRead / totalBytes * 100);
             }
 
-            return zipPath;
+            return filePath;
         }
 
-        public bool InstallUpdate(string zipPath)
+        public bool InstallUpdate(string filePath)
         {
             try
             {
-                if (!File.Exists(zipPath)) return false;
+                if (!File.Exists(filePath)) return false;
 
-                var appDir = AppContext.BaseDirectory;
-                var updaterPath = Path.Combine(UpdateDir, "SpokysProjectLightning.Updater.exe");
+                var ext = Path.GetExtension(filePath).ToLowerInvariant();
 
-                // Copy the updater to a temp location if it doesn't exist
-                var embeddedUpdater = Path.Combine(appDir, "SpokysProjectLightning.Updater.exe");
+                // If it's an installer .exe, run it silently
+                if (ext == ".exe")
+                {
+                    var appDir = AppContext.BaseDirectory;
+                    var currentExe = Path.Combine(appDir, "SpokysProjectVercel.exe");
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = filePath,
+                        Arguments = $"/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=\"{appDir.TrimEnd('\\')}\"",
+                        UseShellExecute = true,
+                        Verb = "runas",
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        CreateNoWindow = true
+                    };
+                    var proc = Process.Start(psi);
+                    return proc != null;
+                }
+
+                // ZIP-based update
+                var appDir2 = AppContext.BaseDirectory;
+                var updaterPath = Path.Combine(UpdateDir, "SpokysProjectVercel.Updater.exe");
+
+                var embeddedUpdater = Path.Combine(appDir2, "SpokysProjectVercel.Updater.exe");
                 if (File.Exists(embeddedUpdater))
                     File.Copy(embeddedUpdater, updaterPath, true);
 
                 if (!File.Exists(updaterPath))
-                {
-                    // No updater exe - do it inline via PowerShell
-                    return InstallUpdateViaPowerShell(zipPath, appDir);
-                }
+                    return InstallUpdateViaPowerShell(filePath, appDir2);
 
-                var currentExe = Path.Combine(appDir, "SpokysProjectLightning.exe");
-                var psi = new ProcessStartInfo
+                var currentExe2 = Path.Combine(appDir2, "SpokysProjectVercel.exe");
+                var psi2 = new ProcessStartInfo
                 {
                     FileName = updaterPath,
-                    Arguments = $"\"{zipPath}\" \"{appDir.TrimEnd('\\')}\" \"{currentExe}\" {Environment.ProcessId}",
+                    Arguments = $"\"{filePath}\" \"{appDir2.TrimEnd('\\')}\" \"{currentExe2}\" {Environment.ProcessId}",
                     UseShellExecute = true,
                     WindowStyle = ProcessWindowStyle.Hidden,
                     CreateNoWindow = true
                 };
-                Process.Start(psi);
+                Process.Start(psi2);
                 return true;
             }
             catch
@@ -173,20 +191,23 @@ namespace SpokysProjectLightning.Services
         {
             try
             {
+                var safeZip = zipPath.Replace("'", "''");
+                var safeDir = appDir.Replace("'", "''");
+                var safeExe = Path.Combine(appDir, "SpokysProjectVercel.exe").Replace("'", "''");
                 var script = $@"
 Start-Sleep -Seconds 2
 try {{
     Add-Type -A 'System.IO.Compression.FileSystem'
-    $zip = [IO.Compression.ZipFile]::OpenRead('{zipPath}')
+    $zip = [IO.Compression.ZipFile]::OpenRead('{safeZip}')
     foreach ($entry in $zip.Entries) {{
-        $dest = Join-Path '{appDir}' $entry.FullName
+        $dest = Join-Path '{safeDir}' $entry.FullName
         $dir = [IO.Path]::GetDirectoryName($dest)
         if (!(Test-Path $dir)) {{ New-Item -ItemType Directory -Path $dir -Force | Out-Null }}
         if (!$entry.Name) {{ continue }}
         [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $dest, $true)
     }}
     $zip.Dispose()
-    Start-Process '{Path.Combine(appDir, "SpokysProjectLightning.exe")}'
+    Start-Process '{safeExe}'
 }} catch {{
     [Console]::WriteLine($_.Exception.Message)
     Start-Sleep 5
@@ -214,7 +235,7 @@ try {{
             {
                 if (Directory.Exists(UpdateDir))
                 {
-                    foreach (var f in Directory.GetFiles(UpdateDir, "update-*.zip"))
+                    foreach (var f in Directory.GetFiles(UpdateDir, "update-*"))
                     {
                         try { File.Delete(f); } catch { }
                     }

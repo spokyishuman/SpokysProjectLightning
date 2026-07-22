@@ -4,10 +4,10 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using SpokysProjectLightning.Models;
-using SpokysProjectLightning.Services;
+using SpokysProjectVercel.Models;
+using SpokysProjectVercel.Services;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     public partial class LibraryPage : UserControl
     {

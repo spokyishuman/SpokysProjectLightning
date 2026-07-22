@@ -1,4 +1,4 @@
-<Window x:Class="SpokysProjectLightning.Views.ColorPickerDialog"
+<Window x:Class="SpokysProjectVercel.Views.ColorPickerDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Pick a Color" Height="360" Width="380"

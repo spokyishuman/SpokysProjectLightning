@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using SpokysProjectLightning.Services;
+using SpokysProjectVercel.Services;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     public partial class ReportBugPage : UserControl
     {

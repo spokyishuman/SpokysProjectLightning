@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using SpokysProjectLightning.Services;
+using SpokysProjectVercel.Services;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     public partial class SettingsPage : UserControl
     {
@@ -97,8 +97,6 @@ namespace SpokysProjectLightning.Views
             OmdbApiKeyBox.Text = settings.OmdbApiKey;
             SteamDaddyApiKeyBox.Text = settings.SteamDaddyApiKey;
             MovieProxyUrlBox.Text = settings.MovieProxyUrl;
-            BugReportWebhookUrlBox.Text = settings.BugReportWebhookUrl;
-
             // Update URL
             if (!string.IsNullOrEmpty(settings.UpdateUrl))
             {
@@ -464,7 +462,7 @@ namespace SpokysProjectLightning.Views
                 UpdateStatus.Text = "📦 Installing update...";
 
                 var appDir = AppContext.BaseDirectory;
-                var appExe = Path.Combine(appDir, "SpokysProjectLightning.exe");
+                var appExe = Path.Combine(appDir, "SpokysProjectVercel.exe");
                 var pid = Environment.ProcessId;
 
                 // Write a PowerShell script that waits for this app to exit, extracts the zip, then restarts
@@ -775,14 +773,6 @@ Remove-Item $zip -ErrorAction SilentlyContinue
             ApiKeyStatus.Text = "✅ Movie proxy URL saved";
         }
 
-        private void SaveBugReportWebhook_Click(object sender, RoutedEventArgs e)
-        {
-            var settings = _data.LoadSettings();
-            settings.BugReportWebhookUrl = BugReportWebhookUrlBox.Text.Trim();
-            _data.SaveSettings(settings);
-            ApiKeyStatus.Text = "✅ Webhook URL saved";
-        }
-
         private void SaveUpdateUrl_Click(object sender, RoutedEventArgs e)
         {
             var settings = _data.LoadSettings();
@@ -794,7 +784,7 @@ Remove-Item $zip -ErrorAction SilentlyContinue
 
         private void ResetUpdateUrl_Click(object sender, RoutedEventArgs e)
         {
-            var defaultUrl = "https://api.github.com/repos/spokyishuman/SpokysProjectLightning/releases/latest";
+            var defaultUrl = "https://api.github.com/repos/spokyishuman/SpokysProjectVercel/releases/latest";
             UpdateUrlBox.Text = defaultUrl;
             var settings = _data.LoadSettings();
             settings.UpdateUrl = defaultUrl;

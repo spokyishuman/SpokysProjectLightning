@@ -8,9 +8,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using SpokysProjectLightning.Models;
+using SpokysProjectVercel.Models;
 
-namespace SpokysProjectLightning.Services
+namespace SpokysProjectVercel.Services
 {
     public class ManifestService
     {
@@ -170,13 +170,51 @@ namespace SpokysProjectLightning.Services
                 installedFiles.Add(luaPath);
                 result.LuaPath = luaPath;
 
+                // 6. Copy files directly to Steam directories (like SFF/LumaCore)
+                try
+                {
+                    var depotCache = Path.Combine(steamPath, "depotcache");
+                    var configDepot = Path.Combine(steamPath, "config", "depotcache");
+                    var stplugIn = Path.Combine(steamPath, "config", "stplug-in");
+                    Directory.CreateDirectory(depotCache);
+                    Directory.CreateDirectory(configDepot);
+                    Directory.CreateDirectory(stplugIn);
+
+                    foreach (var m in downloadable)
+                    {
+                        var fileName = $"{m.DepotId}_{m.ManifestId}.manifest";
+                        var src = Path.Combine(ManifestPaths.ManifestDir, fileName);
+                        if (File.Exists(src))
+                        {
+                            var dst = Path.Combine(depotCache, fileName);
+                            File.Copy(src, dst, true);
+                            installedFiles.Add(dst);
+                            var dst2 = Path.Combine(configDepot, fileName);
+                            File.Copy(src, dst2, true);
+                            installedFiles.Add(dst2);
+                        }
+                    }
+
+                    var steamLuaDst = Path.Combine(stplugIn, $"{appId}.lua");
+                    if (File.Exists(luaPath))
+                    {
+                        File.Copy(luaPath, steamLuaDst, true);
+                        installedFiles.Add(steamLuaDst);
+                    }
+
+                    result.DepotCachePath = depotCache;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[ManifestService] Copy to Steam dirs failed: {ex.Message}");
+                }
+
                 result.Success = true;
                 result.ManifestsInstalled = installedDepots.Count;
                 result.TotalBytes = totalBytes;
-                result.DepotCachePath = ManifestPaths.ManifestDir;
                 result.InstalledFiles = installedFiles;
                 result.Message = $"Installed {installedDepots.Count} manifests ({FormatSize(totalBytes)}) for {gameName}.\n" +
-                                 $"Files saved to SteamDaddy data directory. Run SteamDaddy.exe to apply.";
+                                 $"Files placed in Steam's depotcache and lua directories.";
                 return result;
             }
             catch (Exception ex)
@@ -250,18 +288,22 @@ namespace SpokysProjectLightning.Services
         }
 
         /// <summary>
-        /// LuaTools-style .lua generation: setManifestid(depotId, "manifestId") for each depot.
-        /// The active mode determines the subdirectory (lua or stplug-in).
+        /// SFF/LumaCore-style .lua generation: addappid for the base app and each depot,
+        /// plus setManifestid for manifest pinning. LumaCore auto-registers the appid
+        /// from the filename, but the depot addappid calls also register decryption keys
+        /// and depot ownership.
         /// </summary>
-        private string GenerateLuaList(string appId, string gameName,
+        public string GenerateLuaList(string appId, string gameName,
             List<(string depotId, string manifestId, long size)> depots)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"-- {gameName} (AppID: {appId})");
-            sb.AppendLine("-- Added by Spoky's Project Lightning");
+            sb.AppendLine($"-- MAIN APPLICATION");
+            sb.AppendLine($"addappid({appId}) -- {EscapeVdf(gameName)}");
             sb.AppendLine();
+            sb.AppendLine($"-- MAIN APP DEPOTS");
             foreach (var d in depots)
             {
+                sb.AppendLine($"addappid({d.depotId}, 1) -- Depot {d.depotId}");
                 sb.AppendLine($"setManifestid({d.depotId}, \"{d.manifestId}\")");
             }
             return sb.ToString();

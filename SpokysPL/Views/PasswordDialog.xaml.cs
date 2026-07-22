@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace SpokysProjectLightning.Views
+namespace SpokysProjectVercel.Views
 {
     public partial class PasswordDialog : Window
     {
