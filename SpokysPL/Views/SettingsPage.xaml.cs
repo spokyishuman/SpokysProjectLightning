@@ -367,56 +367,50 @@ namespace SpokysProjectVercel.Views
 
             try
             {
-                var json = await new HttpClient().GetStringAsync(UpdateService.UpdateCheckUrl);
-                var release = Newtonsoft.Json.Linq.JObject.Parse(json);
-                var assets = release["assets"] as Newtonsoft.Json.Linq.JArray;
-
-                string? setupUrl = null;
-                string? version = null;
-                if (assets != null)
+                var svc = new UpdateService();
+                var update = await svc.CheckForUpdatesAsync();
+                if (update == null)
                 {
-                    foreach (var asset in assets)
+                    // No update manifest, try to fetch installer from GitHub release directly
+                    var http = new HttpClient();
+                    http.DefaultRequestHeaders.Add("User-Agent", "SpokysPL-Downloader/4.0");
+                    http.Timeout = TimeSpan.FromSeconds(10);
+                    var json = await http.GetStringAsync(
+                        "https://api.github.com/repos/spokyishuman/SpokysProjectLightning/releases/latest");
+                    var release = Newtonsoft.Json.Linq.JObject.Parse(json);
+                    var assets = release["assets"] as Newtonsoft.Json.Linq.JArray;
+
+                    string? setupUrl = null;
+                    string? version = null;
+                    if (assets != null)
                     {
-                        var name = asset["name"]?.ToString();
-                        if (name != null && name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) &&
-                            name.IndexOf("Setup", StringComparison.OrdinalIgnoreCase) >= 0)
+                        foreach (var asset in assets)
                         {
-                            setupUrl = asset["browser_download_url"]?.ToString();
-                            var tag = release["tag_name"]?.ToString()?.TrimStart('v', 'V');
-                            version = tag ?? "0.0.0";
-                            break;
+                            var name = asset["name"]?.ToString();
+                            if (name != null && name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) &&
+                                name.IndexOf("Setup", StringComparison.OrdinalIgnoreCase) >= 0)
+                            {
+                                setupUrl = asset["browser_download_url"]?.ToString();
+                                var tag = release["tag_name"]?.ToString()?.TrimStart('v', 'V');
+                                version = tag ?? "0.0.0";
+                                break;
+                            }
                         }
                     }
-                }
 
-                if (string.IsNullOrEmpty(setupUrl))
-                {
-                    UpdateStatus.Text = "❌ No installer found in the latest release. Upload a Setup.exe to GitHub releases.";
+                    if (string.IsNullOrEmpty(setupUrl))
+                    {
+                        UpdateStatus.Text = "❌ No installer found in the latest release. Upload a Setup.exe to GitHub releases.";
+                        return;
+                    }
+
+                    await DownloadAndRunInstaller(setupUrl, version!);
                     return;
                 }
 
-                UpdateStatus.Text = $"⬇ Downloading installer (v{version})...";
-
-                var destDir = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "SpokysPL", "Downloads");
-                Directory.CreateDirectory(destDir);
-                var destPath = Path.Combine(destDir, $"SpokysPL-Setup-v{version}.exe");
-
-                using var http = new HttpClient();
-                http.Timeout = TimeSpan.FromMinutes(10);
-                var bytes = await http.GetByteArrayAsync(setupUrl);
-                await File.WriteAllBytesAsync(destPath, bytes);
-
-                UpdateStatus.Text = $"✅ Installer saved. Launching...";
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = destPath,
-                    UseShellExecute = true,
-                    Verb = "runas"
-                });
-                await Task.Delay(2000);
-                Application.Current.Shutdown();
+                // Use the update's download URL (should point to the setup exe or zip)
+                var downUrl = update.DownloadUrl;
+                await DownloadAndRunInstaller(downUrl, update.Version);
             }
             catch (Exception ex)
             {
@@ -426,6 +420,33 @@ namespace SpokysProjectVercel.Views
             {
                 if (btn != null) btn.IsEnabled = true;
             }
+        }
+
+        private async Task DownloadAndRunInstaller(string url, string version)
+        {
+            UpdateStatus.Text = $"⬇ Downloading installer (v{version})...";
+
+            var destDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "SpokysPL", "Downloads");
+            Directory.CreateDirectory(destDir);
+            var ext = Path.GetExtension(new Uri(url).AbsolutePath) ?? ".exe";
+            var destPath = Path.Combine(destDir, $"SpokysPL-Setup-v{version}{ext}");
+
+            using var http = new HttpClient();
+            http.Timeout = TimeSpan.FromMinutes(10);
+            var bytes = await http.GetByteArrayAsync(url);
+            await File.WriteAllBytesAsync(destPath, bytes);
+
+            UpdateStatus.Text = $"✅ Installer saved. Launching...";
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = destPath,
+                UseShellExecute = true,
+                Verb = "runas"
+            });
+            await Task.Delay(2000);
+            Application.Current.Shutdown();
         }
 
         private async void CheckForUpdates_Click(object sender, RoutedEventArgs e)

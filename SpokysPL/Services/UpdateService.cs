@@ -20,7 +20,7 @@ namespace SpokysProjectVercel.Services
     public class UpdateService
     {
         private readonly HttpClient _http;
-        public static string UpdateCheckUrl { get; set; } = "https://api.github.com/repos/spokyishuman/SpokysProjectLightning/releases/latest";
+        public static string UpdateCheckUrl { get; set; } = "https://raw.githubusercontent.com/spokyishuman/SpokysProjectLightning/main/update.json";
 
         private static readonly string UpdateDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
