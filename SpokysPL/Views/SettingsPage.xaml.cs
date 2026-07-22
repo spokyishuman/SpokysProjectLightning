@@ -784,7 +784,7 @@ Remove-Item $zip -ErrorAction SilentlyContinue
 
         private void ResetUpdateUrl_Click(object sender, RoutedEventArgs e)
         {
-            var defaultUrl = "https://api.github.com/repos/spokyishuman/SpokysProjectVercel/releases/latest";
+            var defaultUrl = "https://api.github.com/repos/spokyishuman/SpokysProjectLightning/releases/latest";
             UpdateUrlBox.Text = defaultUrl;
             var settings = _data.LoadSettings();
             settings.UpdateUrl = defaultUrl;
