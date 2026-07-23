@@ -34,12 +34,12 @@ if ($LASTEXITCODE -ne 0) { throw "Build failed" }
 
 # 3. Build the updater
 Write-Host "Publishing updater..." -ForegroundColor Cyan
-& dotnet publish "$PSScriptRoot\SpokysPL.Updater\SpokysPL.Updater.csproj" -c Release
+& dotnet publish "$PSScriptRoot\SpokysProjectVercel.Updater\SpokysProjectVercel.Updater.csproj" -c Release
 if ($LASTEXITCODE -ne 0) { throw "Updater publish failed" }
 
 # 4. Copy updater into main output
 $publishDir = "$projectDir\bin\Release\net8.0-windows"
-$updaterSrc = "$PSScriptRoot\SpokysPL.Updater\bin\Release\net8.0\win-x64\publish\SpokysPL.Updater.exe"
+$updaterSrc = "$PSScriptRoot\SpokysProjectVercel.Updater\bin\Release\net8.0\win-x64\publish\SpokysProjectVercel.Updater.exe"
 Copy-Item $updaterSrc "$publishDir\SpokysPL.Updater.exe" -Force
 
 # 5. Create output dir & zip

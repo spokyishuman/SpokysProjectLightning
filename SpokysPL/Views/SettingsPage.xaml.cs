@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using SpokysProjectVercel.Services;
 
@@ -56,7 +57,11 @@ namespace SpokysProjectVercel.Views
             // Theme selector
             _lastTheme = settings.Theme;
             if (ThemeIndex.TryGetValue(settings.Theme, out var idx))
+            {
                 ThemeSelector.SelectedIndex = idx;
+                if (ThemeSelector.SelectedItem is ComboBoxItem item && ThemeSelector.Template.FindName("ThemeDisplayText", ThemeSelector) is System.Windows.Controls.TextBlock tb)
+                    tb.Text = item.Content?.ToString() ?? settings.Theme;
+            }
 
             // Download path
             var dlPath = settings.DownloadPath;
@@ -114,12 +119,19 @@ namespace SpokysProjectVercel.Views
             if (ThemeSelector.SelectedItem is ComboBoxItem item && item.Tag is string tag && tag != _lastTheme)
             {
                 _lastTheme = tag;
+                if (ThemeSelector.Template.FindName("ThemeDisplayText", ThemeSelector) is System.Windows.Controls.TextBlock tb)
+                    tb.Text = item.Content?.ToString() ?? tag;
                 if (DataContext is ViewModels.MainViewModel vm)
                 {
                     vm.ApplyTheme(tag);
                     ThemeStatus.Text = $"✅ Theme changed to {tag}";
                 }
             }
+        }
+
+        private void ThemeSelector_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ThemeSelector.IsDropDownOpen = !ThemeSelector.IsDropDownOpen;
         }
 
         private void BrowseDownloadPath_Click(object sender, RoutedEventArgs e)

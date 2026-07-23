@@ -66,7 +66,7 @@
                         <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal"
                                     VerticalAlignment="Center">
                             <Button x:Name="InstallBtn" Content="⬇ Install / Update"
-                                    Style="{DynamicResource PrimaryButton}" Padding="16,8"
+                                    Style="{DynamicResource AccentButton}" Padding="16,8"
                                     FontSize="13" Margin="0,0,8,0"
                                     Click="InstallBtn_Click"/>
                             <Button x:Name="UninstallBtn" Content="🗑 Remove DLLs"
@@ -183,7 +183,7 @@
                                         Style="{DynamicResource SecondaryButton}"
                                         Click="LoadDefaultTomlBtn_Click" Margin="0,0,8,0"/>
                                 <Button Content="💾 Save" Padding="14,5" FontSize="11"
-                                        Style="{DynamicResource PrimaryButton}"
+                                        Style="{DynamicResource AccentButton}"
                                         Click="SaveTomlBtn_Click"/>
                             </StackPanel>
                             <TextBox x:Name="TomlEditor" Grid.Row="1"

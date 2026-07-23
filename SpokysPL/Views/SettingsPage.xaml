@@ -71,6 +71,61 @@
                             <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}"
                                              Color="{DynamicResource SurfaceColor}"/>
                         </ComboBox.Resources>
+                        <ComboBox.Style>
+                            <Style TargetType="ComboBox">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ComboBox">
+                                            <Grid>
+                                                <Border x:Name="MainBorder"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        CornerRadius="6"
+                                                        Padding="{TemplateBinding Padding}"
+                                                        Cursor="Hand"
+                                                        MouseLeftButtonDown="ThemeSelector_MouseLeftButtonDown">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0"
+                                                                   x:Name="ThemeDisplayText"
+                                                                   Text="Dark"
+                                                                   Foreground="{TemplateBinding Foreground}"
+                                                                   VerticalAlignment="Center"
+                                                                   IsHitTestVisible="False"/>
+                                                        <Path Grid.Column="1"
+                                                              Data="M0,0 L6,6 L12,0"
+                                                              Fill="{TemplateBinding Foreground}"
+                                                              Stretch="None"
+                                                              Margin="4,0,0,0"
+                                                              VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </Border>
+                                                <Popup x:Name="PART_Popup"
+                                                       IsOpen="{TemplateBinding IsDropDownOpen}"
+                                                       Placement="Bottom"
+                                                       AllowsTransparency="True"
+                                                       Focusable="False"
+                                                       PopupAnimation="Slide">
+                                                    <Border Background="{DynamicResource SurfaceBrush}"
+                                                            BorderBrush="{DynamicResource CardBorderBrush}"
+                                                            BorderThickness="1" CornerRadius="6"
+                                                            MinWidth="{TemplateBinding ActualWidth}"
+                                                            Margin="0,2,0,0">
+                                                        <ScrollViewer>
+                                                            <ItemsPresenter/>
+                                                        </ScrollViewer>
+                                                    </Border>
+                                                </Popup>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ComboBox.Style>
                         <ComboBoxItem Content="Dark" Tag="Dark"/>
                         <ComboBoxItem Content="Emerald" Tag="Emerald"/>
                         <ComboBoxItem Content="Midnight Blue" Tag="Midnight Blue"/>

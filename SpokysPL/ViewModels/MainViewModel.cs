@@ -55,7 +55,7 @@ namespace SpokysProjectVercel.ViewModels
             new() { Icon = "🎬", ToolTip = "Movies", PageName = "Movies", DisplayName = "Movies", IsPinned = true },
             new() { Icon = "🔧", ToolTip = "Tools", PageName = "Tools", DisplayName = "Tools", IsPinned = true },
             new() { Icon = "🛒", ToolTip = "Shop", PageName = "Shop", DisplayName = "Shop", IsPinned = true },
-            new() { Icon = "⚡", ToolTip = "OpenSteamTool", PageName = "OpenSteamTool", DisplayName = "OST", IsPinned = true },
+            new() { Icon = "⚡", ToolTip = "Open Steam Tools", PageName = "OpenSteamTool", DisplayName = "Open Steam Tools", IsPinned = true },
             new() { Icon = "🐛", ToolTip = "Report Bug", PageName = "ReportBug", DisplayName = "Bug", IsPinned = true },
         };
 
