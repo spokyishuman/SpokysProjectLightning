@@ -51,7 +51,7 @@
     </ProjectReference>
   </ItemGroup>
 
-  <Target Name="CopyUpdater" AfterTargets="Build;Publish">
+  <Target Name="CopyUpdater" AfterTargets="Build;Publish" Condition="Exists('..\SpokysProjectVercel.Updater\bin\$(Configuration)\net8.0\win-x64\publish\SpokysProjectVercel.Updater.exe')">
     <Copy SourceFiles="..\SpokysProjectVercel.Updater\bin\$(Configuration)\net8.0\win-x64\publish\SpokysProjectVercel.Updater.exe"
           DestinationFolder="$(OutputPath)"
           SkipUnchangedFiles="True" />
