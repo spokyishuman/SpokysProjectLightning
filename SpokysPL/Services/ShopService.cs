@@ -159,6 +159,7 @@ namespace SpokysProjectVercel.Services
                 items.Add(item);
             }
             SaveItems(items);
+            _ = AutoPublishAsync();
         }
 
         public void RemoveItem(string appId)
@@ -166,6 +167,14 @@ namespace SpokysProjectVercel.Services
             var items = LoadLocal();
             items.RemoveAll(i => i.AppId == appId);
             SaveItems(items);
+            _ = AutoPublishAsync();
+        }
+
+        private async Task AutoPublishAsync()
+        {
+            var settings = new DataService().LoadSettings();
+            if (string.IsNullOrEmpty(settings.ShopGithubToken)) return;
+            await PublishToGithubAsync();
         }
 
         private List<ShopItem> LoadLocal()
