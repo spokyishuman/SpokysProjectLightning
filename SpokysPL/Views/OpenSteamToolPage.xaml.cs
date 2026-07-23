@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using SpokysProjectVercel.Services;
 
 namespace SpokysProjectVercel.Views
@@ -264,6 +265,8 @@ namespace SpokysProjectVercel.Views
 
         private async void NewLuaBtn_Click(object sender, RoutedEventArgs e)
         {
+            Brush R(string key, Brush fallback) => Application.Current.TryFindResource(key) as Brush ?? fallback;
+
             var dialog = new Window
             {
                 Title = "New Lua Config",
@@ -271,94 +274,52 @@ namespace SpokysProjectVercel.Views
                 Height = 400,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Owner = Window.GetWindow(this),
-                Background = System.Windows.Media.Brushes.Black,
+                Background = R("CardBrush", new SolidColorBrush(Color.FromRgb(30, 30, 40))),
                 ResizeMode = ResizeMode.NoResize
             };
             var panel = new StackPanel { Margin = new Thickness(16, 16, 16, 16) };
 
-            var lblAppId = new TextBlock
+            var textFg = R("TextPrimaryBrush", Brushes.White);
+            var inputBg = R("SurfaceBrush", new SolidColorBrush(Color.FromRgb(40, 40, 50)));
+
+            TextBlock MakeLabel(string text) => new TextBlock
             {
-                Text = "Steam App ID:",
-                Foreground = System.Windows.Media.Brushes.White,
+                Text = text,
+                Foreground = textFg,
                 Margin = new Thickness(0, 0, 0, 4)
             };
-            var appIdBox = new TextBox
+
+            TextBox MakeInput() => new TextBox
             {
-                Text = "",
-                Foreground = System.Windows.Media.Brushes.White,
-                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 50)),
+                Foreground = textFg,
+                Background = inputBg,
                 Padding = new Thickness(6, 4, 6, 4),
                 Margin = new Thickness(0, 0, 0, 8)
             };
 
-            var lblDepot = new TextBlock
-            {
-                Text = "Depot Key (optional):",
-                Foreground = System.Windows.Media.Brushes.White,
-                Margin = new Thickness(0, 0, 0, 4)
-            };
-            var depotBox = new TextBox
-            {
-                Text = "",
-                Foreground = System.Windows.Media.Brushes.White,
-                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 50)),
-                Padding = new Thickness(6, 4, 6, 4),
-                Margin = new Thickness(0, 0, 0, 8)
-            };
+            var lblAppId = MakeLabel("Steam App ID:");
+            var appIdBox = MakeInput();
 
-            var lblToken = new TextBlock
-            {
-                Text = "Access Token (optional):",
-                Foreground = System.Windows.Media.Brushes.White,
-                Margin = new Thickness(0, 0, 0, 4)
-            };
-            var tokenBox = new TextBox
-            {
-                Text = "",
-                Foreground = System.Windows.Media.Brushes.White,
-                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 50)),
-                Padding = new Thickness(6, 4, 6, 4),
-                Margin = new Thickness(0, 0, 0, 8)
-            };
+            var lblDepot = MakeLabel("Depot Key (optional):");
+            var depotBox = MakeInput();
 
-            var lblManifest = new TextBlock
-            {
-                Text = "Manifest ID (optional):",
-                Foreground = System.Windows.Media.Brushes.White,
-                Margin = new Thickness(0, 0, 0, 4)
-            };
-            var manifestBox = new TextBox
-            {
-                Text = "",
-                Foreground = System.Windows.Media.Brushes.White,
-                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 50)),
-                Padding = new Thickness(6, 4, 6, 4),
-                Margin = new Thickness(0, 0, 0, 8)
-            };
+            var lblToken = MakeLabel("Access Token (optional):");
+            var tokenBox = MakeInput();
 
-            var lblFileName = new TextBlock
-            {
-                Text = "File name (e.g. mygame.lua):",
-                Foreground = System.Windows.Media.Brushes.White,
-                Margin = new Thickness(0, 0, 0, 4)
-            };
-            var nameBox = new TextBox
-            {
-                Text = "",
-                Foreground = System.Windows.Media.Brushes.White,
-                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 50)),
-                Padding = new Thickness(6, 4, 6, 4),
-                Margin = new Thickness(0, 0, 0, 8)
-            };
+            var lblManifest = MakeLabel("Manifest ID (optional):");
+            var manifestBox = MakeInput();
+
+            var lblFileName = MakeLabel("File name (e.g. mygame.lua):");
+            var nameBox = MakeInput();
 
             var previewBox = new TextBox
             {
-                FontFamily = new System.Windows.Media.FontFamily("Consolas"),
+                FontFamily = new FontFamily("Consolas"),
                 FontSize = 11,
                 IsReadOnly = true,
-                Foreground = System.Windows.Media.Brushes.LimeGreen,
-                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(20, 20, 30)),
-                BorderBrush = System.Windows.Media.Brushes.Gray,
+                Foreground = R("PrimaryBrush", Brushes.LimeGreen),
+                Background = R("CardBrush", new SolidColorBrush(Color.FromRgb(20, 20, 30))),
+                BorderBrush = R("BorderBrush", Brushes.Gray),
                 Height = 80,
                 Margin = new Thickness(0, 0, 0, 8),
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto
@@ -386,8 +347,8 @@ namespace SpokysProjectVercel.Views
             {
                 Content = "💾 Save Lua Config",
                 Padding = new Thickness(14, 8, 14, 8),
-                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(76, 175, 80)),
-                Foreground = System.Windows.Media.Brushes.White,
+                Background = R("SuccessBrush", new SolidColorBrush(Color.FromRgb(76, 175, 80))) is Brush sb && sb != Brushes.Transparent ? sb : new SolidColorBrush(Color.FromRgb(76, 175, 80)),
+                Foreground = Brushes.White,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 IsEnabled = false
             };
@@ -420,12 +381,7 @@ namespace SpokysProjectVercel.Views
             panel.Children.Add(manifestBox);
             panel.Children.Add(lblFileName);
             panel.Children.Add(nameBox);
-            panel.Children.Add(new TextBlock
-            {
-                Text = "Preview:",
-                Foreground = System.Windows.Media.Brushes.White,
-                Margin = new Thickness(0, 0, 0, 4)
-            });
+            panel.Children.Add(MakeLabel("Preview:"));
             panel.Children.Add(previewBox);
             panel.Children.Add(saveBtn);
             dialog.Content = panel;

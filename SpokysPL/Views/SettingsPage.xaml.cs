@@ -178,7 +178,7 @@ namespace SpokysProjectVercel.Views
 
                 var row = new Border
                 {
-                    Background = new SolidColorBrush(Color.FromArgb(0x14, 0x1F, 0x19, 0x00)),
+                    Background = TryFindResource("SurfaceBrush") as Brush ?? new SolidColorBrush(Color.FromArgb(0x14, 0x1F, 0x19, 0x00)),
                     CornerRadius = new CornerRadius(6),
                     Padding = new Thickness(8, 6, 8, 6),
                     Margin = new Thickness(0, 0, 0, 4)

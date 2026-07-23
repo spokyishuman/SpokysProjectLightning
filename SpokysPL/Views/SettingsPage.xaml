@@ -31,7 +31,7 @@
                     <TextBlock FontSize="13" Foreground="{DynamicResource MutedForegroundBrush}" TextWrapping="Wrap"
                                Text="Enter the path where Steam is installed so the library can be managed."
                                Margin="0,0,0,14"/>
-                    <Border Background="#331B2D22" CornerRadius="8"
+                    <Border Background="{DynamicResource CardBrush}" CornerRadius="8"
                             BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" Padding="12,10">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -84,7 +84,7 @@
                     <TextBlock FontSize="13" Foreground="{DynamicResource MutedForegroundBrush}" TextWrapping="Wrap"
                                Text="Where downloaded fixes and archives are saved."
                                Margin="0,0,0,14"/>
-                    <Border Background="#331B2D22" CornerRadius="8"
+                    <Border Background="{DynamicResource CardBrush}" CornerRadius="8"
                             BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" Padding="12,10">
                         <Grid>
                             <Grid.ColumnDefinitions>
