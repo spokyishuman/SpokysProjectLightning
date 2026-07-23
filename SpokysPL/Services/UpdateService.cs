@@ -13,6 +13,7 @@ namespace SpokysProjectVercel.Services
     {
         public string Version { get; set; } = "";
         public string DownloadUrl { get; set; } = "";
+        public string InstallerUrl { get; set; } = "";
         public string ReleaseNotes { get; set; } = "";
         public bool Mandatory { get; set; }
     }
