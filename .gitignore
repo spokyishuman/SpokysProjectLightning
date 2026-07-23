@@ -1,0 +1,5 @@
+Release/
+*.zip
+bin/
+obj/
+nul
