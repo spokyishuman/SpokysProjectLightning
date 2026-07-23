@@ -1,15 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Microsoft.Web.WebView2.Core;
-using Microsoft.Web.WebView2.Wpf;
 using SpokysProjectVercel.Services;
 
 namespace SpokysProjectVercel.Views
@@ -24,11 +18,6 @@ namespace SpokysProjectVercel.Views
 
     public partial class ToolsPage : UserControl
     {
-        private bool _webView2Initialized;
-        private static readonly string DownloadDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "SpokysPL", "ToolDownloads");
-
         public ToolsPage()
         {
             InitializeComponent();
@@ -87,64 +76,9 @@ namespace SpokysProjectVercel.Views
             }
         }
 
-        private async void ToolCard_Click(object sender, MouseButtonEventArgs e)
+        private void ToolCard_Click(object sender, MouseButtonEventArgs e)
         {
             if (sender is FrameworkElement el && el.Tag is string url && !string.IsNullOrEmpty(url))
-            {
-                await NavigateToUrl(url);
-            }
-        }
-
-        private async Task NavigateToUrl(string url)
-        {
-            UrlBar.Text = url;
-            Placeholder.Visibility = Visibility.Collapsed;
-            ToolBrowser.Visibility = Visibility.Visible;
-
-            if (!_webView2Initialized)
-            {
-                var userDataFolder = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "SpokysPL", "WebView2");
-                var env = await CoreWebView2Environment.CreateAsync(
-                    browserExecutableFolder: null,
-                    userDataFolder: userDataFolder);
-                await ToolBrowser.EnsureCoreWebView2Async(env);
-                ToolBrowser.CoreWebView2.Settings.UserAgent =
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
-                ToolBrowser.CoreWebView2.NewWindowRequested += (s, args) =>
-                {
-                    args.Handled = true;
-                    _ = NavigateToUrl(args.Uri);
-                };
-                ToolBrowser.CoreWebView2.DownloadStarting += OnDownloadStarting;
-                _webView2Initialized = true;
-            }
-
-            ToolBrowser.CoreWebView2.Navigate(url);
-        }
-
-        private void GoBack_Click(object sender, RoutedEventArgs e)
-        {
-            if (ToolBrowser.CoreWebView2?.CanGoBack == true)
-                ToolBrowser.CoreWebView2.GoBack();
-        }
-
-        private void GoForward_Click(object sender, RoutedEventArgs e)
-        {
-            if (ToolBrowser.CoreWebView2?.CanGoForward == true)
-                ToolBrowser.CoreWebView2.GoForward();
-        }
-
-        private void Refresh_Click(object sender, RoutedEventArgs e)
-        {
-            ToolBrowser.CoreWebView2?.Reload();
-        }
-
-        private void OpenExternal_Click(object sender, RoutedEventArgs e)
-        {
-            var url = UrlBar.Text;
-            if (!string.IsNullOrEmpty(url) && Uri.TryCreate(url, UriKind.Absolute, out _))
             {
                 try
                 {
@@ -154,97 +88,12 @@ namespace SpokysProjectVercel.Views
                         UseShellExecute = true
                     });
                 }
-                catch { }
-            }
-        }
-
-        private void OnDownloadStarting(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs e)
-        {
-            var fileName = e.DownloadOperation.ResultFilePath;
-            var ext = Path.GetExtension(fileName).ToLowerInvariant();
-
-            // Only intercept manifest-related downloads
-            if (ext != ".zip" && ext != ".manifest" && ext != ".lua") return;
-
-            e.Handled = true;
-
-            var destDir = DownloadDir;
-            Directory.CreateDirectory(destDir);
-            var localPath = Path.Combine(destDir, Path.GetFileName(fileName));
-            e.ResultFilePath = localPath;
-
-            e.DownloadOperation.StateChanged += async (_, _) =>
-            {
-                try
+                catch (Exception ex)
                 {
-                    if (e.DownloadOperation.State == Microsoft.Web.WebView2.Core.CoreWebView2DownloadState.Interrupted)
-                    {
-                        ToastService.Show($"❌ Download failed: {Path.GetFileName(localPath)}", "error");
-                    }
-                    else if (e.DownloadOperation.State == Microsoft.Web.WebView2.Core.CoreWebView2DownloadState.Completed)
-                    {
-                        await InstallDownloadedFile(localPath);
-                    }
+                    MessageBox.Show($"Could not open {url}:\n{ex.Message}",
+                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-                catch { }
-            };
-        }
-
-        private async Task InstallDownloadedFile(string path)
-        {
-            try
-            {
-                var steamPath = SteamService.FindSteamPath();
-                if (steamPath == null)
-                {
-                    ToastService.Show("⚠️ File saved but Steam not found. Install manually.", "warning");
-                    return;
-                }
-
-                ManifestPaths.EnsureDirs();
-                var ext = Path.GetExtension(path).ToLowerInvariant();
-                var fileName = Path.GetFileName(path);
-
-                if (ext == ".manifest")
-                {
-                    File.Copy(path, Path.Combine(ManifestPaths.ManifestDir, fileName), true);
-                    ToastService.Show($"✅ Manifest saved: {fileName}", "success");
-                }
-                else if (ext == ".lua")
-                {
-                    File.Copy(path, Path.Combine(ManifestPaths.LuaDir, fileName), true);
-                    ToastService.Show($"✅ Lua script saved: {fileName}", "success");
-                }
-                else if (ext == ".zip")
-                {
-                    int installed = 0;
-                    string[] manifestExts = { ".manifest", ".lua", ".vdf" };
-                    using var zip = ZipFile.OpenRead(path);
-                    foreach (var entry in zip.Entries.Where(e => !string.IsNullOrEmpty(e.Name)))
-                    {
-                        var entryExt = Path.GetExtension(entry.Name).ToLowerInvariant();
-                        if (!manifestExts.Contains(entryExt)) continue;
-
-                        string targetDir = entryExt switch
-                        {
-                            ".lua" => ManifestPaths.LuaDir,
-                            _ => ManifestPaths.ManifestDir
-                        };
-                        Directory.CreateDirectory(targetDir);
-                        entry.ExtractToFile(Path.Combine(targetDir, entry.Name), true);
-                        installed++;
-                    }
-                    if (installed > 0)
-                        ToastService.Show($"✅ {installed} file(s) extracted to depotcache", "success");
-                    else
-                        ToastService.Show($"⚠️ No manifest files found in {fileName}", "warning");
-                }
-            }
-            catch (Exception ex)
-            {
-                ToastService.Show($"❌ Failed to install {Path.GetFileName(path)}: {ex.Message}", "error");
             }
         }
     }
 }
-

@@ -86,11 +86,10 @@ namespace SpokysProjectVercel.Views
             {
                 var env = await CoreWebView2Environment.CreateAsync(null, WvUserDataFolder);
                 var wv = new WebView2();
-                var tcs = new TaskCompletionSource<bool>();
 
                 var win = new Window
                 {
-                    Title = "Discord Login — Log in on the page",
+                    Title = "Discord Login — Log in on the page, then close this window",
                     Width = 860,
                     Height = 650,
                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
@@ -109,20 +108,40 @@ namespace SpokysProjectVercel.Views
                         wv.CoreWebView2.Navigate(args.Uri);
                     };
 
-                    _ = CheckCookiesPeriodically(wv, win, tcs);
                     wv.CoreWebView2.Navigate("https://generator.ryuu.lol");
                 };
 
-                win.Closed += (_, _) => tcs.TrySetResult(IsLoggedIn);
-
                 win.ShowDialog();
-                await tcs.Task;
 
-                if (IsLoggedIn)
+                // Extract cookies after user closes the window
+                try
                 {
-                    SaveLoginState();
-                    UpdateLoginUI();
+                    var cookies = await wv.CoreWebView2.CookieManager.GetCookiesAsync("https://generator.ryuu.lol");
+                    if (cookies != null && cookies.Count > 0)
+                    {
+                        var cc = new System.Net.CookieContainer();
+                        foreach (var c in cookies)
+                            cc.Add(new Uri("https://generator.ryuu.lol"),
+                                new System.Net.Cookie(c.Name, c.Value, c.Path, c.Domain));
+                        _sessionCookies = cc;
+
+                        try
+                        {
+                            var info = await wv.CoreWebView2.ExecuteScriptAsync(
+                                "JSON.stringify({name: (document.querySelector('[data-username], .user-info, .user-name')?.textContent || document.title).trim(), avatar: document.querySelector('img[src*=\"cdn.discord\"], .avatar img, [class*=avatar]')?.getAttribute('src') || ''})");
+                            var parsed = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(info?.Trim('"') ?? "{}");
+                            _discordUser = parsed?.GetValueOrDefault("name");
+                            _discordAvatarUrl = parsed?.GetValueOrDefault("avatar");
+                            if (string.IsNullOrEmpty(_discordUser) || _discordUser == "Ryuu's Manifests")
+                                _discordUser = "Discord User";
+                        }
+                        catch { }
+
+                        SaveLoginState();
+                        UpdateLoginUI();
+                    }
                 }
+                catch { }
             }
             catch (Exception ex)
             {
@@ -136,27 +155,7 @@ namespace SpokysProjectVercel.Views
             }
         }
 
-        private async Task ExtractLoginState(WebView2 wv)
-        {
-            try
-            {
-                var cookies = await wv.CoreWebView2.CookieManager.GetCookiesAsync("https://generator.ryuu.lol");
-                var cc = new System.Net.CookieContainer();
-                foreach (var c in cookies)
-                    cc.Add(new Uri("https://generator.ryuu.lol"),
-                        new System.Net.Cookie(c.Name, c.Value, c.Path, c.Domain));
-                _sessionCookies = cc;
 
-                var info = await wv.CoreWebView2.ExecuteScriptAsync(
-                    "JSON.stringify({name: (document.querySelector('[data-username], .user-info, .user-name')?.textContent || document.title).trim(), avatar: document.querySelector('img[src*=\"cdn.discord\"], .avatar img, [class*=avatar]')?.getAttribute('src') || ''})");
-                var parsed = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(info?.Trim('"') ?? "{}");
-                _discordUser = parsed?.GetValueOrDefault("name");
-                _discordAvatarUrl = parsed?.GetValueOrDefault("avatar");
-                if (string.IsNullOrEmpty(_discordUser) || _discordUser == "Ryuu's Manifests")
-                    _discordUser = "Discord User";
-            }
-            catch { }
-        }
 
         public FixesPage()
         {
@@ -352,27 +351,7 @@ namespace SpokysProjectVercel.Views
             }
         }
 
-        private async Task CheckCookiesPeriodically(WebView2 wv, Window win, TaskCompletionSource<bool> tcs)
-        {
-            for (int i = 0; i < 300; i++)
-            {
-                await Task.Delay(1000);
-                try
-                {
-                    var cookies = await Dispatcher.InvokeAsync(() =>
-                        wv.CoreWebView2.CookieManager.GetCookiesAsync("https://generator.ryuu.lol")).Task.Unwrap();
-                    if (cookies != null && cookies.Count > 0)
-                    {
-                        await ExtractLoginState(wv);
-                        Dispatcher.Invoke(() => win.Close());
-                        return;
-                    }
-                }
-                catch { }
-                if (tcs.Task.IsCompleted) return;
-            }
-        }
-
+        
         private async Task LoadGamesAsync()
         {
             _allGames.Clear();
