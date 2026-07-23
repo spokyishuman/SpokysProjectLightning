@@ -80,7 +80,7 @@ A WPF desktop app that helps you manage Steam game manifests and fixes, stream m
 
 ## Installation
 
-Download the latest installer from [Releases](https://github.com/spokyishuman/SpokysProjectLightning/releases).
+Download the latest installer from [Releases](https://github.com/spokyishuman/Spoky-s-Project-Vercel/releases).
 
 **System Requirements:**
 - Windows 10/11 64-bit
@@ -94,7 +94,7 @@ Download the latest installer from [Releases](https://github.com/spokyishuman/Sp
 Built with Visual Studio / .NET 8 SDK.
 
 ```bash
-git clone https://github.com/spokyishuman/SpokysProjectLightning.git
+git clone https://github.com/spokyishuman/Spoky-s-Project-Vercel.git
 cd SpokysProjectLightning
 dotnet build
 ```

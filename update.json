@@ -1,7 +1,7 @@
 {
   "Version": "1.0.0.2",
-  "DownloadUrl": "https://github.com/spokyishuman/SpokysProjectLightning/releases/download/v1.0.0.2/SpokysPL-1.0.0.2.zip",
-  "InstallerUrl": "https://github.com/spokyishuman/SpokysProjectLightning/releases/download/v1.0.0.2/Spokys-Project-Vercel-Setup-v1.0.0.2.exe",
+  "DownloadUrl": "https://github.com/spokyishuman/Spoky-s-Project-Vercel/releases/download/v1.0.0.2/SpokysPL-1.0.0.2.zip",
+  "InstallerUrl": "https://github.com/spokyishuman/Spoky-s-Project-Vercel/releases/download/v1.0.0.2/Spokys-Project-Vercel-Setup-v1.0.0.2.exe",
   "ReleaseNotes": "Fixed: updater no longer opens cmd window. Sidebar 'OST' renamed to 'Open Steam Tools'. ComboBox theme dropdown now styled correctly. Install/Update buttons use proper accent style.",
   "Mandatory": false
 }

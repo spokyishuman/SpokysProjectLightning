@@ -384,7 +384,7 @@ namespace SpokysProjectVercel.Views
                 http.DefaultRequestHeaders.Add("User-Agent", "SpokysPL-Installer/4.0");
                 http.Timeout = TimeSpan.FromSeconds(10);
                 var json = await http.GetStringAsync(
-                    "https://raw.githubusercontent.com/spokyishuman/SpokysProjectLightning/main/update.json");
+                    "https://raw.githubusercontent.com/spokyishuman/Spoky-s-Project-Vercel/main/update.json");
                 var manifest = Newtonsoft.Json.JsonConvert.DeserializeObject<SpokysProjectVercel.Services.UpdateManifest>(json);
 
                 var setupUrl = manifest?.InstallerUrl;
@@ -393,7 +393,7 @@ namespace SpokysProjectVercel.Views
                 if (string.IsNullOrEmpty(setupUrl))
                 {
                     // Fallback: try GitHub release download URL directly
-                    setupUrl = $"https://github.com/spokyishuman/SpokysProjectLightning/releases/download/v{version}/Spokys-Project-Vercel-Setup-v{version}.exe";
+                    setupUrl = $"https://github.com/spokyishuman/Spoky-s-Project-Vercel/releases/download/v{version}/Spokys-Project-Vercel-Setup-v{version}.exe";
                 }
 
                 await DownloadAndRunInstaller(setupUrl, version);
@@ -791,7 +791,7 @@ Remove-Item '{zip}' -ErrorAction SilentlyContinue
 
         private void ResetUpdateUrl_Click(object sender, RoutedEventArgs e)
         {
-            var defaultUrl = "https://api.github.com/repos/spokyishuman/SpokysProjectLightning/releases/latest";
+            var defaultUrl = "https://api.github.com/repos/spokyishuman/Spoky-s-Project-Vercel/releases/latest";
             UpdateUrlBox.Text = defaultUrl;
             var settings = _data.LoadSettings();
             settings.UpdateUrl = defaultUrl;

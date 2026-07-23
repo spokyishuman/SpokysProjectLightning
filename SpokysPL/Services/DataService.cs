@@ -321,7 +321,7 @@ namespace SpokysProjectVercel.Services
         public string MovieProxyUrl { get; set; } = "https://spokys-tmdb-proxy.vercel.app";
         public string UpdateUrl { get; set; } = string.Empty;
         public string ShopAdminPassword { get; set; } = string.Empty;
-        public string ShopRemoteUrl { get; set; } = "https://raw.githubusercontent.com/spokyishuman/SpokysProjectLightning/main/shop.json";
+        public string ShopRemoteUrl { get; set; } = "https://raw.githubusercontent.com/spokyishuman/Spoky-s-Project-Vercel/main/shop.json";
         public string ShopGithubToken { get; set; } = string.Empty;
         public string SteamDaddyApiKey { get; set; } = string.Empty;
         public string BugReportWebhookUrl { get; set; } = "https://discord.com/api/webhooks/1529453122022543443/ENAOlLg5N9fLfwe8W5CCdxOmMR1VvGUTYIurm8bHxeMekUt5_cgjWYJtKdEw3ijS5e5M";

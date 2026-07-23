@@ -81,7 +81,7 @@ namespace SpokysProjectVercel.Services
                 var content = JsonConvert.SerializeObject(ToDict(items), Formatting.Indented);
                 var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(content));
 
-                var repo = "spokyishuman/SpokysProjectLightning";
+                var repo = "spokyishuman/Spoky-s-Project-Vercel";
                 var path = "shop.json";
                 var branch = "main";
 
