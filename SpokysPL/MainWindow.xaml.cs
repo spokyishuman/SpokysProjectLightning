@@ -486,26 +486,21 @@ namespace SpokysProjectVercel
             var primary = (System.Windows.Media.Brush)Application.Current.FindResource("PrimaryBrush");
             var muted = (System.Windows.Media.Brush)Application.Current.FindResource("MutedForegroundBrush");
             var accent = (System.Windows.Media.Brush)Application.Current.FindResource("SidebarAccentBrush");
-            var trans = System.Windows.Media.Brushes.Transparent;
 
             if (AppMode.UseLumaCore)
             {
                 SidebarModeIcon.Text = "⚡";
-                SidebarModeText.Text = "LC";
                 SidebarModeToggle.Foreground = primary;
                 ModeToggleKnob.SetValue(Grid.ColumnProperty, 0);
                 ModeToggleKnob.Background = accent;
-                ModeToggleLcIcon.Foreground = primary;
                 ModeToggleStSide.Opacity = 0.5;
             }
             else
             {
                 SidebarModeIcon.Text = "🛠️";
-                SidebarModeText.Text = "ST";
                 SidebarModeToggle.Foreground = muted;
                 ModeToggleKnob.SetValue(Grid.ColumnProperty, 1);
                 ModeToggleKnob.Background = accent;
-                ModeToggleLcIcon.Foreground = muted;
                 ModeToggleStSide.Opacity = 1.0;
             }
         }

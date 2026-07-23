@@ -83,7 +83,7 @@
                     <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
                         <TextBlock Text="💀" FontSize="28" Foreground="{DynamicResource PrimaryBrush}"
                                    VerticalAlignment="Center"/>
-                        <TextBlock Text="PROJECT SPOKY" FontSize="32" FontWeight="ExtraBold" FontStyle="Italic"
+                        <TextBlock Text="PROJECT VERCEL" FontSize="32" FontWeight="ExtraBold" FontStyle="Italic"
                                    Foreground="{DynamicResource PrimaryBrush}" Margin="8,0">
                             <TextBlock.Effect>
                                 <DropShadowEffect BlurRadius="18" ShadowDepth="0"
