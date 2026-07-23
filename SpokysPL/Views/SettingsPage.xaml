@@ -67,6 +67,10 @@
                               BorderBrush="{DynamicResource CardBorderBrush}"
                               Padding="10,8" FontSize="13" MaxWidth="280"
                               SelectionChanged="ThemeSelector_SelectionChanged">
+                        <ComboBox.Resources>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}"
+                                             Color="{DynamicResource SurfaceColor}"/>
+                        </ComboBox.Resources>
                         <ComboBoxItem Content="Dark" Tag="Dark"/>
                         <ComboBoxItem Content="Emerald" Tag="Emerald"/>
                         <ComboBoxItem Content="Midnight Blue" Tag="Midnight Blue"/>
