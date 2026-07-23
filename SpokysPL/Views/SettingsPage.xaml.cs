@@ -458,57 +458,57 @@ namespace SpokysProjectVercel.Views
 
                 var appDir = AppContext.BaseDirectory;
                 var appExe = Path.Combine(appDir, "SpokysProjectVercel.exe");
+                var updaterSrc = Path.Combine(appDir, "SpokysProjectVercel.Updater.exe");
                 var pid = Environment.ProcessId;
 
-                // Write a PowerShell script that waits for this app to exit, extracts the zip, then restarts
-                var psScript = $@"
-$pid = {pid}
-$zip = '{zipPath.Replace("'", "''")}'
-$dir = '{appDir.Replace("'", "''")}'
-$exe = '{appExe.Replace("'", "''")}'
-try {{
-    Wait-Process -Id $pid -ErrorAction SilentlyContinue
-    Start-Sleep 2
-    Add-Type -A 'System.IO.Compression.FileSystem'
-    $z = [IO.Compression.ZipFile]::OpenRead($zip)
-    foreach ($e in $z.Entries) {{
-        if (!$e.Name) {{ continue }}
-        $d = Join-Path $dir $e.FullName
-        $p = [IO.Path]::GetDirectoryName($d)
-        if (!(Test-Path $p)) {{ [IO.Directory]::CreateDirectory($p) | Out-Null }}
-        [IO.Compression.ZipFileExtensions]::ExtractToFile($e, $d, $true)
-    }}
-    $z.Dispose()
-    # Restart the app without elevation (even if this script is elevated)
-    cmd /c start """" ""$exe""
-}} catch {{
-    $err = $_.Exception.Message
-    Start-Process 'powershell' ""-NoProfile -Command `""Write-Host 'Update failed: $err'; Start-Sleep 5`""""
-}}
-Remove-Item $zip -ErrorAction SilentlyContinue
-";
-                var psPath = Path.Combine(Path.GetTempPath(), $"spokys-update-{pid}.ps1");
-                await File.WriteAllTextAsync(psPath, psScript);
+                var updaterDest = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "SpokysProjectVercel", "Updates", "SpokysProjectVercel.Updater.exe");
+                Directory.CreateDirectory(Path.GetDirectoryName(updaterDest)!);
+                if (File.Exists(updaterSrc))
+                    File.Copy(updaterSrc, updaterDest, true);
 
-                try
+                if (File.Exists(updaterDest))
                 {
+                    // Use the updater executable — launch it elevated
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = updaterDest,
+                        Arguments = $"\"{zipPath}\" \"{appDir.TrimEnd('\\')}\" \"{appExe}\" {pid}",
+                        Verb = "runas",
+                        UseShellExecute = true,
+                        WindowStyle = ProcessWindowStyle.Hidden
+                    });
+                }
+                else
+                {
+                    // Fallback: PowerShell script (won't work for Program Files without elevation)
+                    var zip = zipPath.Replace("'", "''");
+                    var dir = appDir.Replace("'", "''");
+                    var exe = appExe.Replace("'", "''");
+                    var script = $@"
+Start-Sleep 2
+Add-Type -A 'System.IO.Compression.FileSystem'
+$z = [IO.Compression.ZipFile]::OpenRead('{zip}')
+foreach ($e in $z.Entries) {{
+    if (!$e.Name) {{ continue }}
+    $d = Join-Path '{dir}' $e.FullName
+    $p = [IO.Path]::GetDirectoryName($d)
+    if (!(Test-Path $p)) {{ [IO.Directory]::CreateDirectory($p) | Out-Null }}
+    [IO.Compression.ZipFileExtensions]::ExtractToFile($e, $d, $true)
+}}
+$z.Dispose()
+cmd /c start """" ""{exe}""
+Remove-Item '{zip}' -ErrorAction SilentlyContinue
+";
+                    var psPath = Path.Combine(Path.GetTempPath(), $"spokys-update-{pid}.ps1");
+                    await File.WriteAllTextAsync(psPath, script);
                     Process.Start(new ProcessStartInfo
                     {
                         FileName = "powershell",
                         Arguments = $"-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \"{psPath}\"",
                         Verb = "runas",
                         UseShellExecute = true
-                    });
-                }
-                catch
-                {
-                    // UAC denied or elevation failed — fall back to non-elevated (will fail if in Program Files)
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = "powershell",
-                        Arguments = $"-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \"{psPath}\"",
-                        UseShellExecute = true,
-                        CreateNoWindow = true
                     });
                 }
 
