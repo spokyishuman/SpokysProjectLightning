@@ -1,15 +1,1 @@
-{
-  "9f05b143": {
-    "name": "Premium",
-    "activo": "true",
-    "imgCabecera": "",
-    "imgLogo": "",
-    "imgVertical": "",
-    "precioNormal": 100,
-    "precioDonadores": 7500,
-    "descuento": 0,
-    "tipo": "Service",
-    "descripcion": "Project vercel Premium",
-    "customImg": ""
-  }
-}
+{}
