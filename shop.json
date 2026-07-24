@@ -1,1 +1,15 @@
-{}
+{
+  "22642dba": {
+    "name": "Vercel PREMIUM",
+    "activo": "true",
+    "imgCabecera": "",
+    "imgLogo": "",
+    "imgVertical": "",
+    "precioNormal": 200,
+    "precioDonadores": 100,
+    "descuento": 0,
+    "tipo": "Service",
+    "descripcion": "TO GET 0 ADS AND FREE ROLLS FOR A CHEAP PRICE",
+    "customImg": ""
+  }
+}
