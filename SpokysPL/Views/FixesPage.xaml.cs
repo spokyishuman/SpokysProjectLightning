@@ -54,11 +54,11 @@ namespace SpokysProjectVercel.Views
         private string? _discordUser;
         private string? _discordAvatarUrl;
         private System.Net.CookieContainer? _sessionCookies;
+        private bool _hasSavedLogin;
+        private bool IsLoggedIn => _hasSavedLogin;
         private static readonly string CookieStateFile = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "SpokysPL", "cookies.json");
-
-        private bool IsLoggedIn => _sessionCookies != null;
 
         private void UpdateLoginUI()
         {
@@ -80,68 +80,155 @@ namespace SpokysProjectVercel.Views
         private async void DiscordLogin_Click(object sender, RoutedEventArgs e)
         {
             DiscordLoginBtn.IsEnabled = false;
-            DiscordLoginBtn.Content = "⏳ Loading...";
+            DiscordLoginBtn.Content = "Loading...";
+
+            System.Net.CookieContainer? capturedCookies = null;
+            var oauthStarted = false;
+            var backOnGenerator = false;
 
             try
             {
                 var env = await CoreWebView2Environment.CreateAsync(null, WvUserDataFolder);
                 var wv = new WebView2();
-
                 var win = new Window
                 {
-                    Title = "Discord Login — Log in on the page, then close this window",
+                    Title = "Discord Login — waiting for generator.ryuu.lol...",
                     Width = 860,
-                    Height = 650,
+                    Height = 700,
                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                    Owner = Window.GetWindow(this),
-                    Content = wv
+                    Owner = Window.GetWindow(this)
+                };
+                win.Content = wv;
+
+                // Timer to detect login by checking for session cookies
+                DispatcherTimer? checkTimer = null;
+                checkTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1.5) };
+                checkTimer.Tick += async (_, _) =>
+                {
+                    try
+                    {
+                        if (wv.CoreWebView2 == null || !win.IsVisible) return;
+                        // Only accept cookies after OAuth flow was completed
+                        if (!oauthStarted || !backOnGenerator) return;
+
+                        var cookies = await wv.CoreWebView2.CookieManager.GetCookiesAsync("https://generator.ryuu.lol");
+                        if (cookies.Count > 0)
+                        {
+                            capturedCookies = new System.Net.CookieContainer();
+                            foreach (var c in cookies)
+                                capturedCookies.Add(new Uri("https://generator.ryuu.lol"),
+                                    new System.Net.Cookie(c.Name, c.Value, "/", "generator.ryuu.lol"));
+                            checkTimer?.Stop();
+                            ToastService.Show("Logged in with Discord!", "success");
+                            Dispatcher.BeginInvoke(() =>
+                            {
+                                if (win.IsVisible)
+                                    win.Close();
+                            });
+                        }
+                    }
+                    catch { }
                 };
 
                 win.Loaded += async (_, _) =>
                 {
                     await wv.EnsureCoreWebView2Async(env);
+                    wv.CoreWebView2.Settings.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
 
-                    // Redirect popups (Discord OAuth) into the same WebView2 so cookies stay in one store
-                    wv.CoreWebView2.NewWindowRequested += (_, args) =>
+                    // Don't handle NewWindowRequested — if the site's popup is blocked,
+                    // it falls back to same-window navigation automatically
+
+                    wv.CoreWebView2.NavigationStarting += (_, args) =>
                     {
-                        args.Handled = true;
-                        wv.CoreWebView2.Navigate(args.Uri);
+                        if (args.Uri.StartsWith("discord://", StringComparison.OrdinalIgnoreCase))
+                        {
+                            oauthStarted = true;
+                            backOnGenerator = false;
+                            args.Cancel = true;
+                            try { Process.Start(new ProcessStartInfo(args.Uri) { UseShellExecute = true }); }
+                            catch { }
+                            Dispatcher.BeginInvoke(() =>
+                            {
+                                wv.CoreWebView2?.Navigate("https://generator.ryuu.lol");
+                                win.Title = "Authorizing in Discord app — waiting...";
+                            });
+                        }
+                        // Detect any navigation away from generator.ryuu.lol as OAuth start
+                        else if (oauthStarted == false && !args.Uri.Contains("generator.ryuu.lol"))
+                        {
+                            oauthStarted = true;
+                            backOnGenerator = false;
+                        }
+                    };
+
+                    wv.CoreWebView2.SourceChanged += (_, _) =>
+                    {
+                        try
+                        {
+                            var src = wv.CoreWebView2?.Source;
+                            if (src != null)
+                            {
+                                var uri = new Uri(src);
+                                if (uri.Host.Contains("generator.ryuu.lol"))
+                                {
+                                    if (oauthStarted)
+                                        backOnGenerator = true;
+                                    win.Title = "Discord Login — click 'Login with Discord' on the page";
+                                }
+                                else if (uri.Host.Contains("discord.com"))
+                                {
+                                    oauthStarted = true;
+                                    backOnGenerator = false;
+                                    win.Title = "Discord Authorization — log in & click Authorize";
+                                }
+                            }
+                        }
+                        catch { }
                     };
 
                     wv.CoreWebView2.Navigate("https://generator.ryuu.lol");
+                    checkTimer?.Start();
+                };
+
+                win.Closed += (_, _) =>
+                {
+                    checkTimer?.Stop();
+                    if (capturedCookies == null || capturedCookies.Count == 0)
+                    {
+                        try
+                        {
+                            if (wv.CoreWebView2 != null)
+                            {
+                                var fetch = wv.CoreWebView2.CookieManager.GetCookiesAsync("https://generator.ryuu.lol")
+                                    .GetAwaiter().GetResult();
+                                if (fetch.Count > 0)
+                                {
+                                    capturedCookies = new System.Net.CookieContainer();
+                                    foreach (var c in fetch)
+                                        capturedCookies.Add(new Uri("https://generator.ryuu.lol"),
+                                            new System.Net.Cookie(c.Name, c.Value, "/", "generator.ryuu.lol"));
+                                }
+                            }
+                        }
+                        catch { }
+                    }
                 };
 
                 win.ShowDialog();
 
-                // Extract cookies after user closes the window
-                try
+                if (capturedCookies != null && capturedCookies.Count > 0)
                 {
-                    var cookies = await wv.CoreWebView2.CookieManager.GetCookiesAsync("https://generator.ryuu.lol");
-                    if (cookies != null && cookies.Count > 0)
-                    {
-                        var cc = new System.Net.CookieContainer();
-                        foreach (var c in cookies)
-                            cc.Add(new Uri("https://generator.ryuu.lol"),
-                                new System.Net.Cookie(c.Name, c.Value, c.Path, c.Domain));
-                        _sessionCookies = cc;
-
-                        try
-                        {
-                            var info = await wv.CoreWebView2.ExecuteScriptAsync(
-                                "JSON.stringify({name: (document.querySelector('[data-username], .user-info, .user-name')?.textContent || document.title).trim(), avatar: document.querySelector('img[src*=\"cdn.discord\"], .avatar img, [class*=avatar]')?.getAttribute('src') || ''})");
-                            var parsed = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(info?.Trim('"') ?? "{}");
-                            _discordUser = parsed?.GetValueOrDefault("name");
-                            _discordAvatarUrl = parsed?.GetValueOrDefault("avatar");
-                            if (string.IsNullOrEmpty(_discordUser) || _discordUser == "Ryuu's Manifests")
-                                _discordUser = "Discord User";
-                        }
-                        catch { }
-
-                        SaveLoginState();
-                        UpdateLoginUI();
-                    }
+                    _sessionCookies = capturedCookies;
+                    _hasSavedLogin = true;
+                    _discordUser = "Discord User";
+                    SaveLoginState();
+                    UpdateLoginUI();
+                    ToastService.Show("Logged in with Discord!", "success");
                 }
-                catch { }
+                else
+                {
+                    MessageBox.Show("Login failed: No session cookie detected.\n\nMake sure you complete the Discord OAuth in the browser window, then close it.", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
             catch (Exception ex)
             {
@@ -150,12 +237,10 @@ namespace SpokysProjectVercel.Views
             }
             finally
             {
-                DiscordLoginBtn.Content = "🔑 Login with Discord";
+                DiscordLoginBtn.Content = "Login with Discord";
                 DiscordLoginBtn.IsEnabled = true;
             }
         }
-
-
 
         public FixesPage()
         {
@@ -221,12 +306,13 @@ namespace SpokysProjectVercel.Views
                     if (data != null && data.TryGetValue("username", out var name) && !string.IsNullOrEmpty(name))
                     {
                         _discordUser = name;
+                        _hasSavedLogin = true;
                     }
                 }
             }
             catch { }
 
-            // Restore cookies from disk and validate them
+            // Restore cookies from disk
             try
             {
                 if (File.Exists(CookieStateFile))
@@ -252,50 +338,7 @@ namespace SpokysProjectVercel.Views
             }
             catch { }
 
-            // Validate restored cookies with a test request
-            if (_sessionCookies != null)
-                _ = ValidateCookiesAsync();
-
             UpdateLoginUI();
-        }
-
-        private async Task ValidateCookiesAsync()
-        {
-            try
-            {
-                if (_sessionCookies == null) return;
-                var uris = new[] { new Uri("https://generator.ryuu.lol"), new Uri("https://generator.ryuu.lol/fixes/") };
-                bool hasAny = false;
-                foreach (var u in uris)
-                    if (_sessionCookies.GetCookies(u).Count > 0) { hasAny = true; break; }
-                if (!hasAny) { await Dispatcher.InvokeAsync(Logout); return; }
-
-                var handler = new System.Net.Http.SocketsHttpHandler
-                {
-                    AllowAutoRedirect = true,
-                    MaxAutomaticRedirections = 5,
-                    CookieContainer = _sessionCookies,
-                    SslOptions = new System.Net.Security.SslClientAuthenticationOptions
-                    {
-                        EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls13
-                    }
-                };
-                using var http = new System.Net.Http.HttpClient(handler);
-                http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
-                http.Timeout = TimeSpan.FromSeconds(10);
-
-                var resp = await http.GetAsync("https://generator.ryuu.lol/files/");
-                var body = await resp.Content.ReadAsStringAsync();
-                if (body.Contains("discord", StringComparison.OrdinalIgnoreCase) ||
-                    body.Contains("login", StringComparison.OrdinalIgnoreCase))
-                {
-                    await Dispatcher.InvokeAsync(Logout);
-                }
-            }
-            catch
-            {
-                await Dispatcher.InvokeAsync(Logout);
-            }
         }
 
         private void Logout()
@@ -303,8 +346,10 @@ namespace SpokysProjectVercel.Views
             _sessionCookies = null;
             _discordUser = null;
             _discordAvatarUrl = null;
+            _hasSavedLogin = false;
             try { if (File.Exists(LoginStateFile)) File.Delete(LoginStateFile); } catch { }
             try { if (File.Exists(CookieStateFile)) File.Delete(CookieStateFile); } catch { }
+            try { if (Directory.Exists(WvUserDataFolder)) Directory.Delete(WvUserDataFolder, true); } catch { }
             UpdateLoginUI();
         }
 
@@ -327,7 +372,7 @@ namespace SpokysProjectVercel.Views
             }
             catch { }
 
-            // Persist cookies so they survive restart
+            // Persist cookies to disk
             if (_sessionCookies != null)
             {
                 try
@@ -351,7 +396,6 @@ namespace SpokysProjectVercel.Views
             }
         }
 
-        
         private async Task LoadGamesAsync()
         {
             _allGames.Clear();
@@ -451,7 +495,7 @@ namespace SpokysProjectVercel.Views
 
             var prevBtn = new Button
             {
-                Content = "◀",
+                Content = "<",
                 Width = 36,
                 Height = 36,
                 Margin = new Thickness(0, 0, 4, 0),
@@ -498,7 +542,7 @@ namespace SpokysProjectVercel.Views
 
             var nextBtn = new Button
             {
-                Content = "▶",
+                Content = ">",
                 Width = 36,
                 Height = 36,
                 IsEnabled = _currentPage < pageCount
@@ -515,17 +559,12 @@ namespace SpokysProjectVercel.Views
 
         private void PrevPage_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentPage > 1)
-            {
-                _currentPage--;
-                ApplyFilter();
-            }
+            if (_currentPage > 1) { _currentPage--; ApplyFilter(); }
         }
 
         private void NextPage_Click(object sender, RoutedEventArgs e)
         {
-            _currentPage++;
-            ApplyFilter();
+            _currentPage++; ApplyFilter();
         }
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -539,31 +578,25 @@ namespace SpokysProjectVercel.Views
         private void ContextManifest_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem mi && mi.Tag is FixGame game)
-                InstallManifest_Click(new Button { Tag = game, Content = "📦 Manifest" }, null!);
+                InstallManifest_Click(new Button { Tag = game, Content = "Manifest" }, null!);
         }
 
         private void ContextFix_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem mi && mi.Tag is FixGame game)
-                ApplyFix_Click(new Button { Tag = game, Content = "🛠️ Fix" }, null!);
+                ApplyFix_Click(new Button { Tag = game, Content = "Fix" }, null!);
         }
 
         private void ContextOpenSteam_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem mi && mi.Tag is string appId)
-            {
-                try { Process.Start(new ProcessStartInfo { FileName = $"https://store.steampowered.com/app/{appId}", UseShellExecute = true }); }
-                catch { }
-            }
+                try { Process.Start(new ProcessStartInfo { FileName = $"https://store.steampowered.com/app/{appId}", UseShellExecute = true }); } catch { }
         }
 
         private void ContextCopyId_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem mi && mi.Tag is string appId)
-            {
-                try { Clipboard.SetText(appId); ToastService.Show($"📋 App ID {appId} copied", "success"); }
-                catch { }
-            }
+                try { Clipboard.SetText(appId); ToastService.Show($"App ID {appId} copied", "success"); } catch { }
         }
 
         private static (string luaDir, string manifestDir, string keysDir) TargetDirs => (
@@ -576,59 +609,39 @@ namespace SpokysProjectVercel.Views
         {
             var btn = sender as Button;
             if (btn == null) return;
-
             btn.IsEnabled = false;
             var original = btn.Content;
-            btn.Content = "⏳ Downloading LumaCore...";
-
+            btn.Content = "Downloading LumaCore...";
             try
             {
                 var steamPath = SteamService.FindSteamPath();
                 if (string.IsNullOrEmpty(steamPath))
                 {
-                    MessageBox.Show("Steam installation not found.", "Error",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Steam installation not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-
                 var steamProcs = Process.GetProcessesByName("steam");
                 if (steamProcs.Length > 0)
                 {
-                    var result = MessageBox.Show(
-                        "Steam is currently running. It is recommended to close Steam before installing LumaCore.\n\n" +
-                        "Do you want to close Steam now?",
-                        "LumaCore Install", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        foreach (var p in steamProcs) p.Kill();
-                        await Task.Delay(1000);
-                    }
+                    var result = MessageBox.Show("Steam is currently running. Close Steam now?", "LumaCore Install",
+                        MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+                    if (result == MessageBoxResult.Yes) { foreach (var p in steamProcs) p.Kill(); await Task.Delay(1000); }
                     else if (result == MessageBoxResult.Cancel) return;
                 }
-
-                btn.Content = "⏳ Installing...";
+                btn.Content = "Installing...";
                 var lc = new LumaCoreService();
                 int extracted = await lc.InstallAsync();
-
-                var msg = $"LumaCore installed successfully!\n\n" +
-                          $"Files placed in: {steamPath}\n" +
-                          $"DLLs installed: {extracted}\n\n" +
-                          "Please restart Steam for changes to take effect.";
-
-                if (steamProcs.Length > 0)
-                    msg += "\n\nSteam was closed during installation — you can now restart it.";
-
+                var msg = $"LumaCore installed successfully!\n\nFiles placed in: {steamPath}\nDLLs installed: {extracted}\n\nPlease restart Steam for changes to take effect.";
+                if (steamProcs.Length > 0) msg += "\n\nSteam was closed during installation — you can now restart it.";
                 MessageBox.Show(msg, "LumaCore", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (UnauthorizedAccessException)
             {
-                MessageBox.Show("Permission denied. Try running the app as Administrator.",
-                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Permission denied. Try running the app as Administrator.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to install LumaCore:\n{ex.Message}",
-                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Failed to install LumaCore:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -641,27 +654,19 @@ namespace SpokysProjectVercel.Views
         {
             var btn = sender as Button;
             if (btn != null) btn.IsEnabled = false;
-
             try
             {
-                foreach (var p in Process.GetProcessesByName("steam"))
-                    p.Kill();
-
+                foreach (var p in Process.GetProcessesByName("steam")) p.Kill();
                 await Task.Delay(2000);
-
                 var steamPath = SteamService.FindSteamPath();
                 if (!string.IsNullOrEmpty(steamPath))
                 {
                     var exe = Path.Combine(steamPath, "steam.exe");
-                    if (File.Exists(exe))
-                        Process.Start(exe);
+                    if (File.Exists(exe)) Process.Start(exe);
                 }
             }
             catch { }
-            finally
-            {
-                if (btn != null) btn.IsEnabled = true;
-            }
+            finally { if (btn != null) btn.IsEnabled = true; }
         }
 
         private async void InstallManifest_Click(object sender, RoutedEventArgs e)
@@ -669,22 +674,18 @@ namespace SpokysProjectVercel.Views
             if (sender is Button btn && btn.Tag is FixGame game)
             {
                 btn.IsEnabled = false;
-                btn.Content = "⏳ Manifest...";
+                btn.Content = "Manifest...";
                 var errors = new List<string>();
-
                 try
                 {
                     var steamPath = SteamService.FindSteamPath();
                     if (string.IsNullOrEmpty(steamPath) || !Directory.Exists(steamPath))
                     {
-                        MessageBox.Show("Steam not found. Install Steam first.", "Error",
-                            MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Steam not found. Install Steam first.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
-
                     var (luaDir, manifestDir, keysDir) = TargetDirs;
                     ManifestPaths.EnsureDirs();
-
                     bool installed = false;
                     var settings = new DataService().LoadSettings();
                     var sdKey = settings.SteamDaddyApiKey;
@@ -710,11 +711,7 @@ namespace SpokysProjectVercel.Views
                     {
                         var faresResult = await _faresService.GetManifestsAsync(appId);
                         if (faresResult == null || faresResult.Manifests.Count == 0)
-                        {
-                            errors.Add("fares.top: no manifest data");
-                            return;
-                        }
-
+                        { errors.Add("fares.top: no manifest data"); return; }
                         int downloaded = 0;
                         foreach (var m in faresResult.Manifests)
                         {
@@ -722,71 +719,48 @@ namespace SpokysProjectVercel.Views
                             {
                                 var bytes = await _faresService.DownloadManifestAsync(appId, m.DepotId, m.ManifestId);
                                 if (bytes == null || bytes.Length == 0) continue;
-                                var fileName = $"{m.DepotId}_{m.ManifestId}.manifest";
-                                await File.WriteAllBytesAsync(Path.Combine(manifestDir, fileName), bytes);
+                                await File.WriteAllBytesAsync(Path.Combine(manifestDir, $"{m.DepotId}_{m.ManifestId}.manifest"), bytes);
                                 downloaded++;
                             }
                             catch { }
                         }
-
                         if (downloaded == 0)
-                        {
-                            errors.Add("fares.top: downloaded 0 manifests");
-                            return;
-                        }
-
+                        { errors.Add("fares.top: downloaded 0 manifests"); return; }
                         var lua = _manifestService.GenerateLuaList(appId, faresResult.Name,
                             faresResult.Manifests.Select(m => (m.DepotId, m.ManifestId, m.Size)).ToList());
                         await File.WriteAllTextAsync(Path.Combine(luaDir, $"{appId}.lua"), lua);
-
-                        btn.Content = "✅ Manifest";
+                        btn.Content = "Manifest";
                         ToastService.Show($"✅ {faresResult.Name} — Manifest from fares.top!", "success");
                         installed = true;
                     }
 
                     if (UseLumaCoreMode)
                     {
-                        // LumaCore mode — try our own manifest source first
                         if (!installed)
                         {
-                            try
-                            {
-                                btn.Content = "⏳ fares.top...";
-                                await Task.Delay(100);
-                                await InstallFaresManifest(game.AppId);
-                            }
+                            try { btn.Content = "fares.top..."; await Task.Delay(100); await InstallFaresManifest(game.AppId); }
                             catch (Exception ex) { errors.Add($"fares.top: {ex.Message}"); }
                         }
                     }
                     else
                     {
-                        // SteamTools mode — try steamtools.games first
                         try
                         {
-                            btn.Content = "⏳ steamtools.games...";
+                            btn.Content = "steamtools.games...";
                             await Task.Delay(100);
                             var stManifest = await _steamTools.GenerateManifestAsync(game.AppId);
                             if (stManifest != null && !string.IsNullOrEmpty(stManifest.DownloadUrl))
                             {
                                 var luaBytes = await _steamTools.DownloadFileAsync(stManifest.LuaUrl);
                                 if (luaBytes != null && luaBytes.Length > 0)
-                                {
-                                    var luaPath = Path.Combine(luaDir, $"{game.AppId}.lua");
-                                    await File.WriteAllBytesAsync(luaPath, luaBytes);
-                                }
-
+                                    await File.WriteAllBytesAsync(Path.Combine(luaDir, $"{game.AppId}.lua"), luaBytes);
                                 var keyBytes = await _steamTools.DownloadFileAsync(stManifest.KeyVdfUrl);
                                 if (keyBytes != null && keyBytes.Length > 0)
-                                {
-                                    var keyPath = Path.Combine(keysDir, "key.vdf");
-                                    await File.WriteAllBytesAsync(keyPath, keyBytes);
-                                }
-
+                                    await File.WriteAllBytesAsync(Path.Combine(keysDir, "key.vdf"), keyBytes);
                                 var zipBytes = await _steamTools.DownloadFileAsync(stManifest.DownloadUrl);
                                 if (zipBytes != null && zipBytes.Length > 0)
                                     await InstallZipBytes(zipBytes);
-
-                                btn.Content = "✅ Manifest";
+                                btn.Content = "Manifest";
                                 ToastService.Show($"✅ {game.Title} — Manifest from steamtools.games!", "success");
                                 installed = true;
                             }
@@ -795,38 +769,27 @@ namespace SpokysProjectVercel.Views
                         catch (Exception ex) { errors.Add($"steamtools.games: {ex.Message}"); }
                     }
 
-                    // Source 2: fallback to the other mode's primary source
                     if (!installed)
                     {
                         if (UseLumaCoreMode)
                         {
-                            // LumaCore mode fallback: steamtools.games
                             try
                             {
-                                btn.Content = "⏳ steamtools.games...";
+                                btn.Content = "steamtools.games...";
                                 await Task.Delay(100);
                                 var stManifest = await _steamTools.GenerateManifestAsync(game.AppId);
                                 if (stManifest != null && !string.IsNullOrEmpty(stManifest.DownloadUrl))
                                 {
                                     var luaBytes = await _steamTools.DownloadFileAsync(stManifest.LuaUrl);
                                     if (luaBytes != null && luaBytes.Length > 0)
-                                    {
-                                        var luaPath = Path.Combine(luaDir, $"{game.AppId}.lua");
-                                        await File.WriteAllBytesAsync(luaPath, luaBytes);
-                                    }
-
+                                        await File.WriteAllBytesAsync(Path.Combine(luaDir, $"{game.AppId}.lua"), luaBytes);
                                     var keyBytes = await _steamTools.DownloadFileAsync(stManifest.KeyVdfUrl);
                                     if (keyBytes != null && keyBytes.Length > 0)
-                                    {
-                                        var keyPath = Path.Combine(keysDir, "key.vdf");
-                                        await File.WriteAllBytesAsync(keyPath, keyBytes);
-                                    }
-
+                                        await File.WriteAllBytesAsync(Path.Combine(keysDir, "key.vdf"), keyBytes);
                                     var zipBytes = await _steamTools.DownloadFileAsync(stManifest.DownloadUrl);
                                     if (zipBytes != null && zipBytes.Length > 0)
                                         await InstallZipBytes(zipBytes);
-
-                                    btn.Content = "✅ Manifest";
+                                    btn.Content = "Manifest";
                                     ToastService.Show($"✅ {game.Title} — Manifest from steamtools.games!", "success");
                                     installed = true;
                                 }
@@ -836,36 +799,26 @@ namespace SpokysProjectVercel.Views
                         }
                         else
                         {
-                            // SteamTools mode fallback: fares.top
-                            try
-                            {
-                                btn.Content = "⏳ fares.top...";
-                                await Task.Delay(100);
-                                await InstallFaresManifest(game.AppId);
-                            }
+                            try { btn.Content = "fares.top..."; await Task.Delay(100); await InstallFaresManifest(game.AppId); }
                             catch (Exception ex) { errors.Add($"fares.top: {ex.Message}"); }
                         }
                     }
 
-                    // Source 3: SteamDaddy / ContraryCDN API (requires API key from Discord)
                     if (!installed && steamDaddy != null)
                     {
                         try
                         {
-                            btn.Content = "⏳ SteamDaddy...";
+                            btn.Content = "SteamDaddy...";
                             await Task.Delay(100);
                             var result = await steamDaddy.FetchManifestAsync(game.AppId);
                             if (result?.IsZip == true && result.ExtractedFiles.Count > 0)
                             {
                                 foreach (var f in result.ExtractedFiles)
                                 {
-                                    var dest = f.IsLua
-                                        ? Path.Combine(luaDir, f.FileName)
-                                        : Path.Combine(manifestDir, f.FileName);
+                                    var dest = f.IsLua ? Path.Combine(luaDir, f.FileName) : Path.Combine(manifestDir, f.FileName);
                                     await File.WriteAllBytesAsync(dest, f.Data);
                                 }
-
-                                btn.Content = "✅ SteamDaddy";
+                                btn.Content = "SteamDaddy";
                                 ToastService.Show($"✅ {game.Title} — Manifest from SteamDaddy!", "success");
                                 installed = true;
                             }
@@ -874,18 +827,17 @@ namespace SpokysProjectVercel.Views
                         catch (Exception ex) { errors.Add($"SteamDaddy: {ex.Message}"); }
                     }
 
-                    // Source 4: steamtools.site (ad-based, last resort)
                     if (!installed)
                     {
                         try
                         {
-                            btn.Content = "⏳ steamtools.site...";
+                            btn.Content = "steamtools.site...";
                             await Task.Delay(100);
                             var zipBytes = await _steamToolsSite.DownloadManifestZipAsync(game.AppId);
                             if (zipBytes != null && zipBytes.Length > 0)
                             {
                                 await InstallZipBytes(zipBytes);
-                                btn.Content = "✅ Manifest";
+                                btn.Content = "Manifest";
                                 ToastService.Show($"✅ {game.Title} — Manifest from steamtools.site!", "success");
                                 installed = true;
                             }
@@ -894,23 +846,17 @@ namespace SpokysProjectVercel.Views
                         catch (Exception ex) { errors.Add($"steamtools.site: {ex.Message}"); }
                     }
 
-                    // All sources failed — show details
                     if (!installed)
                     {
-                        btn.Content = "📦 Manifest";
+                        btn.Content = "Manifest";
                         var detail = string.Join("\n", errors.Select((e, i) => $"  {i + 1}. {e}"));
                         MessageBox.Show(
                             $"❌ All manifest sources failed for {game.Title} (App {game.AppId}):\n\n{detail}\n\n" +
-                            "Tips:\n" +
-                            "• Check your internet connection\n" +
-                            "• Get a SteamDaddy API key from discord.gg/XN6YGcUF89\n" +
-                            "• Try the '🛠️ Fix' button instead\n" +
-                            "• Try using OpenSteamTool (⚡ OST page) for auto-manifest",
+                            "Tips:\n• Check your internet connection\n• Get a SteamDaddy API key from discord.gg/XN6YGcUF89\n• Try the 'Fix' button instead\n• Try using OpenSteamTool (OST page) for auto-manifest",
                             "Manifest Failed", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                     else
                     {
-                        // Also copy files directly to Steam directories (like SFF/LumaCore)
                         try
                         {
                             var depotCache = Path.Combine(steamPath, "depotcache");
@@ -919,7 +865,6 @@ namespace SpokysProjectVercel.Views
                             Directory.CreateDirectory(depotCache);
                             Directory.CreateDirectory(configDepot);
                             Directory.CreateDirectory(stplugIn);
-
                             foreach (var f in Directory.GetFiles(manifestDir, "*.manifest"))
                             {
                                 var name = Path.GetFileName(f);
@@ -929,30 +874,18 @@ namespace SpokysProjectVercel.Views
                             foreach (var f in Directory.GetFiles(luaDir, "*.lua"))
                                 File.Copy(f, Path.Combine(stplugIn, Path.GetFileName(f)), true);
                         }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine($"[InstallManifest] Copy to Steam dirs failed: {ex.Message}");
-                        }
-
+                        catch (Exception ex) { Debug.WriteLine($"[InstallManifest] Copy to Steam dirs failed: {ex.Message}"); }
                         var sdSvc = new SteamDaddyService();
                         var sdExe = sdSvc.GetExePath();
-                        if (sdExe != null)
-                        {
-                            try { Process.Start(new ProcessStartInfo { FileName = sdExe, UseShellExecute = true }); }
-                            catch { }
-                        }
+                        if (sdExe != null) try { Process.Start(new ProcessStartInfo { FileName = sdExe, UseShellExecute = true }); } catch { }
                     }
                 }
                 catch (Exception ex)
                 {
-                    btn.Content = "📦 Manifest";
-                    MessageBox.Show($"❌ Error: {ex.Message}", "Error",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    btn.Content = "Manifest";
+                    MessageBox.Show($"❌ Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-                finally
-                {
-                    btn.IsEnabled = true;
-                }
+                finally { btn.IsEnabled = true; }
             }
         }
 
@@ -961,77 +894,52 @@ namespace SpokysProjectVercel.Views
             if (sender is Button btn && btn.Tag is FixGame game)
             {
                 btn.IsEnabled = false;
-                btn.Content = "⏳ Fixing...";
+                btn.Content = "Fixing...";
 
                 try
                 {
                     var steamPath = SteamService.FindSteamPath();
                     if (string.IsNullOrEmpty(steamPath) || !Directory.Exists(steamPath))
                     {
-                        btn.Content = "🛠️ Fix";
-                        MessageBox.Show("Steam not found. Install Steam first.", "Error",
-                            MessageBoxButton.OK, MessageBoxImage.Error);
+                        btn.Content = "Fix";
+                        MessageBox.Show("Steam not found. Install Steam first.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
-                    // Find the fix from Ryuu
                     var fix = await _ryuuFixes.GetFixForAppAsync(game.AppId);
                     if (fix == null || string.IsNullOrEmpty(fix.Href))
                     {
-                        btn.Content = "🛠️ Fix";
-                        MessageBox.Show($"❌ No fix available for {game.Title} on Ryuu's repository.",
-                            "No Fix", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        btn.Content = "Fix";
+                        MessageBox.Show($"❌ No fix available for {game.Title} on Ryuu's repository.", "No Fix", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
 
-                    // Download — use stored session cookies if logged in, else try direct
-                    btn.Content = "⏳ Downloading...";
+                    btn.Content = "Downloading...";
                     byte[]? zipBytes;
 
-                    if (_sessionCookies != null)
-                    {
-                        zipBytes = await DownloadWithCookiesAsync(fix.Href, _sessionCookies);
-                    }
+                    // Try download with the saved session cookie (HTTP-only auth cookie)
+                    if (_sessionCookies != null && _sessionCookies.Count > 0)
+                        zipBytes = await DownloadWithSessionCookieAsync(fix.Href);
                     else
-                    {
                         zipBytes = await _ryuuFixes.DownloadFixAsync(fix.Href);
-                    }
 
                     if (zipBytes == null || zipBytes.Length == 0)
                     {
-                        // Auto-logout if we were logged in — cookies are stale
-                        if (_sessionCookies != null)
-                            await Dispatcher.InvokeAsync(Logout);
-                        btn.Content = "🛠️ Fix";
-                        MessageBox.Show("❌ Could not download fix.\nClick 'Login with Discord' first.",
-                            "Download Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                        btn.Content = "Fix";
+                        MessageBox.Show("❌ Could not download fix.\nMake sure you're logged in with Discord.", "Download Failed", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
-                    // Let the user pick where to extract via native folder dialog
-                    var folderDlg = new Microsoft.Win32.OpenFolderDialog
-                    {
-                        Title = "Choose where to extract the fix files"
-                    };
+                    var folderDlg = new Microsoft.Win32.OpenFolderDialog { Title = "Choose where to extract the fix files" };
                     if (folderDlg.ShowDialog(Window.GetWindow(this)) != true)
-                    {
-                        btn.Content = "🛠️ Fix";
-                        return;
-                    }
+                    { btn.Content = "Fix"; return; }
                     var extractDir = folderDlg.FolderName;
 
-                    // Ask to add Defender exclusion for the chosen folder
-                    var excl = MessageBox.Show(
-                        $"Add a Windows Defender exclusion for:\n{extractDir}\n\n" +
-                        "This prevents Defender from removing the fix files. (Admin required)",
-                        "Defender Exclusion", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    var excl = MessageBox.Show($"Add a Windows Defender exclusion for:\n{extractDir}\n\nThis prevents Defender from removing the fix files. (Admin required)", "Defender Exclusion", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (excl == MessageBoxResult.Yes) AddDefenderExclusion(extractDir);
 
-                    if (excl == MessageBoxResult.Yes)
-                        AddDefenderExclusion(extractDir);
-
-                    btn.Content = "⏳ Extracting...";
+                    btn.Content = "Extracting...";
                     Directory.CreateDirectory(extractDir);
-
                     using var ms = new MemoryStream(zipBytes);
                     using var zip = new ZipArchive(ms, ZipArchiveMode.Read);
                     int extracted = 0;
@@ -1040,28 +948,20 @@ namespace SpokysProjectVercel.Views
                         if (string.IsNullOrEmpty(entry.Name)) continue;
                         var destPath = Path.Combine(extractDir, entry.FullName);
                         var parent = Path.GetDirectoryName(destPath);
-                        if (!string.IsNullOrEmpty(parent))
-                            Directory.CreateDirectory(parent);
+                        if (!string.IsNullOrEmpty(parent)) Directory.CreateDirectory(parent);
                         try { entry.ExtractToFile(destPath, true); extracted++; }
                         catch { }
                     }
 
-                    btn.Content = "✅ Fix";
-
-                    MessageBox.Show($"✅ {game.Title} — Fix extracted!\n\n" +
-                        $"Extracted {extracted} file(s) to:\n{extractDir}",
-                        "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    btn.Content = "Fix";
+                    MessageBox.Show($"✅ {game.Title} — Fix extracted!\n\nExtracted {extracted} file(s) to:\n{extractDir}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
-                    btn.Content = "🛠️ Fix";
-                    MessageBox.Show($"❌ Error: {ex.Message}", "Error",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    btn.Content = "Fix";
+                    MessageBox.Show($"❌ Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-                finally
-                {
-                    btn.IsEnabled = true;
-                }
+                finally { btn.IsEnabled = true; }
             }
         }
 
@@ -1080,43 +980,34 @@ namespace SpokysProjectVercel.Views
             }
             catch
             {
-                MessageBox.Show(
-                    "Could not add Defender exclusion. Try running the app as Administrator.",
-                    "Permission Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Could not add Defender exclusion. Try running the app as Administrator.", "Permission Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
-        private static string SanitizeFolderName(string name)
+        private async Task<byte[]?> DownloadWithSessionCookieAsync(string href)
         {
-            var invalid = Path.GetInvalidFileNameChars();
-            var sb = new System.Text.StringBuilder();
-            foreach (var c in name) sb.Append(invalid.Contains(c) ? '_' : c);
-            return sb.ToString().Trim();
-        }
+            if (_sessionCookies == null || _sessionCookies.Count == 0) return null;
 
-        private async Task<byte[]?> DownloadWithCookiesAsync(string href, System.Net.CookieContainer cookies)
-        {
-            var handler = new System.Net.Http.SocketsHttpHandler
+            var handler = new SocketsHttpHandler
             {
                 AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate,
                 AllowAutoRedirect = true,
                 MaxAutomaticRedirections = 10,
-                CookieContainer = cookies,
+                CookieContainer = _sessionCookies,
                 SslOptions = new System.Net.Security.SslClientAuthenticationOptions
                 {
                     EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls13
                 }
             };
-            using var http = new System.Net.Http.HttpClient(handler);
+            using var http = new HttpClient(handler);
             http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36");
             http.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
             http.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Language", "en-US,en;q=0.9");
             http.DefaultRequestHeaders.Referrer = new Uri("https://generator.ryuu.lol/fixes/");
             http.Timeout = TimeSpan.FromSeconds(60);
 
-            // Build all possible URL shapes
             const string BaseUrl = "https://generator.ryuu.lol";
-            var fileName = System.IO.Path.GetFileName(href.TrimEnd('/').Replace("%20", " "));
+            var fileName = Path.GetFileName(href.TrimEnd('/').Replace("%20", " "));
             var urls = new List<string>();
 
             if (href.StartsWith("http"))
@@ -1144,12 +1035,10 @@ namespace SpokysProjectVercel.Views
                 try
                 {
                     var escaped = url.Replace(" ", "%20");
-                    Debug.WriteLine($"[DownloadWithCookies] Trying: {escaped}");
-                    using var req = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, escaped);
+                    using var req = new HttpRequestMessage(HttpMethod.Get, escaped);
                     var resp = await http.SendAsync(req);
                     var ct = resp.Content.Headers.ContentType?.MediaType ?? "";
 
-                    // If server returned HTML (Discord login page), skip this URL
                     if (ct.Contains("text/html") || ct.Contains("text/plain"))
                     {
                         var body = await resp.Content.ReadAsStringAsync();
@@ -1158,16 +1047,11 @@ namespace SpokysProjectVercel.Views
                             continue;
                     }
 
-                    var bytes = await resp.Content.ReadAsByteArrayAsync();
-                    if (bytes != null && bytes.Length > 0)
-                    {
-                        Debug.WriteLine($"[DownloadWithCookies] Success: {bytes.Length} bytes from {escaped}");
-                        return bytes;
-                    }
+                    resp.EnsureSuccessStatusCode();
+                    return await resp.Content.ReadAsByteArrayAsync();
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Debug.WriteLine($"[DownloadWithCookies] Failed {url}: {ex.Message}");
                     continue;
                 }
             }
@@ -1176,4 +1060,3 @@ namespace SpokysProjectVercel.Views
 
     }
 }
-

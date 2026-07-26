@@ -8,21 +8,33 @@
     <UseWPF>true</UseWPF>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
     <ApplicationIcon>app.ico</ApplicationIcon>
-<ApplicationVersion>1.0.0.2</ApplicationVersion>
-<AssemblyVersion>1.0.0.2</AssemblyVersion>
-<FileVersion>1.0.0.2</FileVersion>
-<InformationalVersion>1.0.0.2</InformationalVersion>
+    <ApplicationVersion>1.0.0.2</ApplicationVersion>
+    <AssemblyVersion>1.0.0.2</AssemblyVersion>
+    <FileVersion>1.0.0.2</FileVersion>
+    <InformationalVersion>1.0.0.2</InformationalVersion>
     <AssemblyName>SpokysProjectVercel</AssemblyName>
     <RootNamespace>SpokysProjectVercel</RootNamespace>
     <Company>Spoky</Company>
     <Product>Spoky's Project Vercel</Product>
     <Description>Steam tools and manifest manager</Description>
+    <PublishSingleFile>false</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <DebugType>None</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4078.44" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Obfuscar" Version="2.2.46" />
     <PackageReference Include="SharpCompress" Version="0.50.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
   </ItemGroup>
@@ -37,35 +49,29 @@
     <Content Include="data-fix.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="shop.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="movies.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="obfuscar.xml" CopyToOutputDirectory="Never" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SpokysProjectVercel.Updater\SpokysProjectVercel.Updater.csproj" ReferenceOutputAssembly="false">
-      <Private>false</Private>
-    </ProjectReference>
-  </ItemGroup>
-
-  <Target Name="CopyUpdater" AfterTargets="Build;Publish" Condition="Exists('..\SpokysProjectVercel.Updater\bin\$(Configuration)\net8.0\win-x64\publish\SpokysProjectVercel.Updater.exe')">
-    <Copy SourceFiles="..\SpokysProjectVercel.Updater\bin\$(Configuration)\net8.0\win-x64\publish\SpokysProjectVercel.Updater.exe"
-          DestinationFolder="$(OutputPath)"
-          SkipUnchangedFiles="True" />
-    <Copy SourceFiles="..\SpokysProjectVercel.Updater\bin\$(Configuration)\net8.0\win-x64\publish\SpokysProjectVercel.Updater.exe"
-          DestinationFolder="$(OutputPath)publish\"
-          SkipUnchangedFiles="True" Condition="Exists('$(OutputPath)publish\')" />
-  </Target>
-
-  <Target Name="CopyBackgroundVideos" AfterTargets="Build;Publish" Condition="Exists('$(MSBuildProjectDirectory)')">
+  <Target Name="CopyBackgroundVideos" AfterTargets="Build" Condition="Exists('$(MSBuildProjectDirectory)')">
     <ItemGroup>
       <_Videos Include="$(MSBuildProjectDirectory)\*.mp4;$(MSBuildProjectDirectory)\*.webm;$(MSBuildProjectDirectory)\*.mkv" />
     </ItemGroup>
     <Copy SourceFiles="@(_Videos)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="True" />
-    <Copy SourceFiles="@(_Videos)" DestinationFolder="$(OutputPath)publish\" SkipUnchangedFiles="True" Condition="Exists('$(OutputPath)publish\')" />
+  </Target>
+
+  <Target Name="Obfuscate" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' And '$(PublishSingleFile)' == 'false'">
+    <PropertyGroup>
+      <ObfuscarExe>$(UserProfile)\.nuget\packages\obfuscar\2.2.46\tools\Obfuscar.Console.exe</ObfuscarExe>
+      <ObfuscarCmd>"$(ObfuscarExe)" obfuscar.xml</ObfuscarCmd>
+    </PropertyGroup>
+    <Exec Command="$(ObfuscarCmd)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\bin\Release\net8.0-windows\win-x64\Obfuscated\SpokysProjectVercel.dll"
+          DestinationFolder="$(OutputPath)"
+          OverwriteReadOnlyFiles="True"
+          Condition="Exists('$(MSBuildProjectDirectory)\bin\Release\net8.0-windows\win-x64\Obfuscated\SpokysProjectVercel.dll')" />
   </Target>
 
 </Project>

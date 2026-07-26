@@ -1,0 +1,31 @@
+# Build outputs
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.xml
+
+# IDE files
+.vs/
+*.sln
+*.suo
+*.user
+
+# NuGet packages
+packages/
+
+# ConfuserEx output
+Obfuscated/
+
+# Logs
+*.log
+run_err.txt
+
+# Config files
+*.deps.json
+*.runtimeconfig.json
+
+# Temporary files
+*.tmp
+*.temp

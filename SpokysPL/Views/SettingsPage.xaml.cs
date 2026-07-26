@@ -112,6 +112,58 @@ namespace SpokysProjectVercel.Views
             {
                 UpdateUrlBox.Text = UpdateService.UpdateCheckUrl;
             }
+
+            // Premium state
+            UpdatePremiumUI();
+        }
+
+        private void UpdatePremiumUI()
+        {
+            var isPremium = PremiumService.IsPremium;
+            PremiumBadgeText.Text = isPremium ? "PREMIUM" : "FREE";
+            PremiumBadge.Background = isPremium
+                ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 215, 0))
+                : new SolidColorBrush(System.Windows.Media.Color.FromRgb(100, 100, 100));
+            PremiumActivePanel.Visibility = isPremium ? Visibility.Visible : Visibility.Collapsed;
+            PremiumInactivePanel.Visibility = isPremium ? Visibility.Collapsed : Visibility.Visible;
+            if (isPremium)
+                PremiumStatus.Text = $"🔑 {PremiumService.CurrentKey}";
+        }
+
+        private void ActivatePremium_Click(object sender, RoutedEventArgs e)
+        {
+            var key = PremiumKeyBox.Text.Trim();
+            var (ok, msg) = PremiumService.Activate(key);
+            PremiumStatus.Text = ok ? $"✅ {msg}" : $"❌ {msg}";
+            if (ok) UpdatePremiumUI();
+        }
+
+        private void PremiumKeyBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter) ActivatePremium_Click(sender, e);
+        }
+
+        private void DeactivatePremium_Click(object sender, RoutedEventArgs e)
+        {
+            PremiumService.Deactivate();
+            PremiumStatus.Text = "Premium deactivated.";
+            UpdatePremiumUI();
+        }
+
+        private void ImportLicense_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Select SPVL License File",
+                Filter = "SPVL License (*.spvl)|*.spvl|All files (*.*)|*.*",
+                DefaultExt = ".spvl"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                var (ok, msg) = PremiumService.ImportLicenseFile(dialog.FileName);
+                PremiumStatus.Text = ok ? $"✅ {msg}" : $"❌ {msg}";
+                if (ok) UpdatePremiumUI();
+            }
         }
 
         private void ThemeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)

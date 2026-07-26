@@ -325,7 +325,11 @@ namespace SpokysProjectVercel.Services
         public string ShopGithubToken { get; set; } = string.Empty;
         public string SteamDaddyApiKey { get; set; } = string.Empty;
         public string BugReportWebhookUrl { get; set; } = "https://discord.com/api/webhooks/1529453122022543443/ENAOlLg5N9fLfwe8W5CCdxOmMR1VvGUTYIurm8bHxeMekUt5_cgjWYJtKdEw3ijS5e5M";
+        public string ShopPurchaseWebhookUrl { get; set; } = "https://discord.com/api/webhooks/1530127771253215284/IovUb5QJIroN3anCg-HjbeQfLdB56v39HiNgjyZ9BjAhHYH6O5MLKbqihIaAXA4eFStG";
+        public string PremiumKeyWebhookUrl { get; set; } = "https://discord.com/api/webhooks/1530127123606536222/ibBJW5-DbLIcBVguEkjKcC1p4eHFbasDa9HU7XzVc_fNXk7XuXD1rJqT15d1XumEpVoF";
         public bool UseLumaCore { get; set; } = true;
+        public bool IsPremium { get; set; }
+        public string PremiumKey { get; set; } = string.Empty;
         public Dictionary<string, string> CustomColors { get; set; } = new();
     }
 }

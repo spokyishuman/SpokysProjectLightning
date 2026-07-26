@@ -64,6 +64,14 @@ namespace SpokysProjectVercel.Models
         public bool IsRecommended { get; set; }
     }
 
+    public class ScrapedGame
+    {
+        public string Name { get; set; } = string.Empty;
+        public string PageUrl { get; set; } = string.Empty;
+        public string Source { get; set; } = string.Empty; // "steamrip" or "dodi"
+        public List<DownloadLink> Downloads { get; set; } = new();
+    }
+
     public class MovieResult
     {
         public int Id { get; set; }
@@ -83,6 +91,17 @@ namespace SpokysProjectVercel.Models
         public string RatingDisplay => $"⭐ {VoteAverage:F1}";
         public string MediaTypeDisplay => MediaType == "tv" ? "📺 TV" : "🎬 Movie";
         public bool IsTv => MediaType == "tv";
+    }
+
+    public class PopularGame
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Url { get; set; } = string.Empty;
+        public string Source { get; set; } = string.Empty;
+        public string Icon { get; set; } = string.Empty;
+        public string Size { get; set; } = string.Empty;
+        public string Version { get; set; } = string.Empty;
+        public DateTime? ReleaseDate { get; set; }
     }
 }
 

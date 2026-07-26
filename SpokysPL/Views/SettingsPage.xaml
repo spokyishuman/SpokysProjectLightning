@@ -323,6 +323,71 @@
                 </StackPanel>
             </Border>
 
+            <!-- Premium -->
+            <Border Style="{DynamicResource ModernCard}" Margin="0,0,0,16">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                        <TextBlock Text="👑" FontSize="18" Margin="0,0,8,0"/>
+                        <TextBlock Text="Premium" FontSize="17" FontWeight="Bold"
+                                   Foreground="{DynamicResource CardForegroundBrush}"/>
+                        <Border x:Name="PremiumBadge" CornerRadius="4" Padding="8,2"
+                                Background="#FFD700" Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="PremiumBadgeText" Text="FREE" FontSize="9"
+                                       FontWeight="Bold" Foreground="#000"/>
+                        </Border>
+                    </StackPanel>
+                    <TextBlock FontSize="13" Foreground="{DynamicResource MutedForegroundBrush}" TextWrapping="Wrap"
+                               Text="Go premium to remove ads from the Movies tab and support development."
+                               Margin="0,0,0,14"/>
+
+                    <!-- Premium active state -->
+                    <StackPanel x:Name="PremiumActivePanel" Visibility="Collapsed">
+                        <TextBlock FontSize="13" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"
+                                   Text="✅ Ads are hidden. Thank you for supporting the project!"/>
+                        <Button Content="✕ Deactivate Premium" Style="{DynamicResource SecondaryButton}"
+                                Padding="14,8" Click="DeactivatePremium_Click"/>
+                    </StackPanel>
+
+                    <!-- Premium inactive state -->
+                    <StackPanel x:Name="PremiumInactivePanel">
+                        <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="Enter your license key to activate:" Margin="0,0,0,8"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" CornerRadius="4" BorderBrush="{DynamicResource CardBorderBrush}"
+                                    BorderThickness="1" Background="{DynamicResource SurfaceBrush}"
+                                    Margin="0,0,8,0" Padding="8,6">
+                                <TextBox x:Name="PremiumKeyBox"
+                                         FontSize="13" FontFamily="Consolas"
+                                         Background="Transparent" BorderThickness="0"
+                                         Foreground="{DynamicResource TextPrimaryBrush}"
+                                         KeyDown="PremiumKeyBox_KeyDown"/>
+                            </Border>
+                            <Button Grid.Column="1" Content="Activate" Style="{DynamicResource AccentButton}"
+                                    Padding="14,8" Click="ActivatePremium_Click"/>
+                        </Grid>
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Or import a .spvl license file:"
+                                       FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                            <Button Grid.Column="1" Content="📂 Import License"
+                                    Style="{DynamicResource SecondaryButton}"
+                                    Padding="12,6" FontSize="11"
+                                    Click="ImportLicense_Click"/>
+                        </Grid>
+                        <TextBlock x:Name="PremiumStatus" Text="" FontSize="12"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <TextBlock x:Name="VersionLabel" Text="Project Vercel"
                        FontSize="11" Foreground="{DynamicResource MutedForegroundBrush}"
                        HorizontalAlignment="Center" Margin="0,8,0,0"/>

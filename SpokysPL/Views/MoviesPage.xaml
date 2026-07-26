@@ -102,6 +102,53 @@
                         <Button Content="✕" FontSize="14" Width="28" Height="28"
                                 Style="{DynamicResource WindowCloseButton}" Click="ClosePlayer_Click"/>
                     </Border>
+
+                    <!-- Watermark -->
+                    <TextBlock Text="Spoky's Project Vercel"
+                               Foreground="#20FFFFFF" FontSize="12" FontWeight="SemiBold"
+                               HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                               Margin="0,0,10,6" Panel.ZIndex="15"
+                               IsHitTestVisible="False"/>
+
+                    <!-- Overlay ad — sits on top of the paused movie -->
+                    <Grid x:Name="AdOverlay" Visibility="Collapsed" Panel.ZIndex="50"
+                          Background="#BB000000">
+                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="460" Height="360">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0" Background="{DynamicResource CardBrush}" CornerRadius="12,12,0,0"
+                                    Padding="14,10">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="📺" FontSize="14" Margin="0,0,8,0"/>
+                                    <TextBlock x:Name="AdTitle" Text="Advertisement"
+                                               FontSize="13" FontWeight="Bold"
+                                               Foreground="{DynamicResource CardForegroundBrush}"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                            <wv2:WebView2 Grid.Row="1" x:Name="AdWebView"/>
+                            <Border Grid.Row="2" Height="3" Background="{DynamicResource SurfaceBrush}">
+                                <Border x:Name="AdTimerFill" Background="{DynamicResource PrimaryBrush}"
+                                        Width="0" HorizontalAlignment="Left"/>
+                            </Border>
+                            <Border Grid.Row="3" Background="{DynamicResource CardBrush}" CornerRadius="0,0,12,12"
+                                    Padding="14,8">
+                                <StackPanel>
+                                    <TextBlock x:Name="AdTimerText" Text="Ad ends in 15s..."
+                                               FontSize="10" Foreground="{DynamicResource MutedForegroundBrush}"
+                                               HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                    <Button x:Name="AdCloseBtn" Content="Continue →"
+                                            Style="{DynamicResource AccentButton}" Padding="14,5"
+                                            FontSize="11" HorizontalAlignment="Center"
+                                            Click="AdCloseBtn_Click" IsEnabled="False"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Border>
             
@@ -110,39 +157,50 @@
                     Margin="0,8,0,0" Padding="12,8"
                     BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <TextBlock Grid.Column="0" x:Name="PlayerTitle" 
-                               FontSize="14" FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextPrimaryBrush}"
-                               VerticalAlignment="Center" Margin="8,0"
-                               TextTrimming="CharacterEllipsis"/>
-                    
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button Content="🔄 Sources" 
-                                Click="TryNextSource_Click"
-                                Style="{DynamicResource SecondaryButton}"
-                                Padding="10,6" FontSize="11"
-                                Margin="0,0,6,0"/>
-                        <Button Content="📺 S/E"
-                                Click="ShowEpisodeSelector_Click"
-                                Style="{DynamicResource SecondaryButton}"
-                                Padding="10,6" FontSize="11"
-                                Margin="0,0,6,0"
-                                x:Name="EpisodeBtn"
-                                Visibility="Collapsed"/>
-                    </StackPanel>
-                    
-                    <Button Grid.Column="4" x:Name="FullscreenBtn" Content="⛶ Fullscreen" 
-                            Click="ToggleFullscreen_Click"
-                            Style="{DynamicResource AccentButton}"
-                            Padding="12,6" FontSize="11"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" x:Name="PlayerTitle" 
+                                   FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                   VerticalAlignment="Center" Margin="8,0"
+                                   TextTrimming="CharacterEllipsis"/>
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button x:Name="SourcesToggleBtn" Content="📋 Sources"
+                                    Click="SourcesToggleBtn_Click"
+                                    Style="{DynamicResource SecondaryButton}"
+                                    Padding="10,6" FontSize="11"
+                                    Margin="0,0,6,0"/>
+                            <Button Content="📺 S/E"
+                                    Click="ShowEpisodeSelector_Click"
+                                    Style="{DynamicResource SecondaryButton}"
+                                    Padding="10,6" FontSize="11"
+                                    Margin="0,0,6,0"
+                                    x:Name="EpisodeBtn"
+                                    Visibility="Collapsed"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Collapsible sources list -->
+                    <Border x:Name="SourcesPanel" Grid.Row="1"
+                            Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="6" Margin="0,6,0,0"
+                            Padding="6" MaxHeight="160"
+                            Visibility="Collapsed"
+                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl x:Name="SourcesList"/>
+                        </ScrollViewer>
+                    </Border>
                 </Grid>
             </Border>
         </Grid>
@@ -287,6 +345,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </StackPanel>
+
     </Grid>
 </UserControl>
 

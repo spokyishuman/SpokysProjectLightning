@@ -30,9 +30,15 @@ namespace SpokysProjectVercel.Views
         private DispatcherTimer? _positionTimer;
         private DispatcherTimer? _searchTimer;
 
+        private const string AdWatchUrl = "https://projectdeathseal-bot.onrender.com/ad/watch";
+        private DispatcherTimer? _adTimer;
+        private DispatcherTimer? _adCountdown;
+        private int _adSecondsLeft;
+
         private static readonly HashSet<string> BlockedDomains = new(StringComparer.OrdinalIgnoreCase)
         {
-            "doubleclick.net", "googlesyndication.com", "googleadservices.com",
+            "doubleclick.net", "googlesyndication.com",
+            "googleadservices.com",
             "googleads.g.doubleclick.net", "adservice.google.com", "pagead2.googlesyndication.com",
             "adnxs.com", "adsrvr.org", "criteo.com", "criteo.net",
             "outbrain.com", "taboola.com", "scorecardresearch.com", "quantserve.com",
@@ -60,6 +66,7 @@ namespace SpokysProjectVercel.Views
             IsVisibleChanged += OnIsVisibleChanged;
             PreviewKeyDown += Page_KeyDown;
             UpdateSearchPlaceholder();
+            StartAdTimer();
         }
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -86,6 +93,8 @@ namespace SpokysProjectVercel.Views
                 await LoadRecommended();
                 // Pre-warm the WebView2 player so the first click plays instantly (no buffering spin)
                 _ = EnsurePlayerInitializedAsync();
+                // Start the ad timer — first ad after 60 min
+                _adTimer?.Start();
             }
         }
 
@@ -349,7 +358,6 @@ namespace SpokysProjectVercel.Views
                 PlayerOverlay.Visibility = Visibility.Visible;
                 PlayerOverlay.Focus();
 
-                FullscreenBtn.Content = "⛶ Fullscreen";
                 await InitializeAndNavigate(movie);
             }
         }
@@ -361,6 +369,10 @@ namespace SpokysProjectVercel.Views
 
             _isFullscreen = true;
             _fullscreenWindow = mainWindow;
+
+            // Hide controls bar in fullscreen — only the video should show
+            PlayerControlsBorder.Visibility = Visibility.Collapsed;
+            SourcesPanel.Visibility = Visibility.Collapsed;
 
             // Hide page content behind the fullscreen layer
             HeaderSection.Visibility = Visibility.Collapsed;
@@ -379,6 +391,8 @@ namespace SpokysProjectVercel.Views
         {
             if (!_isFullscreen) return;
             _isFullscreen = false;
+
+            PlayerControlsBorder.Visibility = Visibility.Visible;
 
             HeaderSection.Visibility = Visibility.Visible;
             RecommendedSection.Visibility = Visibility.Visible;
@@ -464,6 +478,17 @@ namespace SpokysProjectVercel.Views
                         "Object.defineProperty(document,'visibilityState',{get:function(){return 'visible'}});" +
                         "window.focus=function(){};window.blur=function(){};"
                     );
+
+                    MoviePlayer.CoreWebView2.ContainsFullScreenElementChanged += (_, _) =>
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            if (MoviePlayer.CoreWebView2.ContainsFullScreenElement)
+                                EnterFullscreen();
+                            else if (_isFullscreen)
+                                ExitFullscreen();
+                        });
+                    };
                 }
             }
             catch (Exception ex)
@@ -601,6 +626,13 @@ namespace SpokysProjectVercel.Views
             if (!IsVisible)
             {
                 PausePlayback();
+                _adTimer?.Stop();
+                _adCountdown?.Stop();
+            }
+            else
+            {
+                if (_hasLoaded && AdOverlay.Visibility != Visibility.Visible)
+                    _adTimer?.Start();
             }
         }
 
@@ -630,13 +662,42 @@ namespace SpokysProjectVercel.Views
             catch { }
         }
 
-        private async void TryNextSource_Click(object sender, RoutedEventArgs e)
+        private async void SourcesToggleBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentPlaying == null || _currentUrls.Count == 0) return;
-            await SaveCurrentPosition();
-            _currentSourceIndex++;
-            if (_currentSourceIndex >= _currentUrls.Count) _currentSourceIndex = 0;
-            NavigateToSource();
+            if (_currentUrls.Count == 0) return;
+
+            if (SourcesPanel.Visibility == Visibility.Visible)
+            {
+                SourcesPanel.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            SourcesList.Items.Clear();
+            for (int i = 0; i < _currentUrls.Count; i++)
+            {
+                var idx = i;
+                var btn = new Button
+                {
+                    Content = $"Source {idx + 1}: {_currentUrls[idx]}",
+                    Style = (Style)FindResource("SecondaryButton"),
+                    HorizontalContentAlignment = HorizontalAlignment.Left,
+                    Padding = new Thickness(8, 4, 8, 4),
+                    Margin = new Thickness(0, 1, 0, 1),
+                    FontSize = 11,
+                    ToolTip = _currentUrls[idx]
+                };
+                if (idx == _currentSourceIndex)
+                    btn.FontWeight = FontWeights.Bold;
+                btn.Click += async (_, _) =>
+                {
+                    await SaveCurrentPosition();
+                    _currentSourceIndex = idx;
+                    NavigateToSource();
+                    SourcesPanel.Visibility = Visibility.Collapsed;
+                };
+                SourcesList.Items.Add(btn);
+            }
+            SourcesPanel.Visibility = Visibility.Visible;
         }
 
         private async void ShowEpisodeSelector_Click(object sender, RoutedEventArgs e)
@@ -708,6 +769,94 @@ namespace SpokysProjectVercel.Views
             StopPositionTimer();
             PlayerOverlay.Visibility = Visibility.Collapsed;
             try { if (MoviePlayer.CoreWebView2 != null) MoviePlayer.CoreWebView2.NavigateToString("<html><body style='background:#000'></body></html>"); } catch { }
+        }
+
+        // ── Ad system ──
+
+        private void StartAdTimer()
+        {
+            _adTimer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(60) };
+            _adTimer.Tick += (s, e) =>
+            {
+                _adTimer?.Stop();
+                Dispatcher.BeginInvoke(() => ShowAdPopup());
+            };
+        }
+
+        private void ResetAdTimer()
+        {
+            _adTimer?.Stop();
+            _adTimer?.Start();
+        }
+
+        private async void ShowAdPopup()
+        {
+            if (AdOverlay.Visibility == Visibility.Visible) return;
+            if (PremiumService.IsPremium) return;
+            // Only show ad overlay if a movie is actually playing
+            if (_currentPlaying == null || PlayerOverlay.Visibility != Visibility.Visible)
+            {
+                ResetAdTimer();
+                return;
+            }
+
+            PausePlayback();
+            AdOverlay.Visibility = Visibility.Visible;
+            AdCloseBtn.IsEnabled = false;
+            AdTimerFill.Width = 0;
+            _adSecondsLeft = 15;
+            AdTimerText.Text = $"Ad ends in {_adSecondsLeft}s...";
+
+            // Load the bot's ad page (AdSense + countdown timer) in the ad WebView2
+            try
+            {
+                if (AdWebView.CoreWebView2 == null)
+                {
+                    var env = await CoreWebView2Environment.CreateAsync(null,
+                        System.IO.Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                            "SpokysProjectVercel", "WebView2", "AdView"));
+                    await AdWebView.EnsureCoreWebView2Async(env);
+                    AdWebView.CoreWebView2!.Settings.UserAgent =
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
+                    AdWebView.CoreWebView2!.NewWindowRequested += (s, a) => a.Handled = true;
+                }
+                AdWebView.CoreWebView2?.Navigate(AdWatchUrl);
+            }
+            catch
+            {
+                // If the bot URL fails, WebView2 just shows a blank/error page — fine
+            }
+
+            // Start the local 15s countdown
+            _adCountdown?.Stop();
+            _adCountdown = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _adCountdown.Tick += AdCountdown_Tick;
+            _adCountdown.Start();
+        }
+
+        private void AdCountdown_Tick(object? sender, EventArgs e)
+        {
+            _adSecondsLeft--;
+            if (_adSecondsLeft <= 0)
+            {
+                _adCountdown?.Stop();
+                AdTimerText.Text = "Ad complete!";
+                AdTimerFill.Width = AdTimerFill.Parent is FrameworkElement p ? p.ActualWidth : 100;
+                AdCloseBtn.IsEnabled = true;
+                return;
+            }
+            AdTimerText.Text = $"Ad ends in {_adSecondsLeft}s...";
+            if (AdTimerFill.Parent is FrameworkElement parent && parent.ActualWidth > 0)
+                AdTimerFill.Width = (15 - _adSecondsLeft) / 15.0 * parent.ActualWidth;
+        }
+
+        private void AdCloseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            _adCountdown?.Stop();
+            AdOverlay.Visibility = Visibility.Collapsed;
+            try { AdWebView.CoreWebView2?.NavigateToString("<html><body style='background:#000'></body></html>"); } catch { }
+            ResetAdTimer();
         }
     }
 }
