@@ -1,0 +1,7 @@
+;!@Install@!UTF-8!
+Title="Spoky's Project Vercel v1.1.0"
+BeginPrompt="Install Spoky's Project Vercel v1.1.0?"
+RunProgram="powershell -ExecutionPolicy Bypass -File install.ps1"
+AutoInstall="powershell -ExecutionPolicy Bypass -File install.ps1 -Silent"
+GUIMode="2"
+;!@InstallEnd@!
