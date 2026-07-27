@@ -20,7 +20,7 @@ Name: english; MessagesFile: compiler:Default.isl
 Name: desktopicon; Description: Create a &desktop shortcut; GroupDescription: Additional shortcuts:
 
 [Files]
-Source: "D:\Spoky's Project Lightning\Publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\Spoky's Project Lightning\SpokysPL\bin\Release\net8.0-windows\win-x64\publish\SpokysProjectVercel.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Spoky's Project Vercel"; Filename: "{app}\SpokysProjectVercel.exe"; WorkingDir: "{app}"
